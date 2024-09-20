@@ -9,9 +9,13 @@
 #include "include/dateTime.h"
 #include "include/colors.h"
 #include "include/utils.h"
-
+#include "include/testingArea.h"
 char* dateTimeAux;
 int zoomAux, regAux;
+
+void testingArea(){
+    initTestingArea();
+}
 
 void help (void) {
     for(int i=0; strcasecmp(helpText[i], "end")!=0; i++){

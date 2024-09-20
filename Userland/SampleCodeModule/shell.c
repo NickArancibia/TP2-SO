@@ -25,6 +25,7 @@ int init(){
         else if(strcasecmp(commandPrompt, modes[DIVBYZERO_MODE]) == SELECTED_MODE) divByZero();
         else if(strcasecmp(commandPrompt, modes[INVALIDOPCODE_MODE]) == SELECTED_MODE) invalidOp();
         else if(strcasecmp(commandPrompt, modes[REGISTERS_MODE]) == SELECTED_MODE) registers();
+        else if(strcasecmp(commandPrompt, modes[TESTING_AREA]) == SELECTED_MODE) testingArea();
         else notFound(commandPrompt);
     }
 }

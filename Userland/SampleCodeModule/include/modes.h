@@ -13,5 +13,5 @@ void registers(void);
 void eliminator(void);
 void notFound(char* commandNotFound);
 void playEasterEgg();
-
+void testingArea();
 #endif

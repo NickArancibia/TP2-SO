@@ -30,6 +30,8 @@ GLOBAL sysPrintCursor
 GLOBAL sysHideCursor
 GLOBAL sysShowCursor
 GLOBAL sysSetCursorPosition
+GLOBAL sysMalloc
+GLOBAL sysFree
 
 GLOBAL sysCtrlPressed
 
@@ -175,5 +177,17 @@ sysCtrlPressed:
 
 sysClearKbEntry:
     mov rax, 27
+    int 80h
+    ret
+
+
+sysMalloc:
+    mov rax, 28
+    int 80h
+    ret
+
+
+sysFree:
+    mov rax, 29
     int 80h
     ret
