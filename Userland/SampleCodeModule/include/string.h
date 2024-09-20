@@ -1,6 +1,6 @@
 #ifndef __STRING_H_
 #define __STRING_H_
-
+#include <stdint.h>
 #define LOWERCASEDIFF 32
 
 /**
@@ -31,5 +31,15 @@ int strcasecmp(const char * str1, const char * str2);
  * Returns a pointer to dest.
 */
 char * strcpy(char *dest, const char *src);
+
+
+
+
+
+
+ void * memset(void * destination, int32_t character, uint64_t length);
+ void * memcpy(void * destination, const void * source, uint64_t length);
+
+
 
 #endif

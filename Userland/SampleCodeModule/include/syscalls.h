@@ -37,5 +37,7 @@ int sysPrintRegs(void);
 int sysPrintCursor();
 int sysHideCursor();
 int sysShowCursor();
+void * sysMalloc();
+int sysFree(void * ptrBlock);
 
 #endif
