@@ -1,4 +1,5 @@
 #include <memoryManager.h>
+#include "./include/defs.h"
 
 #define BLOCK_COUNT 250
 
@@ -24,13 +25,13 @@ void *mallocMM(){
             return free_ptrs[current -1];*/
             return free_ptrs[current++];
     }
-    return;
+    return NULL;
     
 }
 
 int freeMM(void * memorySegment){
     free_ptrs[--current] = memorySegment;        
-    
+    return 0;
 }
 
 
