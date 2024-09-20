@@ -8,7 +8,7 @@
 #include <defs.h>
 #include "interrupts.h"
 #include "time.h"
-
+#include "./include/memoryManager.h"
 
 void load_idt(void);
 
@@ -27,6 +27,8 @@ static const uint64_t PageSize = 0x1000;
 
 static void * const sampleCodeModuleAddress = (void*)0x400000;
 static void * const sampleDataModuleAddress = (void*)0x500000;
+static void * const memoryStart = (void*)0xF00000;
+const int memorySize = 250*100;
 
 typedef int (*EntryPoint)();
 
@@ -57,6 +59,7 @@ void * initializeKernelBinary()
 int main() {
 	load_idt();
 	//initializeTimer();	
+	initializeMemoryMM(memoryStart, memorySize);
 	initializeVideoDriver();
 	initFontManager();
 	
