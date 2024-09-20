@@ -14,7 +14,7 @@ static const char* commands[] = {
 };
 
 static char* helpTextTestingArea[] = { "Tests command information is displayed below\n",
-"Disclaimer: each test loops forever so in order to come back you have to reset the terminal\n\n",
+"Disclaimer: each test loops forever, you can finish it pressing 'q'\n\n",
 "HELP                ->      Shows a description on each available command.\n",
 "TestMM              ->      Test memory manager.\n",
 "q                   ->      Return to shell.\n",

@@ -17,7 +17,7 @@ void initTestingArea(){
         scanf(commandPrompt, 32);
         if(strcasecmp(commandPrompt, commands[HELP]) == SELECTED_MODE) helpCommands();
         else if(strcasecmp(commandPrompt, commands[TEST_MM]) == SELECTED_MODE) testMM();
-        else if(strcasecmp(commandPrompt, commands[EXIT]) == SELECTED_MODE) init();
+        else if(strcasecmp(commandPrompt, commands[EXIT]) == SELECTED_MODE) quit();
         else commandNotFound(commandPrompt);
     }
 }
