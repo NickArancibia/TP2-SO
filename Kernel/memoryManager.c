@@ -36,11 +36,11 @@ void *mallocMM(int size){
     }
     if(curr->size == size){
         curr->isFree = 0;
-        return (void *) (curr + sizeof(memHeader));
+        return ((void *) (((void*)curr) + sizeof(memHeader)));
     }
     if(curr->size > size){
         splitBlock(curr, size);
-        return (void *) (curr + sizeof(memHeader));
+        return ((void *) (((void*)curr) + sizeof(memHeader)));
     }
     return NULL;
 }
