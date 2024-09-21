@@ -3,7 +3,7 @@
 
 void initializeMemoryMM(void * memoryStart, int memorySize);
 
-void *mallocMM();
+void * mallocMM(int size);
 
 int freeMM(void * memorySegment);
 

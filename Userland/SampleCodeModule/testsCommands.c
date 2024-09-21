@@ -12,7 +12,8 @@ void helpCommands (void) {
 }
 
 void testMM(void){
-    test_mm(1,"2500"); 
+    char * argv[]={"25000", 0};
+    test_mm(1, argv); 
 }
 
 void quit(void){

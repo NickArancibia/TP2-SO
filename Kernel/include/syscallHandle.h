@@ -42,9 +42,7 @@ int cleanKbBuffer(void);
 
 int isctrlPressed(void);
 
-
-
-void *malloc();
+void *malloc(int size);
 
 int free(void * memorySegment);
 

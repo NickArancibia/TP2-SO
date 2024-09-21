@@ -6,6 +6,7 @@
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
+#define NULL 0
 
 
 typedef unsigned int size_t;

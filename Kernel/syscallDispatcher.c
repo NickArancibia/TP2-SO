@@ -124,7 +124,9 @@ int sound(uint64_t ms, uint64_t freq){
     return 0;
 }
 
-// rdi = seconds, rsi = ms
+/**
+ * rdi = seconds, rsi = ms
+ */
 int msSleep(uint64_t secs, uint64_t ticks){
     if(secs < 0 || ticks < 0)
         return -1;
@@ -182,8 +184,8 @@ int cleanKbBuffer(){
     return 0;
 }
 
-void *malloc(){
-    return mallocMM();
+void *malloc(int size){
+    return mallocMM(size);
 }
 
 int free(void * memorySegment){
