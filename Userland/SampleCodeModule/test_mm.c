@@ -7,7 +7,7 @@
 #include "./include/syscalls.h"
 
 
-#define MAX_BLOCKS 250
+#define MAX_BLOCKS 10
 
 typedef struct MM_rq {
   void *address;
@@ -45,7 +45,7 @@ uint64_t test_mm(uint64_t argc, char *argv[]) {
 
     // Request as many blocks as we can
     while (rq < MAX_BLOCKS && total < max_memory) {
-      mm_rqs[rq].size = 100;   //GetUniform(max_memory - total - 1) + 1;
+      mm_rqs[rq].size = 100; //GetUniform(max_memory - total - 1) + 1;
       mm_rqs[rq].address = malloc(mm_rqs[rq].size);
       if (checkExit())
         return 0;
@@ -83,9 +83,10 @@ uint64_t test_mm(uint64_t argc, char *argv[]) {
         free(mm_rqs[i].address);
     }
     
-      if(iteration){
-        print("\b\b\b");
-      }
+    if(iteration){
+      print("\b\b\b");
+    }
+    printColor("OK!", GREEN);
     iteration =1;
   }
 }
