@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "include/modes.h"
 #include "include/shell.h"
 #include "include/eliminatorGame.h"
@@ -94,10 +96,10 @@ void playEasterEgg(){
 	
 	sysBeepSound(220, DO_SOST);
 	sysBeepSound(220, DO);
-	sysBeepSound(220, SOL_SOST);
-	sysBeepSound(220, FA);
-	sysBeepSound(220, SOL_SOST);
-	sysBeepSound(220, FA);
+    for(int i=0; i<2; i++){
+        sysBeepSound(220, SOL_SOST);
+        sysBeepSound(220, FA);
+    }
 
 	sysBeepSound(220, DO);
 	sysBeepSound(220, DO_SOST);

@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "include/time.h"
 #include <stdint.h>
 #include <defs.h>
@@ -17,7 +19,7 @@ static int handlersSize = sizeof(irqHandlers)/sizeof(irqHandlers[0]);
 
 
 void irqDispatcher(uint64_t irq) {
-	if(irq >=0 && irq < handlersSize && irqHandlers[irq]!=NULL)
+	if(irq < handlersSize && irqHandlers[irq]!=NULL)
 		irqHandlers[irq]();
 	return;
 }

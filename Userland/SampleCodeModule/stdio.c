@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "include/stdio.h"
 #include "include/syscalls.h"
 #include "include/colors.h"
@@ -131,7 +133,7 @@ int scanf(char * buffer, int size){
             else if(read=='\b' && readSize!=0){
                 if(readSize>=printedSize)
                     readSize--;
-                    buffer[readSize]=0;
+                buffer[readSize]=0;
                 putchar(read);  // Backspace
                 printedSize--;
             }

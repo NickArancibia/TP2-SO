@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdint.h>
 #include <defs.h>
 #include <videoDriver.h>
@@ -22,7 +24,7 @@ static int (*syscallHandlers[])()={
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax){         
     // int handlerSize = sizeof(syscallHandlers)/sizeof(syscallHandlers[0]);
 
-    if(rax < 0 || rax > HANDLER_SIZE)
+    if(rax >= HANDLER_SIZE)
         return -1;
 
     return syscallHandlers[rax](rdi,rsi,rdx,r10,r8);
@@ -35,10 +37,10 @@ int read(uint64_t fd, char * buf, uint64_t count) {
     uint64_t sizeRead=0;
     unsigned char lastRead='\0';
     while(sizeRead!=count && !kbisBufferEmpty()){
-            lastRead = kbreadBuf();
-            buf[sizeRead++] = lastRead;
+        lastRead = kbreadBuf();
+        buf[sizeRead++] = lastRead;
     }
-    return sizeRead == count? count : sizeRead;    // If we return sizeRead-1 it means we stopped at '\n'
+    return sizeRead;    // If we return sizeRead-1 it means we stopped at '\n'
 }
 
 int write(uint64_t fd, char * buf, uint64_t count, uint64_t hexColor){
@@ -128,8 +130,6 @@ int sound(uint64_t ms, uint64_t freq){
  * rdi = seconds, rsi = ms
  */
 int msSleep(uint64_t secs, uint64_t ticks){
-    if(secs < 0 || ticks < 0)
-        return -1;
     int secondsToTicks = secs*18, msToTicks=ticks;
     int totalTicks = secondsToTicks + msToTicks;
     sleep(totalTicks);

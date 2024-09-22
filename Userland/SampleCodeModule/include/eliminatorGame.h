@@ -18,6 +18,9 @@
 #define WIDTH                   128
 #define HEIGHT                  96
 
+#define SNAKEHEADX (WIDTH/2)
+#define SNAKEHEADY (HEIGHT/2 - HEIGHT/4)
+
 #define ELIMINATOR_FONT_LEVEL   4
 #define PIXELS_WIDTH            1024
 #define PIXELS_HEIGHT           768

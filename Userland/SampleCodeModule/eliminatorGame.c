@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "include/eliminatorGame.h"
 #include "include/eliminatorGameUtils.h"
 #include "include/colors.h"
@@ -53,7 +55,7 @@ void eliminatorGame () {
 }
 
 void playAlone(void) {
-    unsigned char finishKey;
+    unsigned char finishKey=0;
     unsigned char lastKeyPressed = UP;
     unsigned char keyPressed = lastKeyPressed;
     unsigned char aux;
@@ -63,8 +65,8 @@ void playAlone(void) {
         printWall();
         lastDirectionP1 = UP;
         
-        snakeHeadP1.x = WIDTH/2;
-        snakeHeadP1.y = HEIGHT/2 - HEIGHT/4;
+        snakeHeadP1.x = SNAKEHEADX;
+        snakeHeadP1.y = SNAKEHEADY;
 
         while (didP1Crashed != CRASHED) {
 
@@ -113,9 +115,9 @@ void playAlone(void) {
 }
 
 void playTwoPlayers(int player2) {
-    unsigned char finishKey;
-    unsigned char keyPressed;
-    unsigned char lastKeyPressed, aux;
+    unsigned char finishKey=0;
+    unsigned char keyPressed=0;
+    unsigned char lastKeyPressed=keyPressed, aux;
     while (finishKey != ESC) {
 
         cleanBoard();
@@ -124,10 +126,10 @@ void playTwoPlayers(int player2) {
         lastDirectionP1 = UP;
         lastDirectionP2 = DOWN;
         
-        snakeHeadP1.x = WIDTH/2;
-        snakeHeadP1.y = HEIGHT/2 - HEIGHT/4;
+        snakeHeadP1.x = SNAKEHEADX;
+        snakeHeadP1.y = SNAKEHEADY;
         
-        snakeHeadP2.x = WIDTH/2;
+        snakeHeadP2.x = SNAKEHEADX;
         snakeHeadP2.y = HEIGHT/2 + HEIGHT/4;
         
         while (didP1Crashed != CRASHED && didP2Crashed != CRASHED) {

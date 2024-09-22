@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <memoryManager.h>
 #include "./include/defs.h"
 
@@ -46,25 +48,26 @@ void *mallocMM(int size){
 }
 
 int freeMM(void * memorySegment){
-    if(memorySegment == NULL)
-        return 0;
-    memHeader * curr = (memHeader *) (memorySegment - sizeof(memHeader));
-    curr->isFree=1;
-    if(curr->prev != NULL && curr->prev->isFree){
-        curr->prev->size += (curr->size + sizeof(memHeader));
-        curr->prev->next = curr->next;
-        if(curr->next != NULL){
-            curr->next->prev = curr->prev;
+    if(memorySegment != NULL){
+        memHeader * curr = (memHeader *) (memorySegment - sizeof(memHeader));
+        curr->isFree=1;
+        if(curr->prev != NULL && curr->prev->isFree){
+            curr->prev->size += (curr->size + sizeof(memHeader));
+            curr->prev->next = curr->next;
+            if(curr->next != NULL){
+                curr->next->prev = curr->prev;
+            }
+            curr = curr->prev;
         }
-        curr = curr->prev;
-    }
-    if(curr->next != NULL && curr->next->isFree){
-        curr->size += (curr->next->size + sizeof(memHeader));
-        curr->next = curr->next->next;
-        if(curr->next != NULL){
-            curr->next->prev = curr;
+        if(curr->next != NULL && curr->next->isFree){
+            curr->size += (curr->next->size + sizeof(memHeader));
+            curr->next = curr->next->next;
+            if(curr->next != NULL){
+                curr->next->prev = curr;
+            }
         }
     }
+    return 0;
 }
 
 void splitBlock(memHeader * block, int size){
