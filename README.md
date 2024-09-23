@@ -20,7 +20,7 @@ Ejecute el comando  ```sudo apt install qemu‐system‐x86 qemu‐utils```
 Ejecute el comando ```sudo apt install docker.io```
 
 - **Descarga de la imagen** 
-Ejecute el comando ```docker pull agodio/itba‐so:1.0```
+Ejecute el comando ```docker pull agodio/itba‐so:3.0```
 
 ### Instalación de XLaunch
 Descarguelo desde el siguiente link:  https://sourceforge.net/projects/vcxsrv/
