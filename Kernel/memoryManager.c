@@ -3,7 +3,7 @@
 #include <memoryManager.h>
 #include "./include/defs.h"
 
-#define BLOCK_COUNT 250
+#define BLOCK_COUNT 100
 
 typedef struct memHeader{
     int size;
