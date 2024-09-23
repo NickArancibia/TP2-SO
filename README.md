@@ -34,6 +34,7 @@ Teniendo Docker correctamente instalado, debe ejecutar el archivo compile.sh. Pa
 
 ### Con el archivo qcow2 ya generado/descargado
 Una vez que posea el archivo qcow2, debe ejecutar el archivo run.sh. Para esto párese dentro de la carpeta de la Shell (TPE-Arqui) e ingrese el comando ```./run.sh``` . Luego de su ejecución, se abrirá el emulador qemu y verá una pantalla brindándole la bienvenida y proporcionándole ayuda inicial.
+En caso de querer ejecutar el driver de sonido, puede hacerlo mediante el comando ```./run.sh nosound```.
 
 ## Guía de comandos
 
