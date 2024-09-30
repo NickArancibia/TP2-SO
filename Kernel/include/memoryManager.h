@@ -5,6 +5,6 @@ void initializeMemoryMM(void *memoryStart, int memorySize);
 
 void *mallocMM(int size);
 
-int freeMM(void *memorySegment);
+void freeMM(void *memorySegment);
 
 #endif

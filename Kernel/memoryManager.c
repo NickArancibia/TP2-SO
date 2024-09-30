@@ -55,7 +55,7 @@ void *mallocMM(int size)
     return NULL;
 }
 
-int freeMM(void *memorySegment)
+void freeMM(void *memorySegment)
 {
     if (memorySegment != NULL)
     {
@@ -81,7 +81,6 @@ int freeMM(void *memorySegment)
             }
         }
     }
-    return 0;
 }
 
 void splitBlock(memHeader *block, int size)

@@ -44,6 +44,6 @@ int isctrlPressed(void);
 
 void *malloc(int size);
 
-int free(void *memorySegment);
+void free(void *memorySegment);
 
 #endif

@@ -26,7 +26,7 @@ static int scrollUpdateBuffer;
 
 void initializeVideoDriver()
 {
-	framebuffer = (uint8_t *)VBE_mode_info->framebuffer;
+	framebuffer = (uint8_t *)(uintptr_t)VBE_mode_info->framebuffer;
 	widthScreen = VBE_mode_info->width;
 	heightScreen = VBE_mode_info->height;
 	pitch = VBE_mode_info->pitch;
