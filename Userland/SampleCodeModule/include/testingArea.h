@@ -9,19 +9,6 @@
 #define TEST_MM             3
 #define EXIT                4
 
-static const char* commands[] = {
-    "","","help","testMM","q"
-};
-
-static char* helpTextTestingArea[] = { "Tests command information is displayed below\n",
-"Disclaimer: each test loops forever, you can finish it pressing 'q'\n\n",
-"HELP                ->      Shows a description on each available command.\n",
-"TestMM              ->      Test memory manager.\n",
-"q                   ->      Return to shell.\n",
-"end" 
-};
-
-
 void initTestingArea();
 
 

@@ -3,12 +3,12 @@
 
 /**
  * allocates a single block of a fixed size so far and returns a pointer to it
-*/
-void * malloc(int size);
+ */
+void *malloc(int size);
 
 /**
  * deallocate the block pointed by ptrBlock
-*/
-void free(void * ptrBlock);
+ */
+void free(void *ptrBlock);
 
 #endif

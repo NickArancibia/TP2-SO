@@ -10,13 +10,15 @@
  * Otherwise returns a pointer to the allocated
  * memory address.
  */
-void * malloc(int size){
+void *malloc(int size)
+{
     return sysMalloc(size);
 }
 
 /**
  * Deallocate the block pointed by ptrBlock
-*/
-void free(void * ptrBlock){
+ */
+void free(void *ptrBlock)
+{
     sysFree(ptrBlock);
 }

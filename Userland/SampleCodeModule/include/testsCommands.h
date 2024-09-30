@@ -6,7 +6,7 @@
 void testMM(void);
 void helpCommands(void);
 void quit(void);
-void commandNotFound(char* commandNotFound);
+void commandNotFound(char *commandNotFound);
 
 uint64_t test_mm(uint64_t argc, char *argv[]);
 #endif

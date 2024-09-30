@@ -8,23 +8,35 @@
 #include "./include/syscalls.h"
 #include "./include/shell.h"
 
-void helpCommands (void) {
-    for(int i=0; strcasecmp(helpTextTestingArea[i], "end")!=0; i++){
+static char *helpTextTestingArea[] = {"Tests command information is displayed below\n",
+                                      "Disclaimer: each test loops forever, you can finish it pressing 'q'\n\n",
+                                      "HELP                ->      Shows a description on each available command.\n",
+                                      "TestMM              ->      Test memory manager.\n",
+                                      "q                   ->      Return to shell.\n",
+                                      "end"};
+
+void helpCommands(void)
+{
+    for (int i = 0; strcasecmp(helpTextTestingArea[i], "end") != 0; i++)
+    {
         printColor(helpTextTestingArea[i], YELLOW);
     }
 }
 
-void testMM(void){
-    char * argv[]={"25000", 0};
-    test_mm(1, argv); 
+void testMM(void)
+{
+    char *argv[] = {"25000", 0};
+    test_mm(1, argv);
 }
 
-void quit(void){
+void quit(void)
+{
     sysClearScreen();
     init();
 }
 
-void commandNotFound(char* commandNotFound){
-    print(commandNotFound); 
+void commandNotFound(char *commandNotFound)
+{
+    print(commandNotFound);
     print(": command not found.\n");
 }

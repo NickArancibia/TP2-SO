@@ -13,11 +13,11 @@ int leftArrowValue();
 int downArrowValue();
 int rightArrowValue();
 
-int printRect(int x,int y,int base,int height,uint32_t hexColor);
-int printSquare (int x, int y,int side, uint32_t hexColor);
+int printRect(int x, int y, int base, int height, uint32_t hexColor);
+int printSquare(int x, int y, int side, uint32_t hexColor);
 
 int clearScreen();
-int msSleep(uint64_t secs, uint64_t ticks);     // rdi : ms
+int msSleep(uint64_t secs, uint64_t ticks); // rdi : ms
 int printRegs(void);
 
 int sound(uint64_t ms, uint64_t freq);
@@ -35,8 +35,8 @@ int decSize();
 int getZoomLevel();
 int setZoomLevel(int zoomLevel);
 
-int read(uint64_t fd, char * buf, uint64_t count);
-int write(uint64_t fd, char * buf, uint64_t count, uint64_t hexColor);
+int read(uint64_t fd, char *buf, uint64_t count);
+int write(uint64_t fd, char *buf, uint64_t count, uint64_t hexColor);
 
 int cleanKbBuffer(void);
 
@@ -44,6 +44,6 @@ int isctrlPressed(void);
 
 void *malloc(int size);
 
-int free(void * memorySegment);
+int free(void *memorySegment);
 
 #endif

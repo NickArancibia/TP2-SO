@@ -1,4 +1,4 @@
- /*
+/*
  *   interrupts.h
  *
  *  Created on: Apr 18, 2010
@@ -32,7 +32,7 @@ void picMasterMask(uint8_t mask);
 
 void picSlaveMask(uint8_t mask);
 
-//The CPU execution ends.
+// The CPU execution ends.
 void haltcpu(void);
 
 #endif /* INTERRUPS_H_ */

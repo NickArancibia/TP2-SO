@@ -7,27 +7,33 @@
 
 static unsigned long ticks = 0;
 
-void timer_handler() {
-	ticks++;
+void timer_handler()
+{
+    ticks++;
 }
 
-int ms_elapsed() {
-	return ticks;
+int ms_elapsed()
+{
+    return ticks;
 }
 
-int seconds_elapsed() {
-	return ticks / 18;
+int seconds_elapsed()
+{
+    return ticks / 18;
 }
 
-void sleep(int msToSleep){
-	long start = ticks;
-	while((ticks-start)!=msToSleep){
-		_hlt();
-	}
+void sleep(int msToSleep)
+{
+    long start = ticks;
+    while ((ticks - start) != msToSleep)
+    {
+        _hlt();
+    }
 }
 
-void initializeTimer(){
-	uint32_t divisor = 1193180 / 1193;
+void initializeTimer()
+{
+    uint32_t divisor = 1193180 / 1193;
 
     // Set the PIT control word for channel 0
     outb(0x43, 0x36); // 0x36 = 00 11 011 0
@@ -37,6 +43,6 @@ void initializeTimer(){
                       // 0: Binary mode (16-bit binary)
 
     // Send the divisor to channel 0 data register
-    outb(0x40, (uint8_t)(divisor & 0xFF));      // Send the low byte
+    outb(0x40, (uint8_t)(divisor & 0xFF));        // Send the low byte
     outb(0x40, (uint8_t)((divisor >> 8) & 0xFF)); // Send the high byte
 }

@@ -12,71 +12,105 @@
 #include "include/colors.h"
 #include "include/utils.h"
 #include "include/testingArea.h"
-char* dateTimeAux;
+char *dateTimeAux;
 int zoomAux, regAux;
 
-void testingArea(){
+static char *helpText[] = {"Command information is displayed below:\n\n",
+                           "HELP                ->      Shows a description on each available command.\n",
+                           "DIVBYZERO           ->      Shows handling in case of division by zero.\n",
+                           "INVALIDOPCODE       ->      Shows handling in case of an invalid operation code.\n",
+                           "ZOOMIN              ->      Enlarges text size on screen. In case maximum size is reached,\n",
+                           "                            it is properly indicated without making any changes.\n",
+                           "                            Can be alternatively activated with CTRL + i\n",
+                           "ZOOMOUT             ->      Reduces text size on screen. In case minimum size is reached,\n",
+                           "                            it is properly indicated without making any changes.\n",
+                           "                            Can be alternatively activated with CTRL + o\n",
+                           "TIME                ->      Shows current time in HH:MM:SS format.\n",
+                           "DATE                ->      Shows current date in DD/MM/YY format.\n",
+                           "ELIMINATOR          ->      Opens ELIMINATOR game.\n",
+                           "CLEAR               ->      Clears the screen\n",
+                           "REGISTERS           ->      Prints registers values. To do this, first you need to save\n",
+                           "                            your registers by pressing ALT.\n",
+                           "TESTING             ->      Start testing area\n",
+                           "end"};
+
+void testingArea()
+{
     initTestingArea();
 }
 
-void help (void) {
-    for(int i=0; strcasecmp(helpText[i], "end")!=0; i++){
+void help(void)
+{
+    for (int i = 0; strcasecmp(helpText[i], "end") != 0; i++)
+    {
         printColor(helpText[i], YELLOW);
     }
 }
 
-void eliminator() {
+void eliminator()
+{
     sysHideCursor();
     print("\nLoading eliminator...");
-    sysSleep(2,0);
+    sysSleep(2, 0);
     eliminatorGame();
 }
 
-void clear (void) {
+void clear(void)
+{
     sysClearScreen();
 }
 
-void time(void) {
+void time(void)
+{
     printTime();
 }
 
-void date(void) {
+void date(void)
+{
     printDate();
 }
 
-void zoomin() {
+void zoomin()
+{
     zoomAux = incTextSize();
-    if(zoomAux)
+    if (zoomAux)
         print("Maximum size reached.\n");
 }
 
-void zoomout() {
+void zoomout()
+{
     zoomAux = decTextSize();
-    if(zoomAux)
+    if (zoomAux)
         print("Minimum size reached.\n");
 }
 
-void divByZero() {
+void divByZero()
+{
     divZero();
 }
 
-void invalidOp(){
+void invalidOp()
+{
     invalidOpcode();
 }
 
-void registers()  {
+void registers()
+{
     regAux = sysPrintRegs();
-    if(regAux){
+    if (regAux)
+    {
         print("You need to save registers first by pressing ALT\n");
     }
 }
 
-void notFound(char* commandNotFound){
-    print(commandNotFound); 
+void notFound(char *commandNotFound)
+{
+    print(commandNotFound);
     print(": command not found.\n");
 }
 
-void playEasterEgg(){
+void playEasterEgg()
+{
     printColor("I'm", RED);
     printColor(" an", YELLOW);
     printColor(" eas", GREEN);
@@ -88,33 +122,34 @@ void playEasterEgg(){
     sysPrintCursor();
 
     sysBeepSound(220, DO);
-	sysBeepSound(220, DO_SOST);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
-	
-	sysBeepSound(220, DO_SOST);
-	sysBeepSound(220, DO);
-    for(int i=0; i<2; i++){
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, DO);
+    for (int i = 0; i < 2; i++)
+    {
         sysBeepSound(220, SOL_SOST);
         sysBeepSound(220, FA);
     }
 
-	sysBeepSound(220, DO);
-	sysBeepSound(220, DO_SOST);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
-	sysBeepSound(220, SOL);
-	sysBeepSound(220, MI);
+    sysBeepSound(220, DO);
+    sysBeepSound(220, DO_SOST);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
+    sysBeepSound(220, SOL);
+    sysBeepSound(220, MI);
 
-	sysBeepSound(110, FA);
-	sysBeepSound(165, FA_SOST);
-	sysBeepSound(110, SOL);
-	sysBeepSound(165, SOL_SOST);
-	sysBeepSound(110, LA);
-	sysBeepSound(165, SI);
-	sysBeepSound(110, DO_PRIMA);
+    sysBeepSound(110, FA);
+    sysBeepSound(165, FA_SOST);
+    sysBeepSound(110, SOL);
+    sysBeepSound(165, SOL_SOST);
+    sysBeepSound(110, LA);
+    sysBeepSound(165, SI);
+    sysBeepSound(110, DO_PRIMA);
 
     sysShowCursor();
     sysPrintCursor();
