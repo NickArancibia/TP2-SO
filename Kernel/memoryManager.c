@@ -4,6 +4,18 @@
 #include "./include/defs.h"
 
 #define BLOCK_COUNT 250
+#define ALIGNMENT 8
+
+
+// Rounds up to the nearest multiple of the word size (8 bytes)
+// If size is already a multiple of the word size, the bitwise operation keeps it unchanged
+// Otherwise, it rounds up the size to the next multiple of the word size by adding (ALIGNMENT - 1) 
+// and then clearing the lower bits using a bitwise operation with ~(ALIGNMENT - 1)
+//                    size   + 7 (111b)         & ~(111b)"
+//                                              &   (000b)
+#define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+
+
 
 typedef struct memHeader
 {
@@ -34,6 +46,9 @@ void *mallocMM(int size)
         return NULL;
     }
     memHeader *curr = firstBlock;
+
+    size += ALIGN(sizeof(memHeader)); // Aligns the block header
+    size = ALIGN(size); // Aligs the total size
     while (curr != NULL && !(curr->isFree && curr->size >= size))
     {
         curr = curr->next;
@@ -45,8 +60,8 @@ void *mallocMM(int size)
     if (curr->size == size)
     {
         curr->isFree = 0;
-        return ((void *)(((void *)curr) + sizeof(memHeader)));
-    }
+        return ((void *)(((void *)curr) + sizeof(memHeader))); // In order to here be sure the pointer
+    }                                                          // returned is aligned too
     if (curr->size > size)
     {
         splitBlock(curr, size);
