@@ -17,10 +17,20 @@ typedef struct MM_rq
   uint32_t size;
 } mm_rq;
 
+uint8_t rq;
+mm_rq mm_rqs[MAX_BLOCKS];
+
 int checkExit()
 {
   if (getchar() == 'q')
   {
+    for (int i = 0; i < rq; i++)
+    {
+      if (mm_rqs[i].address != 0){
+        free(mm_rqs[i].address);
+      }
+    }
+    
     printColor("OK!", GREEN);
     print("\n");
     return 1;
@@ -30,8 +40,7 @@ int checkExit()
 
 uint64_t test_mm(uint64_t argc, char *argv[])
 {
-  mm_rq mm_rqs[MAX_BLOCKS];
-  uint8_t rq;
+ 
   uint32_t total;
   uint64_t max_memory;
   // if (argc != 1)
@@ -92,8 +101,10 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     {
       if (checkExit())
         return 0;
-      if (mm_rqs[i].address)
+      if (mm_rqs[i].address){
         free(mm_rqs[i].address);
+        mm_rqs[i].address = 0;
+      }
     }
 
     if (iteration)
