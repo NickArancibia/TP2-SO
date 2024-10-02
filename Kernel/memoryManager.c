@@ -47,8 +47,8 @@ void *mallocMM(int size)
     }
     memHeader *curr = firstBlock;
 
-    size += ALIGN(sizeof(memHeader)); // Aligns the block header
-    size = ALIGN(size); // Aligs the total size
+    
+    size = ALIGN(size); 
     while (curr != NULL && !(curr->isFree && curr->size >= size))
     {
         curr = curr->next;
@@ -60,8 +60,8 @@ void *mallocMM(int size)
     if (curr->size == size)
     {
         curr->isFree = 0;
-        return ((void *)(((void *)curr) + sizeof(memHeader))); // In order to here be sure the pointer
-    }                                                          // returned is aligned too
+        return ((void *)(((void *)curr) + sizeof(memHeader))); 
+    }                                                          
     if (curr->size > size)
     {
         splitBlock(curr, size);
