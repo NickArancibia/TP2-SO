@@ -5,7 +5,7 @@
 #include "include/colors.h"
 #include "include/string.h"
 #include "include/lib.h"
-
+#include <stdarg.h>
 #define MAXBUFLEN 100
 #define MINLEN 2
 #define MAX_INPUTS_STORE 10
@@ -57,36 +57,23 @@ int print(char *str)
     return printColor(str, DEFAULT);
 }
 
-int printf(char *str, int first, int sec, int third)
+int printf(char *str, ...)
 {
     char buffer[MAXBUFLEN], numStr[MAXBUFLEN];
-    ;
     int bufferIndex = 0;
-    int numIndex = 0;
+    va_list args;
+    va_start(args, str);
 
     for (int i = 0; str[i] != '\0'; ++i)
     {
         if (str[i] == '%' && str[i + 1] == 'd')
         {
             i++;
-            if (numIndex == 0)
-            {
-                intToString(first, numStr, MINLEN);
-            }
-            else if (numIndex == 1)
-            {
-                intToString(sec, numStr, MINLEN);
-            }
-            else if (numIndex == 2)
-            {
-                intToString(third, numStr, MINLEN);
-            }
-
+            intToString(va_arg(args, int), numStr, MINLEN);
             for (int j = 0; numStr[j] != '\0'; ++j)
             {
                 buffer[bufferIndex++] = numStr[j];
             }
-            numIndex++;
         }
         else
         {
@@ -94,6 +81,7 @@ int printf(char *str, int first, int sec, int third)
         }
     }
     buffer[bufferIndex] = '\0';
+    va_end(args);
     return print(buffer);
 }
 

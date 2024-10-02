@@ -47,7 +47,7 @@ int print(char *str);
  *
  * Returns length print
  */
-int printf(char *str, int first, int sec, int third);
+int printf(char *str,...);
 
 /**
  * Receives a buffer and size as parameters
