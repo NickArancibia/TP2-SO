@@ -15,7 +15,7 @@ GLOBAL _irq05Handler
 
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
-
+GLOBAL forceSwithContent
 GLOBAL _syscallHandler
 
 GLOBAL getRegs
@@ -24,7 +24,7 @@ EXTERN irqDispatcher
 EXTERN exceptionDispatcher
 EXTERN syscallDispatcher
 EXTERN getStackBase
-
+EXTERN switchContent
 GLOBAL saveRegsInBuffer
 GLOBAL setupStack
 
@@ -84,18 +84,60 @@ SECTION .text
 	pop rax
 %endmacro
 
+
+%macro pushStateNoRAX 0
+	push rbx
+	push rcx
+	push rdx
+	push rbp
+	push rdi
+	push rsi
+	push r8
+	push r9
+	push r10
+	push r11
+	push r12
+	push r13
+	push r14
+	push r15
+%endmacro
+
+%macro popStateNoRAX 0
+	pop r15
+	pop r14
+	pop r13
+	pop r12
+	pop r11
+	pop r10
+	pop r9
+	pop r8
+	pop rsi
+	pop rdi
+	pop rbp
+	pop rdx
+	pop rcx
+	pop rbx
+%endmacro
+
+
 %macro irqHandlerMaster 1
 	pushState
 
 	mov rdi, %1 ; pasaje de parametro
 	call irqDispatcher
 
-	; signal pic EOI (End of Interrupt)
-	mov al, 20h
-	out 20h, al
-
-	popState
-	iretq
+	mov rdi, %1
+	cmp rdi, 0          ; Compare the parameter with 0
+	jne .normal_flow    ; If it is not 0, jump to the normal flow
+	mov rdi,rsp
+	call switchContent
+	mov rsp,rax
+	.normal_flow:
+		; signal pic EOI (End of Interrupt)
+		mov al, 20h
+		out 20h, al
+		popState
+		iretq
 %endmacro
 
 %macro saveIntRegs 0
@@ -160,6 +202,11 @@ picSlaveMask:
     retn
 
 
+
+forceSwithContent:
+	int 20h
+	ret
+
 ;8254 Timer (Timer Tick)
 _irq00Handler:
 	irqHandlerMaster 0
@@ -218,9 +265,11 @@ getRegs:
 ; r10 is not a parameters -> rcx = r10
 _syscallHandler:
 	;saveIntRegs
+	pushStateNoRAX
 	mov rcx, r10
 	mov r9, rax
 	call syscallDispatcher
+	popStateNoRAX
 	iretq
 
 haltcpu:

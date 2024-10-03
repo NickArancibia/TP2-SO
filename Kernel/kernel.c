@@ -10,6 +10,8 @@
 #include "interrupts.h"
 #include "time.h"
 #include "./include/memoryManager.h"
+#include "./include/process.h"
+#include "./include/scheduler.h"
 
 void load_idt(void);
 
@@ -27,7 +29,7 @@ static const uint64_t PageSize = 0x1000;
 static void *const sampleCodeModuleAddress = (void *)0x400000;
 static void *const sampleDataModuleAddress = (void *)0x500000;
 static void *const memoryStart = (void *)0xF00000;
-const int memorySize = (250 + 24) * 100;
+const int memorySize = (1 << 20); // 1GB
 
 typedef int (*EntryPoint)();
 
@@ -53,18 +55,37 @@ void *initializeKernelBinary()
 	return getStackBase();
 }
 
+void idle(){
+    while (1)
+    {
+      
+       _hlt();
+    }
+   
+}
+
 int main()
 {
+	
 	load_idt();
 	// initializeTimer();
 	initializeMemoryMM(memoryStart, memorySize);
+
 	initializeVideoDriver();
 	initFontManager();
 
-	((EntryPoint)sampleCodeModuleAddress)();
+	initProcesses();
+	//	
+	createProcess("init", 0, NULL, DEFAULT_PRIORITY,&idle,1);
+	createProcess("shell",0,NULL,DEFAULT_PRIORITY,(entryPoint)sampleCodeModuleAddress,1);
 
-	while (1)
-		_hlt();
+	initScheduler();
+	forceSwithContent();
+	//forceSwithContent();
+	//createProcess("init", 0, NULL, DEFAULT_PRIORITY,idle,1);
+	//((EntryPoint)sampleCodeModuleAddress)();
 
+
+	
 	return 0;
 }

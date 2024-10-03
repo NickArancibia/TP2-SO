@@ -4,21 +4,13 @@
 #include <stdint.h>
 #include <string.h>
 #include <lib.h>
+#include <interrupts.h>
+#include <scheduler.h>
+#include "./include/videoDriver.h"
 
-extern void *setupStack(void *entryPoint, void *stackBase, int argc, char *argv[]);
+extern void *setupStack(entryPoint entryPoint, void *stackBase, int argc, char *argv[]);
 
-typedef struct
-{
-    char name[MAX_NAME_LENGTH];
-    PID pid, parentpid;
-    int argc;
-    char **argv;
-    Priority priority;
-    void *entryPoint;
-    int foreground;
-    ProcessState state;
-    uint64_t *stackBase, *stackEnd;
-} Process;
+
 
 Process processes[MAX_PROCESSES];
 PID current;
@@ -26,7 +18,7 @@ PID current;
 PID initProcesses(void)
 {
     current = 1;
-    return createProcess("init", 0, NULL, DEFAULT_PRIORITY, NULL, 1);
+    return 0;
 }
 
 int checkPriority(Priority priority)
@@ -39,7 +31,7 @@ int checkName(const char *name)
     return name != NULL && strlen(name) <= MAX_NAME_LENGTH;
 }
 
-PID createProcess(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground)
+PID createProcess(const char *name, int argc, char *argv[], Priority priority,  entryPoint entryPoint, int foreground)
 {
     if (!checkPriority(priority) || argc < 0 || entryPoint == NULL || !checkName(name) || current > MAX_PID)
     {
@@ -83,9 +75,9 @@ PID createProcess(const char *name, int argc, char *argv[], Priority priority, e
     processes[pid].foreground = foreground;
     processes[pid].state = READY;
     processes[pid].stackBase = stackLimit + STACK_SIZE;
-    processes[pid].stackEnd = stackLimit;
-
-    setupStack(entryPoint, processes[pid].stackBase, argc, args);
+    processes[pid].stackEnd = setupStack(entryPoint, processes[pid].stackBase, argc, args);
+    
+    schedule(&(processes[pid]));
     return pid;
     // TODO: Handle entryPoint return value
 }

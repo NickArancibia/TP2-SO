@@ -8,9 +8,22 @@
 #define DEFAULT_PRIORITY MIN_PRIORITY
 #define MAX_PID MAX_PROCESSES
 
-#include <defs.h>
-
+#include "defs.h"
+#include <stdint.h>
 typedef int (*entryPoint)(int argc, char *argv[]);
+
+typedef struct
+{
+    char name[MAX_NAME_LENGTH];
+    PID pid, parentpid;
+    int argc;
+    char **argv;
+    Priority priority;
+    entryPoint entryPoint;
+    int foreground;
+    ProcessState state;
+    uint64_t *stackBase, *stackEnd;
+} Process;
 
 PID initProcesses(void);
 PID createProcess(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground);
