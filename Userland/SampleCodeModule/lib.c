@@ -36,3 +36,8 @@ void intToString(int num, char *buf, int minLen)
     }
     buf[length] = '\0';
 }
+
+int createProcess(const char *name, int argc, char *argv[], int priority, void *entryPoint, int foreground)
+{
+    return sysCreateProcess(name, argc, argv, priority, entryPoint, foreground);
+}
