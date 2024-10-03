@@ -26,12 +26,9 @@ EXTERN syscallDispatcher
 EXTERN getStackBase
 
 GLOBAL saveRegsInBuffer
-
+GLOBAL setupStack
 
 SECTION .text
-
-
-
 
 %macro saveRegsInBuffer 0	;; Once you enter here, regs[0]=RIP, regs[1]=RFLAGS, regs[2]=RSP
     mov [regs + 8*3], rax
@@ -103,17 +100,17 @@ SECTION .text
 
 %macro saveIntRegs 0
 
-push rax
-mov rax, [rsp + 8]	; RIP Contexto anterior
-mov [regs], rax
+	push rax
+	mov rax, [rsp + 8]	; RIP Contexto anterior
+	mov [regs], rax
 
-mov rax, [rsp + 8*3] ; RFLAGS Contexto anterior
-mov [regs + 8*1], rax
+	mov rax, [rsp + 8*3] ; RFLAGS Contexto anterior
+	mov [regs + 8*1], rax
 
-mov rax, [rsp + 8*4] ; RSP Contexto anterior
-mov [regs + 8*2], rax
+	mov rax, [rsp + 8*4] ; RSP Contexto anterior
+	mov [regs + 8*2], rax
 
-pop rax
+	pop rax
 
 %endmacro
    
@@ -230,6 +227,26 @@ haltcpu:
 	cli
 	hlt
 	ret
+
+setupStack:
+	push rbp
+    mov rbp, rsp
+
+	mov rsp, rsi
+	push 0x0
+	push rsi
+	push 0x202
+	push 0x8
+	push rdi ; Entrypoint
+
+	mov rdi, rdx ; argc
+	mov rsi, rcx ; argv
+	pushState
+	mov rax, rsp
+
+	mov rsp, rbp
+    pop rbp
+    ret
 
 section .data
 regs dq 18

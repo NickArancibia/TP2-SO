@@ -28,4 +28,18 @@
 
 #define NULL 0
 
+#define STACK_SIZE 4096
+
+typedef unsigned long PID;
+
+typedef enum
+{
+  READY,
+  RUNNING,
+  BLOCKED,
+  KILLED,
+} ProcessState;
+
+typedef unsigned int Priority;
+
 #endif
