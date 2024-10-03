@@ -2,6 +2,8 @@
 #define __SYSCALLHANDLE_H_
 
 #include <stdint.h>
+#include <process.h>
+#include <scheduler.h>
 
 int setCursor(uint64_t x, uint64_t y);
 int hideCursor();
@@ -45,5 +47,8 @@ int isctrlPressed(void);
 void *malloc(int size);
 
 void free(void *memorySegment);
+
+PID processCreate(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground);
+PID getProcesspid(void);
 
 #endif

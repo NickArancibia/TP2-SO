@@ -55,18 +55,17 @@ void *initializeKernelBinary()
 	return getStackBase();
 }
 
-void idle(){
-    while (1)
-    {
-      
-       _hlt();
-    }
-   
+void idle()
+{
+	while (1)
+	{
+		_hlt();
+	}
 }
 
 int main()
 {
-	
+
 	load_idt();
 	// initializeTimer();
 	initializeMemoryMM(memoryStart, memorySize);
@@ -75,17 +74,15 @@ int main()
 	initFontManager();
 
 	initProcesses();
-	//	
-	createProcess("init", 0, NULL, DEFAULT_PRIORITY,&idle,1);
-	createProcess("shell",0,NULL,DEFAULT_PRIORITY,(entryPoint)sampleCodeModuleAddress,1);
+	//
+	createProcess("init", 0, NULL, DEFAULT_PRIORITY, (entryPoint)&idle, 1);
+	createProcess("shell", 0, NULL, DEFAULT_PRIORITY, (entryPoint)sampleCodeModuleAddress, 1);
 
 	initScheduler();
 	forceSwithContent();
-	//forceSwithContent();
-	//createProcess("init", 0, NULL, DEFAULT_PRIORITY,idle,1);
+	// forceSwithContent();
+	// createProcess("init", 0, NULL, DEFAULT_PRIORITY,idle,1);
 	//((EntryPoint)sampleCodeModuleAddress)();
 
-
-	
 	return 0;
 }

@@ -27,5 +27,6 @@ typedef struct
 
 PID initProcesses(void);
 PID createProcess(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground);
+PID getpid(void);
 
 #endif

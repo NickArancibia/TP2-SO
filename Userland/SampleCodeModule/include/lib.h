@@ -37,4 +37,9 @@ int intLength(int num, int minLen);
 
 void intToString(int num, char *buf, int minLen);
 
+/**
+ * Used to create a new process
+ */
+int createProcess(const char *name, int argc, char *argv[], int priority, void *entryPoint, int foreground);
+
 #endif

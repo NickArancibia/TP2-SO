@@ -32,6 +32,8 @@ GLOBAL sysShowCursor
 GLOBAL sysSetCursorPosition
 GLOBAL sysMalloc
 GLOBAL sysFree
+GLOBAL sysCreateProcess
+GLOBAL sysGetPID
 
 GLOBAL sysCtrlPressed
 
@@ -180,14 +182,23 @@ sysClearKbEntry:
     int 80h
     ret
 
-
 sysMalloc:
     mov rax, 28
     int 80h
     ret
 
-
 sysFree:
     mov rax, 29
+    int 80h
+    ret
+
+sysCreateProcess:
+    mov rax, 30
+    mov r10, rcx
+    int 80h
+    ret
+
+sysGetPID:
+    mov rax, 31
     int 80h
     ret
