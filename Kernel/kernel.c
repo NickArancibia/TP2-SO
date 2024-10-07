@@ -12,6 +12,7 @@
 #include "./include/memoryManager.h"
 #include "./include/process.h"
 #include "./include/scheduler.h"
+#include <startup.h>
 
 void load_idt(void);
 
@@ -65,7 +66,6 @@ void idle()
 
 int main()
 {
-
 	load_idt();
 	// initializeTimer();
 	initializeMemoryMM(memoryStart, memorySize);
@@ -73,6 +73,11 @@ int main()
 	initializeVideoDriver();
 	initFontManager();
 
+	drawBootLogo();
+	playBootSound();
+	sleep(5);
+
+	vdClearScreen();
 	initProcesses();
 	//
 	createProcess("init", 0, NULL, DEFAULT_PRIORITY, (entryPoint)&idle, 1);

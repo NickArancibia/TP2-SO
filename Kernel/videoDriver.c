@@ -290,3 +290,13 @@ void vdPrintSquare(int x, int y, int side, uint32_t hexColor)
 {
 	vdPrintRect(x, y, side, side, hexColor);
 }
+
+int getScreenWidth()
+{
+	return widthScreen;
+}
+
+int getScreenHeight()
+{
+	return heightScreen;
+}
