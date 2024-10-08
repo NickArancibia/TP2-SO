@@ -2,6 +2,7 @@
 #define VIDEO_H
 
 #include <stdint.h>
+#include <startup.h>
 
 typedef struct
 {
@@ -68,5 +69,6 @@ void vdSetCursorColor(uint32_t color);
 void vdPrintCursor();
 int getScreenWidth();
 int getScreenHeight();
+void vdPrintLogo(uint32_t bitmap[LOGOWIDTH][LOGOHEIGHT], int bitmapWidth, int bitmapHeight);
 
 #endif

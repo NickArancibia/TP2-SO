@@ -75,7 +75,6 @@ int main()
 
 	drawBootLogo();
 	playBootSound();
-	sleep(5);
 
 	vdClearScreen();
 	initProcesses();

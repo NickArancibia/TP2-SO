@@ -300,3 +300,30 @@ int getScreenHeight()
 {
 	return heightScreen;
 }
+
+void vdPrintLogo(uint32_t bitmap[LOGOWIDTH][LOGOHEIGHT], int bitmapWidth, int bitmapHeight)
+{
+	if (bitmapWidth <= 0 || bitmapHeight <= 0)
+	{
+		return;
+	}
+
+	int startX = (widthScreen - bitmapWidth) / 2;
+	int startY = (heightScreen - bitmapHeight) / 2;
+
+	for (int x = 0; x < bitmapWidth; x++)
+	{
+		for (int y = 0; y < bitmapHeight; y++)
+		{
+			uint32_t hexColor = bitmap[x][y];
+
+			int posX = (startX + x) * bytesPerPixel;
+			int posY = (startY + y) * pitch;
+
+			if (posX < widthScreen * bytesPerPixel && posY < heightScreen * pitch)
+			{
+				vdPutPixel(posX + posY, hexColor);
+			}
+		}
+	}
+}
