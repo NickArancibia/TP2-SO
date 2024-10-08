@@ -78,12 +78,10 @@ int main()
 
 	vdClearScreen();
 	initProcesses();
-	//
 	createProcess("init", 0, NULL, DEFAULT_PRIORITY, (entryPoint)&idle, 1);
-	createProcess("shell", 0, NULL, DEFAULT_PRIORITY, (entryPoint)sampleCodeModuleAddress, 1);
-
 	initScheduler();
-	forceSwithContent();
+	createProcess("shell", 0, NULL, DEFAULT_PRIORITY, (entryPoint)sampleCodeModuleAddress, 1);
+	forceSwitchContent();
 	// forceSwithContent();
 	// createProcess("init", 0, NULL, DEFAULT_PRIORITY,idle,1);
 	//((EntryPoint)sampleCodeModuleAddress)();

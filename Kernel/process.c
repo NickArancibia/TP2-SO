@@ -114,3 +114,8 @@ PID getpid(void)
 {
     return getCurrentProcess()->pid;
 }
+
+PID getppid(void)
+{
+    return getCurrentProcess()->parentpid;
+}

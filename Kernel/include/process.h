@@ -8,6 +8,7 @@
 #define DEFAULT_PRIORITY MIN_PRIORITY
 #define MAX_PID MAX_PROCESSES
 #define NONPID -1
+#define INITPID 1
 
 #include "defs.h"
 #include <stdint.h>
@@ -29,5 +30,6 @@ typedef struct
 PID initProcesses(void);
 PID createProcess(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground);
 PID getpid(void);
+PID getppid(void);
 
 #endif

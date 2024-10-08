@@ -30,7 +30,7 @@
 
 #define STACK_SIZE 4096
 
-typedef unsigned long PID;
+typedef long PID;
 
 typedef enum
 {

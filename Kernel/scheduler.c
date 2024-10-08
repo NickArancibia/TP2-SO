@@ -7,12 +7,6 @@ Quantum qtyQuantums;
 List list;
 Process *currentProcess = NULL;
 
-void initInitScheduler()
-{
-    list.head = NULL;
-    list.tail = NULL;
-}
-
 void initScheduler()
 {
     currentProcess = list.head->pcb;
@@ -81,6 +75,11 @@ uint64_t *switchContent(uint64_t *rsp)
         currentProcess->state = READY;
     }
     currentProcess = unschedule();
+
+    if (currentProcess == NULL)
+    {
+        return rsp;
+    }
 
     currentProcess->state = RUNNING;
     return currentProcess->stackEnd;

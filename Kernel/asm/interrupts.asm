@@ -15,7 +15,7 @@ GLOBAL _irq05Handler
 
 GLOBAL _exception0Handler
 GLOBAL _exception6Handler
-GLOBAL forceSwithContent
+GLOBAL forceSwitchContent
 GLOBAL _syscallHandler
 
 GLOBAL getRegs
@@ -203,7 +203,7 @@ picSlaveMask:
 
 
 
-forceSwithContent:
+forceSwitchContent:
 	int 20h
 	ret
 

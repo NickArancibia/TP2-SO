@@ -34,6 +34,7 @@ GLOBAL sysMalloc
 GLOBAL sysFree
 GLOBAL sysCreateProcess
 GLOBAL sysGetPID
+GLOBAL sysGetParentPID
 
 GLOBAL sysCtrlPressed
 
@@ -200,5 +201,10 @@ sysCreateProcess:
 
 sysGetPID:
     mov rax, 31
+    int 80h
+    ret
+
+sysGetParentPID:
+    mov rax, 32
     int 80h
     ret

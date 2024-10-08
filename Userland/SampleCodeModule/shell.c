@@ -45,6 +45,12 @@ int init()
             registers();
         else if (strcasecmp(commandPrompt, modes[TESTING_AREA]) == SELECTED_MODE)
             testingArea();
+        // Used to test pid and getppid vvv
+        else if (strcasecmp(commandPrompt, "pid") == SELECTED_MODE)
+        {
+            printf("PID: %d\n", sysGetPID());
+            printf("Parent PID: %d\n", sysGetParentPID());
+        }
         else
             notFound(commandPrompt);
     }
