@@ -17,6 +17,10 @@ PID current;
 PID initProcesses(void)
 {
     current = 1;
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        processes[i].pid = NONPID;
+    }
     return 0;
 }
 
@@ -28,6 +32,18 @@ int checkPriority(Priority priority)
 int checkName(const char *name)
 {
     return name != NULL && strlen(name) <= MAX_NAME_LENGTH;
+}
+
+int getFreeProcess()
+{
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (processes[i].pid == NONPID)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 PID createProcess(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground)
@@ -64,21 +80,32 @@ PID createProcess(const char *name, int argc, char *argv[], Priority priority, e
 
     PID pid = current++;
     Process *currentProcess;
+    int allocatedProcess = getFreeProcess();
+    if (allocatedProcess == -1)
+    {
+        freeMM(stackLimit);
+        for (int i = 0; i < argc; i++)
+        {
+            freeMM(args[i]);
+        }
+        freeMM(args);
+        return -1;
+    }
 
     // Set current process Information
     memcpy(processes[pid].name, name, strlen(name) + 1);
-    processes[pid].pid = pid;
-    processes[pid].parentpid = (currentProcess = getCurrentProcess()) == NULL ? 0 : currentProcess->pid;
-    processes[pid].argc = argc;
-    processes[pid].argv = args;
-    processes[pid].priority = priority;
-    processes[pid].entryPoint = entryPoint;
-    processes[pid].foreground = foreground;
-    processes[pid].state = READY;
-    processes[pid].stackBase = stackLimit + STACK_SIZE;
-    processes[pid].stackEnd = setupStack(entryPoint, processes[pid].stackBase, argc, args);
+    processes[allocatedProcess].pid = pid;
+    processes[allocatedProcess].parentpid = (currentProcess = getCurrentProcess()) == NULL ? 0 : currentProcess->pid;
+    processes[allocatedProcess].argc = argc;
+    processes[allocatedProcess].argv = args;
+    processes[allocatedProcess].priority = priority;
+    processes[allocatedProcess].entryPoint = entryPoint;
+    processes[allocatedProcess].foreground = foreground;
+    processes[allocatedProcess].state = READY;
+    processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
+    processes[allocatedProcess].stackEnd = setupStack(entryPoint, processes[allocatedProcess].stackBase, argc, args);
 
-    schedule(&(processes[pid]));
+    schedule(&(processes[allocatedProcess]));
     return pid;
     // TODO: Handle entryPoint return value
 }
