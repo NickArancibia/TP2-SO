@@ -37,7 +37,7 @@ GLOBAL sysGetPID
 GLOBAL sysGetParentPID
 
 GLOBAL sysCtrlPressed
-
+GLOBAL sysYield
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -206,5 +206,10 @@ sysGetPID:
 
 sysGetParentPID:
     mov rax, 32
+    int 80h
+    ret
+
+sysYield:
+    mov rax,33
     int 80h
     ret

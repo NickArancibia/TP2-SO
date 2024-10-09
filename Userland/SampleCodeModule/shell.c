@@ -8,7 +8,7 @@
 #include "include/string.h"
 
 static const char *modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing"};
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing","yield"};
 
 int init()
 {
@@ -45,6 +45,8 @@ int init()
             registers();
         else if (strcasecmp(commandPrompt, modes[TESTING_AREA]) == SELECTED_MODE)
             testingArea();
+        else if (strcasecmp(commandPrompt, modes[YIELD]) == SELECTED_MODE)
+            yield();
         // Used to test pid and getppid vvv
         else if (strcasecmp(commandPrompt, "pid") == SELECTED_MODE)
         {

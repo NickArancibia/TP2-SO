@@ -32,6 +32,7 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "REGISTERS           ->      Prints registers values. To do this, first you need to save\n",
                            "                            your registers by pressing ALT.\n",
                            "TESTING             ->      Start testing area\n",
+                           "YIELD               ->      Relinquish voluntarily the CPU\n",
                            "end"};
 
 void testingArea()
@@ -101,6 +102,10 @@ void registers()
     {
         print("You need to save registers first by pressing ALT\n");
     }
+}
+
+void yield(){
+   sysYield();
 }
 
 void notFound(char *commandNotFound)

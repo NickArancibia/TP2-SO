@@ -52,4 +52,5 @@ PID processCreate(const char *name, int argc, char *argv[], Priority priority, e
 PID getProcesspid(void);
 PID getProcessParentpid(void);
 
+int yield(void);
 #endif

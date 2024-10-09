@@ -42,5 +42,5 @@ int sysFree(void *ptrBlock);
 int sysCreateProcess(const char *name, int argc, char *argv[], int priority, void *entryPoint, int foreground);
 int sysGetPID();
 int sysGetParentPID();
-
+int sysYield();
 #endif
