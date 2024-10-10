@@ -20,6 +20,7 @@
 #define REGISTERS_MODE 11
 #define EASTEREGG_MODE 12
 #define TESTING_AREA 13
+#define PS 14
 
 int init();
 

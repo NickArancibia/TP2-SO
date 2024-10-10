@@ -34,7 +34,7 @@ typedef long PID;
 
 typedef enum
 {
-  READY,
+  READY = 0,
   RUNNING,
   BLOCKED,
   KILLED,

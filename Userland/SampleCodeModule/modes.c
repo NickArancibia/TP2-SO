@@ -12,6 +12,8 @@
 #include "include/colors.h"
 #include "include/utils.h"
 #include "include/testingArea.h"
+#include "include/processStructure.h"
+
 char *dateTimeAux;
 int zoomAux, regAux;
 
@@ -33,6 +35,8 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "                            your registers by pressing ALT.\n",
                            "TESTING             ->      Start testing area\n",
                            "end"};
+
+char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
 
 void testingArea()
 {
@@ -153,4 +157,39 @@ void playEasterEgg()
 
     sysShowCursor();
     sysPrintCursor();
+}
+
+void ps()
+{
+    printf("\n");
+    Process *processes = sysGetPS();
+    for (int i = 0; processes[i].pid != -1; i++)
+    {
+        printf("PID=%d | Name=",
+               processes[i].pid);
+        print(processes[i].name);
+        printf(" | ParentPID=%d | Priority=%d | Foreground=%d | State=",
+               processes[i].parentpid,
+               processes[i].priority,
+               processes[i].foreground);
+        print(states[processes[i].state]);
+        printf(" | StackBase=0x");
+        print(hexToString((uint64_t)processes[i].stackBase));
+        printf(" | StackEnd=0x");
+        print(hexToString((uint64_t)processes[i].stackEnd));
+        printf("\n");
+    }
+    sysFreePS(processes);
+}
+
+void printProcessesInformation()
+{
+    creationParameters params;
+    params.name = "ps";
+    params.argc = 0;
+    params.argv = NULL;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)ps;
+    params.foreground = 1;
+    createProcess(&params);
 }

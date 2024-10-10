@@ -6,9 +6,12 @@
 #include "include/syscalls.h"
 #include "include/stdio.h"
 #include "include/string.h"
+#include "include/lib.h"
 
 static const char *modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing"};
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps"};
+
+creationParameters params;
 
 int init()
 {
@@ -45,11 +48,18 @@ int init()
             registers();
         else if (strcasecmp(commandPrompt, modes[TESTING_AREA]) == SELECTED_MODE)
             testingArea();
-        // Used to test pid and getppid vvv
-        else if (strcasecmp(commandPrompt, "pid") == SELECTED_MODE)
+        else if (strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE)
+            printProcessesInformation();
+        else if (strcasecmp(commandPrompt, "create") == SELECTED_MODE)
         {
-            printf("PID: %d\n", sysGetPID());
-            printf("Parent PID: %d\n", sysGetParentPID());
+            char *argv[] = {"arg1", "arg2", "arg3"};
+            params.name = "test";
+            params.argc = 3;
+            params.argv = argv;
+            params.priority = 1;
+            params.entryPoint = NULL;
+            params.foreground = 1;
+            createProcess(&params);
         }
         else
             notFound(commandPrompt);

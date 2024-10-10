@@ -48,8 +48,11 @@ void *malloc(int size);
 
 void free(void *memorySegment);
 
-PID processCreate(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground);
+PID processCreate(creationParameters *params);
 PID getProcesspid(void);
 PID getProcessParentpid(void);
+
+Process *getPS(void);
+void freePS(Process *processesInfo);
 
 #endif

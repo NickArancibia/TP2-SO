@@ -180,7 +180,6 @@ _cli:
 	cli
 	ret
 
-
 _sti:
 	sti
 	ret
@@ -200,8 +199,6 @@ picSlaveMask:
     out	0A1h,al
     pop     rbp
     retn
-
-
 
 forceSwitchContent:
 	int 20h

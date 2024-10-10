@@ -19,7 +19,7 @@
 #define H_FONT 7
 #define I_FONT 8
 
-#define DEFAULT_FONT D_FONT
+#define DEFAULT_FONT B_FONT
 
 typedef struct
 {

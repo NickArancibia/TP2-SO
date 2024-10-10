@@ -32,6 +32,13 @@ int strcasecmp(const char *str1, const char *str2);
  */
 char *strcpy(char *dest, const char *src);
 
+/**
+ * Receives a 64bits value
+ * Returns a string of the value in hexadecimal
+ * format with up to 8 digits.
+ */
+char *hexToString(uint64_t value);
+
 void *memset(void *destination, int32_t character, uint64_t length);
 void *memcpy(void *destination, const void *source, uint64_t length);
 
