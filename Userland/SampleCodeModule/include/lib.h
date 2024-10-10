@@ -44,4 +44,10 @@ void intToString(int num, char *buf, int minLen);
  */
 int createProcess(creationParameters *params);
 
+/**
+ * Receives a string and a pointer to an int.
+ * Converts the string to an int and leaves it in num.
+ */
+void stringToInt(char *str, int *num);
+
 #endif

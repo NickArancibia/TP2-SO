@@ -37,6 +37,16 @@ void intToString(int num, char *buf, int minLen)
     buf[length] = '\0';
 }
 
+void stringToInt(char *str, int *num)
+{
+    *num = 0;
+    while (*str != '\0')
+    {
+        *num = *num * 10 + (*str - '0');
+        str++;
+    }
+}
+
 int createProcess(creationParameters *params)
 {
     return sysCreateProcess(params);

@@ -78,3 +78,16 @@ char *hexToString(uint64_t value)
 
     return str + 8;
 }
+
+int divideString(char *str)
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (str[i] == ' ')
+        {
+            str[i] = '\0';
+            return i;
+        }
+    }
+    return -1;
+}
