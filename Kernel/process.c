@@ -20,7 +20,8 @@ PID initProcesses(void)
     current = 1;
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        processes[i].pid = NONPID;
+        processes[i].pid = i + 1;
+        processes[i].state = DEAD;
     }
     return 0;
 }
@@ -39,7 +40,7 @@ int getFreeProcess()
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (processes[i].pid == NONPID)
+        if (processes[i].state == DEAD)
         {
             return i;
         }
@@ -80,7 +81,6 @@ PID createProcess(creationParameters *params)
         memcpy(args[i], params->argv[i], len);
     }
 
-    PID pid = current++;
     Process *currentProcess;
     int allocatedProcess = getFreeProcess();
     if (allocatedProcess == -1)
@@ -96,7 +96,6 @@ PID createProcess(creationParameters *params)
 
     // Set current process Information
     memcpy(processes[allocatedProcess].name, params->name, strlen(params->name) + 1);
-    processes[allocatedProcess].pid = pid;
     processes[allocatedProcess].parentpid = (currentProcess = getCurrentProcess()) == NULL ? 0 : currentProcess->pid;
     processes[allocatedProcess].argc = params->argc;
     processes[allocatedProcess].argv = args;
@@ -108,7 +107,7 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].stackEnd = setupStack(params->entryPoint, processes[allocatedProcess].stackBase, params->argc, args);
 
     schedule(&(processes[allocatedProcess]));
-    return pid;
+    return processes[allocatedProcess].pid;
     // TODO: Handle entryPoint return value
 }
 
@@ -117,7 +116,7 @@ int getProcessesCount()
     int count = 0;
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (processes[i].pid != NONPID)
+        if (processes[i].state != DEAD)
         {
             count++;
         }
@@ -139,13 +138,13 @@ Process *getProcessesInformation()
 {
     int count = getProcessesCount();
     Process *ans = mallocMM((count + 1) * sizeof(Process));
-    ans[count].pid = -1;
+    ans[count].pid = NONPID;
 
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (processes[i].pid != NONPID)
+        if (processes[i].state != DEAD)
         {
-            memcpy(&ans[i], &processes[i], sizeof(Process));
+            memcpy(&(ans[i]), &(processes[i]), sizeof(Process));
         }
     }
     return ans;

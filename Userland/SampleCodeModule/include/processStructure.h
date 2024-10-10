@@ -9,7 +9,7 @@ typedef enum
     READY = 0,
     RUNNING,
     BLOCKED,
-    KILLED,
+    DEAD,
 } ProcessState;
 
 typedef unsigned int Priority;
