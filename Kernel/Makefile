@@ -35,6 +35,6 @@ move_objects: $(OBJDIR)
 	mv *.o $(OBJDIR)
 	mv asm/*.o $(OBJDIR)
 clean:
-	rm -rf $(OBJDIR) *.bin
+	rm -rf $(OBJDIR) *.bin *.elf
 
 .PHONY: all clean
