@@ -23,5 +23,6 @@ Process * unschedule();
 uint64_t * switchContent(uint64_t * rsp);
 
 Process * getCurrentProcess();
-
+int blockProcess(PID pid);
+int unblockProcess(PID pid);
 #endif

@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./include/memoryManager.h"
 #include "./include/scheduler.h"
+#include "./include/syscallHandle.h"
 
 Quantum qtyQuantums;
 List list;
@@ -88,4 +89,22 @@ uint64_t *switchContent(uint64_t *rsp)
 Process *getCurrentProcess()
 {
     return currentProcess;
+}
+
+
+int blockProcess(PID pid){
+     Process * pcb;
+    if ((pcb = getProcess(pid)) == NULL)
+        return 1;
+    pcb->state = BLOCKED;
+    if (pcb->pid == currentProcess->pid)
+        return yield();
+    return 0;
+}
+
+int unblockProcess(PID pid){
+    Process * pcb = getProcess(pid);
+    pcb->state = READY;
+    schedule(pcb);
+    return 0;
 }

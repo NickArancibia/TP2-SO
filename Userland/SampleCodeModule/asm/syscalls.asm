@@ -38,6 +38,9 @@ GLOBAL sysGetParentPID
 
 GLOBAL sysCtrlPressed
 GLOBAL sysYield
+GLOBAL sysSuspendProcess
+GLOBAL sysResumeProcess
+
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -211,5 +214,15 @@ sysGetParentPID:
 
 sysYield:
     mov rax,33
+    int 80h
+    ret
+
+sysSuspendProcess:
+    mov rax,34
+    int 80h
+    ret
+
+sysResumeProcess:
+    mov rax,35
     int 80h
     ret

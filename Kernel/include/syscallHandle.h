@@ -51,6 +51,7 @@ void free(void *memorySegment);
 PID processCreate(const char *name, int argc, char *argv[], Priority priority, entryPoint entryPoint, int foreground);
 PID getProcesspid(void);
 PID getProcessParentpid(void);
-
 int yield(void);
+int suspendProcess(PID pid);
+int resumeProcess(PID pid);
 #endif

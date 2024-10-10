@@ -119,3 +119,12 @@ PID getppid(void)
 {
     return getCurrentProcess()->parentpid;
 }
+
+Process * getProcess(PID pid){
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if(pid == processes[i].pid)
+            return &processes[i];
+    }
+    return NULL;
+}
