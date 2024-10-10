@@ -10,6 +10,15 @@
 static const char *modes[] = {
     "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing","yield"};
 
+void testBlock(){
+    sysSuspendProcess(2);
+    for(int i=0; i<200; i++){
+        printf("Testing block %d\n", i);
+    }
+    sysClearScreen();
+    sysResumeProcess(2);
+}
+
 int init()
 {
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
@@ -52,6 +61,17 @@ int init()
         {
             printf("PID: %d\n", sysGetPID());
             printf("Parent PID: %d\n", sysGetParentPID());
+        }
+        else if(strcasecmp(commandPrompt, "create") == SELECTED_MODE){
+            sysCreateProcess("block", 0, NULL, 1, testBlock, 1);
+            for(int i=0; i<9000000; i++);
+            printf("Process created\n");
+        }
+        else if(strcasecmp(commandPrompt, "suspend") == SELECTED_MODE){
+            sysSuspendProcess(3);
+        }
+        else if(strcasecmp(commandPrompt, "resume") == SELECTED_MODE){
+            sysResumeProcess(3);
         }
         else
             notFound(commandPrompt);
