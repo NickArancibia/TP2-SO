@@ -51,8 +51,12 @@ void free(void *memorySegment);
 PID processCreate(creationParameters *params);
 PID getProcesspid(void);
 PID getProcessParentpid(void);
+int yield(void);
+int suspendProcess(PID pid);
+int resumeProcess(PID pid);
 
 Process *getPS(void);
 void freePS(Process *processesInfo);
+void killProcess(PID pid);
 
 #endif

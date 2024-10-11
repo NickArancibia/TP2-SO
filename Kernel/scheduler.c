@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./include/memoryManager.h"
 #include "./include/scheduler.h"
+#include "./include/syscallHandle.h"
 
 Quantum qtyQuantums;
 List list;
@@ -59,12 +60,6 @@ Process *unschedule()
 
 uint64_t *switchContent(uint64_t *rsp)
 {
-    /*
-    if(ticksGlobalElapsed <  0  pcb->ticksElapsed ){
-        ticksGlobalElapsed++;
-        return rsp;
-    }
-    */
     if (currentProcess == NULL)
     {
         return rsp;
@@ -81,13 +76,17 @@ uint64_t *switchContent(uint64_t *rsp)
         schedule(currentProcess);
         currentProcess->state = READY;
     }
-
-    currentProcess = unschedule();
-
-    if (currentProcess == NULL)
-    {
-        return rsp;
+    if(currentProcess->state == BLOCKED){
+        currentProcess->stackEnd = rsp;
     }
+    do{
+        currentProcess = unschedule();
+
+        if (currentProcess == NULL)
+        {
+            return rsp;
+        }
+    } while(currentProcess->state == BLOCKED || currentProcess->state == DEAD);
 
     currentProcess->state = RUNNING;
     return currentProcess->stackEnd;
@@ -96,4 +95,22 @@ uint64_t *switchContent(uint64_t *rsp)
 Process *getCurrentProcess()
 {
     return currentProcess;
+}
+
+
+int blockProcess(PID pid){
+     Process * pcb;
+    if ((pcb = getProcess(pid)) == NULL)
+        return 1;
+    pcb->state = BLOCKED;
+    if (pcb->pid == currentProcess->pid)
+        return yield();
+    return 0;
+}
+
+int unblockProcess(PID pid){
+    Process * pcb = getProcess(pid);
+    pcb->state = READY;
+    schedule(pcb);
+    return 0;
 }

@@ -39,8 +39,11 @@ typedef struct
 
 PID initProcesses(void);
 PID createProcess(creationParameters *params);
+uint64_t * setupStack(int argc, char ** argv, entryPoint entry, uint64_t * stackBase, entryPoint processLoader);
 PID getpid(void);
 PID getppid(void);
+Process * getProcess(PID pid);
+void kill(PID pid);
 
 Process *getProcessesInformation();
 void freeProcessesInformation(Process *processesInfo);

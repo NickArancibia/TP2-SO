@@ -278,15 +278,13 @@ setupStack:
 	push rbp
     mov rbp, rsp
 
-	mov rsp, rsi
+	mov rsp, rcx
 	push 0x0
-	push rsi
+	push rcx
 	push 0x202
 	push 0x8
-	push rdi ; Entrypoint
+	push r8 ; Entrypoint
 
-	mov rdi, rdx ; argc
-	mov rsi, rcx ; argv
 	pushState
 	mov rax, rsp
 

@@ -2,6 +2,7 @@
 #define __SYSCALLS_H_
 
 #include <stdint.h>
+typedef long PID;
 #include "./processStructure.h"
 
 int sysWriteScreen(uint64_t fd, unsigned char *buffer, uint64_t len, uint64_t hexColor);
@@ -44,7 +45,11 @@ int sysCreateProcess(creationParameters *params);
 int sysGetPID();
 int sysGetParentPID();
 
-Process *sysGetPS();
-void sysFreePS(Process *processesInfo);
+Process * sysGetPS();
+void sysFreePS(Process * ps);
+void sysYield();
+void sysSuspendProcess();
+void sysResumeProcess();
+void sysKill(PID pid);
 
 #endif

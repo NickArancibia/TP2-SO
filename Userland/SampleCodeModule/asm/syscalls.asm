@@ -39,6 +39,10 @@ GLOBAL sysGetPS
 GLOBAL sysFreePS
 
 GLOBAL sysCtrlPressed
+GLOBAL sysYield
+GLOBAL sysSuspendProcess
+GLOBAL sysResumeProcess
+GLOBAL sysKill
 
 section .text
 
@@ -217,5 +221,25 @@ sysGetPS:
 
 sysFreePS:
     mov rax, 34
+    int 80h
+    ret
+    
+sysYield:
+    mov rax,35
+    int 80h
+    ret
+
+sysSuspendProcess:
+    mov rax,36
+    int 80h
+    ret
+
+sysResumeProcess:
+    mov rax,37
+    int 80h
+    ret
+
+sysKill:
+    mov rax,38
     int 80h
     ret

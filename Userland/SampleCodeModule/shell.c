@@ -9,14 +9,24 @@
 #include "include/lib.h"
 
 static const char *modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps"};
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps","yield"};
 
 creationParameters params;
+
+void testBlock(){
+    sysSuspendProcess(2);
+    for(int i=0; i<100; i++){
+        printf("Testing block %d\n", i);
+    }
+    sysResumeProcess(2);
+    while(1);
+}
 
 int init()
 {
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
     char commandPrompt[32] = {0};
+    int separator;
     while (IDLE_MODE)
     {
         sysClearKbEntry();
@@ -24,6 +34,7 @@ int init()
         print("> ");
         sysShowCursor();
         scanf(commandPrompt, 32);
+        separator = divideString(commandPrompt);
         if (strcasecmp(commandPrompt, modes[HELP_MODE]) == SELECTED_MODE)
             help();
         else if (strcasecmp(commandPrompt, modes[ELIMINATOR_MODE]) == SELECTED_MODE)
@@ -48,18 +59,30 @@ int init()
             registers();
         else if (strcasecmp(commandPrompt, modes[TESTING_AREA]) == SELECTED_MODE)
             testingArea();
+        else if (strcasecmp(commandPrompt, modes[YIELD]) == SELECTED_MODE)
+            yield();
         else if (strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE)
             printProcessesInformation();
-        else if (strcasecmp(commandPrompt, "create") == SELECTED_MODE)
-        {
-            char *argv[] = {"arg1", "arg2", "arg3"};
-            params.name = "test";
-            params.argc = 3;
-            params.argv = argv;
+        else if(strcasecmp(commandPrompt, "create") == SELECTED_MODE){
+            params.name = "testBlock";
+            params.argc = 0;
+            params.argv = NULL;
             params.priority = 1;
-            params.entryPoint = NULL;
+            params.entryPoint = (entryPoint)testBlock;
             params.foreground = 1;
-            createProcess(&params);
+            int pid = createProcess(&params);
+            printf("Process created with pid %d\n", pid);
+        }
+        else if(strcasecmp(commandPrompt, "kill") == SELECTED_MODE){
+            int toKill = 0;
+            stringToInt(&commandPrompt[separator+1], &toKill);
+            sysKill(toKill);
+        }
+        else if(strcasecmp(commandPrompt, "suspend") == SELECTED_MODE){
+            sysSuspendProcess(3);
+        }
+        else if(strcasecmp(commandPrompt, "resume") == SELECTED_MODE){
+            sysResumeProcess(3);
         }
         else
             notFound(commandPrompt);

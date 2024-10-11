@@ -10,10 +10,13 @@
 #include <scheduler.h>
 #include <videoDriver.h>
 
-extern void *setupStack(entryPoint entryPoint, void *stackBase, int argc, char *argv[]);
-
 Process processes[MAX_PROCESSES];
 PID current;
+
+int processLoader(int argc, char *argv[], entryPoint entry){
+    int returnValue = entry(argc, argv);
+    kill(getpid());
+}
 
 PID initProcesses(void)
 {
@@ -22,6 +25,8 @@ PID initProcesses(void)
     {
         processes[i].pid = i + 1;
         processes[i].state = DEAD;
+        processes[i].argv = NULL;
+        processes[i].argc = 0;
     }
     return 0;
 }
@@ -104,7 +109,7 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].foreground = params->foreground;
     processes[allocatedProcess].state = READY;
     processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
-    processes[allocatedProcess].stackEnd = setupStack(params->entryPoint, processes[allocatedProcess].stackBase, params->argc, args);
+    processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, (entryPoint)processLoader);
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
@@ -134,17 +139,26 @@ PID getppid(void)
     return getCurrentProcess()->parentpid;
 }
 
+Process * getProcess(PID pid){
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if(pid == processes[i].pid)
+            return &processes[i];
+    }
+    return NULL;
+}
+
 Process *getProcessesInformation()
 {
-    int count = getProcessesCount();
+    int count = getProcessesCount(), ansIndex=0;
     Process *ans = mallocMM((count + 1) * sizeof(Process));
     ans[count].pid = NONPID;
 
-    for (int i = 0; i < MAX_PROCESSES; i++)
+    for (int i = 0; i < MAX_PROCESSES && ansIndex != count; i++)
     {
         if (processes[i].state != DEAD)
         {
-            memcpy(&(ans[i]), &(processes[i]), sizeof(Process));
+            memcpy(&(ans[ansIndex++]), &(processes[i]), sizeof(Process));
         }
     }
     return ans;
@@ -153,4 +167,24 @@ Process *getProcessesInformation()
 void freeProcessesInformation(Process *processesInfo)
 {
     freeMM(processesInfo);
+}
+
+void kill(PID pid){
+    if(pid <= INITPID || pid > MAX_PID)
+        return;
+    Process * pcb = &processes[pid-1];
+    if(pcb->state == DEAD){
+        return;
+    }
+    freeMM(pcb->stackBase - STACK_SIZE);
+    if(pcb->argc > 0){
+    for(int i = 0; i < pcb->argc; i++){
+        freeMM(pcb->argv[i]);
+    }
+    freeMM(pcb->argv);
+    }
+    pcb->argv=NULL;
+    pcb->argc=0;
+    pcb->state = DEAD;
+    forceSwitchContent();
 }

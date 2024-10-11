@@ -67,7 +67,7 @@ void idle()
 int main()
 {
 	load_idt();
-	// initializeTimer();
+
 	initializeMemoryMM(memoryStart, memorySize);
 
 	initializeVideoDriver();
@@ -95,9 +95,6 @@ int main()
 	params.priority = DEFAULT_PRIORITY;
 	createProcess(&params);
 	forceSwitchContent();
-	// forceSwithContent();
-	// createProcess("init", 0, NULL, DEFAULT_PRIORITY,idle,1);
-	//((EntryPoint)sampleCodeModuleAddress)();
 
 	return 0;
 }

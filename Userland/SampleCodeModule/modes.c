@@ -34,6 +34,8 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "REGISTERS           ->      Prints registers values. To do this, first you need to save\n",
                            "                            your registers by pressing ALT.\n",
                            "TESTING             ->      Start testing area\n",
+                           "YIELD               ->      Relinquish voluntarily the CPU\n",
+                           "PS                  ->      Shows information about all processes\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -105,6 +107,10 @@ void registers()
     {
         print("You need to save registers first by pressing ALT\n");
     }
+}
+
+void yield(){
+   sysYield();
 }
 
 void notFound(char *commandNotFound)
@@ -192,4 +198,5 @@ void printProcessesInformation()
     params.entryPoint = (entryPoint)ps;
     params.foreground = 1;
     createProcess(&params);
+    return;
 }

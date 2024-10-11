@@ -14,5 +14,6 @@ void eliminator(void);
 void notFound(char *commandNotFound);
 void playEasterEgg();
 void testingArea();
+void yield();
 void printProcessesInformation();
 #endif
