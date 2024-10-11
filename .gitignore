@@ -1,10 +1,12 @@
 
 *.bin
 *.o
+*.elf
 *sys
 *img
 *qcow2
 *vmdk
 *.sh
 .gdb_history
+.gbdinit
 .bash_history

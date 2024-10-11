@@ -92,7 +92,7 @@ int main()
 	params.foreground = 1;
 	params.argc = 0;
 	params.argv = NULL;
-	params.priority = 3;
+	params.priority = DEFAULT_PRIORITY;
 	createProcess(&params);
 	forceSwitchContent();
 	// forceSwithContent();
