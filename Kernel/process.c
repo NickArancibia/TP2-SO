@@ -25,6 +25,8 @@ PID initProcesses(void)
     {
         processes[i].pid = i + 1;
         processes[i].state = DEAD;
+        processes[i].argv = NULL;
+        processes[i].argc = 0;
     }
     return 0;
 }
@@ -107,7 +109,7 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].foreground = params->foreground;
     processes[allocatedProcess].state = READY;
     processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
-    processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, processLoader);
+    processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, (entryPoint)processLoader);
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
@@ -148,15 +150,15 @@ Process * getProcess(PID pid){
 
 Process *getProcessesInformation()
 {
-    int count = getProcessesCount();
+    int count = getProcessesCount(), ansIndex=0;
     Process *ans = mallocMM((count + 1) * sizeof(Process));
     ans[count].pid = NONPID;
 
-    for (int i = 0; i < MAX_PROCESSES; i++)
+    for (int i = 0; i < MAX_PROCESSES && ansIndex != count; i++)
     {
         if (processes[i].state != DEAD)
         {
-            memcpy(&(ans[i]), &(processes[i]), sizeof(Process));
+            memcpy(&(ans[ansIndex++]), &(processes[i]), sizeof(Process));
         }
     }
     return ans;
@@ -175,10 +177,14 @@ void kill(PID pid){
         return;
     }
     freeMM(pcb->stackBase - STACK_SIZE);
+    if(pcb->argc > 0){
     for(int i = 0; i < pcb->argc; i++){
         freeMM(pcb->argv[i]);
     }
-    //freeMM(pcb->argv);                    ??????????????????????????????????
+    freeMM(pcb->argv);
+    }
+    pcb->argv=NULL;
+    pcb->argc=0;
     pcb->state = DEAD;
     forceSwitchContent();
 }
