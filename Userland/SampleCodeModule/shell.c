@@ -7,14 +7,17 @@
 #include "include/stdio.h"
 #include "include/string.h"
 #include "include/lib.h"
+#include "include/test_util.h"
 
 static const char *modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps","yield"};
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps", "yield"};
 
 creationParameters params;
 
-int testBlock(){
-    for(int i=0; i<20; i++){
+int testBlock()
+{
+    for (int i = 0; i < 20; i++)
+    {
         printf("Testing block %d\n", i);
     }
     return 1;
@@ -24,7 +27,7 @@ int init()
 {
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
     char commandPrompt[32] = {0};
-    int separator;
+    int separator, returnValue;
     while (IDLE_MODE)
     {
         sysClearKbEntry();
@@ -61,8 +64,11 @@ int init()
             yield();
         else if (strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE)
             printProcessesInformation();
-        else if(strcasecmp(commandPrompt, "create") == SELECTED_MODE){
-            int returnValue=0;
+        /**
+         * TODO: Remove this
+         */
+        else if (strcasecmp(commandPrompt, "create") == SELECTED_MODE)
+        {
             params.name = "testBlock";
             params.argc = 0;
             params.argv = NULL;
@@ -73,20 +79,57 @@ int init()
             sysWait(pid, &returnValue);
             printf("Process %d returned %d\n", pid, returnValue);
         }
-        else if(strcasecmp(commandPrompt, "kill") == SELECTED_MODE){
-            int toKill = 0;
-            stringToInt(&commandPrompt[separator+1], &toKill);
-            sysKill(toKill);
+        else if (strcasecmp(commandPrompt, "kill") == SELECTED_MODE)
+        {
+            int toKill = satoi(&commandPrompt[separator + 1]);
+            if (toKill == 0)
+            {
+                printf("Use: kill [pid] (e.g. kill 3)\n");
+            }
+            else
+            {
+                if (sysGetPID() == toKill)
+                {
+                    printColor("Why? :( \n", RED);
+                }
+                returnValue = sysKill(toKill);
+                if (returnValue == -1)
+                {
+                    printf("Invalid PID\n");
+                }
+            }
         }
-        else if(strcasecmp(commandPrompt, "suspend") == SELECTED_MODE){
-            int toSuspend = 0;
-            stringToInt(&commandPrompt[separator+1], &toSuspend);
-            sysSuspendProcess(toSuspend);
+        else if (strcasecmp(commandPrompt, "suspend") == SELECTED_MODE)
+        {
+            int toSuspend = satoi(&commandPrompt[separator + 1]);
+            if (toSuspend == 0)
+            {
+                printf("Use: suspend [pid] (e.g. suspend 3)\n");
+            }
+            else
+            {
+                returnValue = sysSuspendProcess(toSuspend);
+                if (returnValue == -1)
+                {
+                    printf("Invalid PID\n");
+                }
+            }
         }
-        else if(strcasecmp(commandPrompt, "resume") == SELECTED_MODE){
-            int toResume = 0;
-            stringToInt(&commandPrompt[separator+1], &toResume);
-            sysResumeProcess(toResume);
+        else if (strcasecmp(commandPrompt, "resume") == SELECTED_MODE)
+        {
+            int toResume = satoi(&commandPrompt[separator + 1]);
+            if (toResume == 0)
+            {
+                printf("Use: resume [pid] (e.g. resume 3)\n");
+            }
+            else
+            {
+                returnValue = sysResumeProcess(toResume);
+                if (returnValue == -1)
+                {
+                    printf("Invalid PID\n");
+                }
+            }
         }
         else
             notFound(commandPrompt);

@@ -28,11 +28,12 @@ int checkExit()
   {
     for (int i = 0; i < rq; i++)
     {
-      if (mm_rqs[i].address != 0){
+      if (mm_rqs[i].address != 0)
+      {
         free(mm_rqs[i].address);
       }
     }
-    
+
     printColor("OK!", GREEN);
     print("\n");
     return 1;
@@ -42,7 +43,7 @@ int checkExit()
 
 uint64_t test_mm(uint64_t argc, char *argv[])
 {
- 
+
   uint32_t total;
   uint64_t max_memory;
   // if (argc != 1)
@@ -103,7 +104,8 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     {
       if (checkExit())
         return 0;
-      if (mm_rqs[i].address){
+      if (mm_rqs[i].address)
+      {
         free(mm_rqs[i].address);
         mm_rqs[i].address = 0;
       }
@@ -120,15 +122,15 @@ uint64_t test_mm(uint64_t argc, char *argv[])
 
 void testMM(void)
 {
-    char *argv[] = {"25000", 0};
-    creationParameters params;
-    params.name="test_mm";
-    params.argc=1;
-    params.argv=argv;
-    params.priority=1;
-    params.entryPoint=(entryPoint)test_mm;
-    params.foreground=1;
+  char *argv[] = {"25000", 0};
+  creationParameters params;
+  params.name = "test_mm";
+  params.argc = 1;
+  params.argv = argv;
+  params.priority = 1;
+  params.entryPoint = (entryPoint)test_mm;
+  params.foreground = 1;
 
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
+  int pid = createProcess(&params);
+  sysWait(pid, NULL);
 }

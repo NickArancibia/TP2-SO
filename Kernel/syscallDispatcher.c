@@ -252,27 +252,33 @@ void freePS(Process *processesInfo)
     freeProcessesInformation(processesInfo);
 }
 
-int yield(void){
+int yield(void)
+{
     forceSwitchContent();
     return 0;
 }
 
-int suspendProcess(PID pid){
+int suspendProcess(PID pid)
+{
     return blockProcess(pid);
 }
 
-int resumeProcess(PID pid){
+int resumeProcess(PID pid)
+{
     return unblockProcess(pid);
 }
 
-void killProcess(PID pid){
-    kill(pid);
+int killProcess(PID pid)
+{
+    return kill(pid);
 }
 
-void exit(){
+void exit()
+{
     kill(getpid());
 }
 
-void wait(PID pidToWait, int * wstatus){
+void wait(PID pidToWait, int *wstatus)
+{
     waitProcess(pidToWait, wstatus);
 }

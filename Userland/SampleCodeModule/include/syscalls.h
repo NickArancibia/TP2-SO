@@ -45,13 +45,13 @@ int sysCreateProcess(creationParameters *params);
 int sysGetPID();
 int sysGetParentPID();
 
-Process * sysGetPS();
-void sysFreePS(Process * ps);
+Process *sysGetPS();
+void sysFreePS(Process *ps);
 void sysYield();
-void sysSuspendProcess();
-void sysResumeProcess();
-void sysKill(PID pid);
+int sysSuspendProcess();
+int sysResumeProcess();
+int sysKill(PID pid);
 void sysExit();
-void sysWait(PID pid, int * wstatus);
+void sysWait(PID pid, int *wstatus);
 
 #endif

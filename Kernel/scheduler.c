@@ -65,28 +65,31 @@ uint64_t *switchContent(uint64_t *rsp)
         return rsp;
     }
 
-    if(list.head->executionsLeft > 0){
+    if (list.head->executionsLeft > 0)
+    {
         list.head->executionsLeft--;
         return rsp;
     }
-    
+
     if (currentProcess->state == RUNNING)
     {
         currentProcess->stackEnd = rsp;
         schedule(currentProcess);
         currentProcess->state = READY;
     }
-    if(currentProcess->state == BLOCKED){
+    if (currentProcess->state == BLOCKED)
+    {
         currentProcess->stackEnd = rsp;
     }
-    do{
+    do
+    {
         currentProcess = unschedule();
 
         if (currentProcess == NULL)
         {
             return rsp;
         }
-    } while(currentProcess->state == BLOCKED || currentProcess->state == DEAD);
+    } while (currentProcess->state == BLOCKED || currentProcess->state == DEAD);
 
     currentProcess->state = RUNNING;
     return currentProcess->stackEnd;
@@ -97,9 +100,9 @@ Process *getCurrentProcess()
     return currentProcess;
 }
 
-
-int blockProcess(PID pid){
-    Process * pcb;
+int blockProcess(PID pid)
+{
+    Process *pcb;
     if ((pcb = getProcess(pid)) == NULL)
         return 1;
     pcb->state = BLOCKED;
@@ -108,8 +111,9 @@ int blockProcess(PID pid){
     return 0;
 }
 
-int unblockProcess(PID pid){
-    Process * pcb = getProcess(pid);
+int unblockProcess(PID pid)
+{
+    Process *pcb = getProcess(pid);
     pcb->state = READY;
     schedule(pcb);
     return 0;
