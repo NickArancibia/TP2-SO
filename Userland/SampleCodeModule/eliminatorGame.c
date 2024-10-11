@@ -78,12 +78,12 @@ void playAlone(void)
 
             sysPrintSquare(snakeHeadP1.x * SNAKE_HEAD_SIZE, snakeHeadP1.y * SNAKE_HEAD_SIZE, SNAKE_HEAD_SIZE, snakeHeadP1.color);
 
-            if (board[snakeHeadP1.x][snakeHeadP1.y] == BLOCKED)
+            if (board[snakeHeadP1.x][snakeHeadP1.y] == BLOCKEDAA)
             {
                 didP1Crashed = CRASHED;
             }
 
-            board[snakeHeadP1.x][snakeHeadP1.y] = BLOCKED;
+            board[snakeHeadP1.x][snakeHeadP1.y] = BLOCKEDAA;
 
             for (int i = 0; i < DEBOUNCER; i++)
             {
@@ -149,18 +149,18 @@ void playTwoPlayers(int player2)
             sysPrintSquare(snakeHeadP1.x * SNAKE_HEAD_SIZE, snakeHeadP1.y * SNAKE_HEAD_SIZE, SNAKE_HEAD_SIZE, snakeHeadP1.color);
             sysPrintSquare(snakeHeadP2.x * SNAKE_HEAD_SIZE, snakeHeadP2.y * SNAKE_HEAD_SIZE, SNAKE_HEAD_SIZE, snakeHeadP2.color);
 
-            if (board[snakeHeadP1.x][snakeHeadP1.y] == BLOCKED)
+            if (board[snakeHeadP1.x][snakeHeadP1.y] == BLOCKEDAA)
             {
                 didP1Crashed = CRASHED;
             }
 
-            if (board[snakeHeadP2.x][snakeHeadP2.y] == BLOCKED)
+            if (board[snakeHeadP2.x][snakeHeadP2.y] == BLOCKEDAA)
             {
                 didP2Crashed = CRASHED;
             }
 
-            board[snakeHeadP1.x][snakeHeadP1.y] = BLOCKED;
-            board[snakeHeadP2.x][snakeHeadP2.y] = BLOCKED;
+            board[snakeHeadP1.x][snakeHeadP1.y] = BLOCKEDAA;
+            board[snakeHeadP2.x][snakeHeadP2.y] = BLOCKEDAA;
 
             for (int i = 0; i < DEBOUNCER; i++)
             {
@@ -227,8 +227,8 @@ void printWall(void)
     {
         sysPrintSquare(i * WALL_SIZE, 0, WALL_SIZE, RED);
         sysPrintSquare(k * WALL_SIZE, 0, WALL_SIZE, RED);
-        board[i][0] = BLOCKED;
-        board[k][0] = BLOCKED;
+        board[i][0] = BLOCKEDAA;
+        board[k][0] = BLOCKEDAA;
         wait();
     }
 
@@ -236,8 +236,8 @@ void printWall(void)
     {
         sysPrintSquare(0, i * WALL_SIZE, WALL_SIZE, RED);
         sysPrintSquare((WIDTH - 1) * WALL_SIZE, i * WALL_SIZE, WALL_SIZE, RED);
-        board[0][i] = BLOCKED;
-        board[WIDTH - 1][i] = BLOCKED;
+        board[0][i] = BLOCKEDAA;
+        board[WIDTH - 1][i] = BLOCKEDAA;
         wait();
     }
 
@@ -246,8 +246,8 @@ void printWall(void)
         sysPrintSquare(i * WALL_SIZE, (HEIGHT - 1) * WALL_SIZE, WALL_SIZE, RED);
         sysPrintSquare(k * WALL_SIZE, (HEIGHT - 1) * WALL_SIZE, WALL_SIZE, RED);
 
-        board[i][HEIGHT - 1] = BLOCKED;
-        board[k][HEIGHT - 1] = BLOCKED;
+        board[i][HEIGHT - 1] = BLOCKEDAA;
+        board[k][HEIGHT - 1] = BLOCKEDAA;
         wait();
     }
 
@@ -262,17 +262,17 @@ void printWall(void)
             for (int i = startX; i < startX + boxSize; i++)
             {
                 sysPrintSquare(i * WALL_SIZE, startY * WALL_SIZE, WALL_SIZE, YELLOW);
-                board[i][startY] = BLOCKED;
+                board[i][startY] = BLOCKEDAA;
                 sysPrintSquare(i * WALL_SIZE, (startY + boxSize - 1) * WALL_SIZE, WALL_SIZE, YELLOW);
-                board[i][startY + boxSize - 1] = BLOCKED;
+                board[i][startY + boxSize - 1] = BLOCKEDAA;
                 wait();
             }
             for (int j = startY; j < startY + boxSize; j++)
             {
                 sysPrintSquare(startX * WALL_SIZE, j * WALL_SIZE, WALL_SIZE, YELLOW);
-                board[startX][j] = BLOCKED;
+                board[startX][j] = BLOCKEDAA;
                 sysPrintSquare((startX + boxSize - 1) * WALL_SIZE, j * WALL_SIZE, WALL_SIZE, YELLOW);
-                board[startX + boxSize - 1][j] = BLOCKED;
+                board[startX + boxSize - 1][j] = BLOCKEDAA;
                 wait();
             }
         }
@@ -291,14 +291,14 @@ void printWall(void)
             for (int i = startX; i < startX + lineLength; i++)
             {
                 sysPrintSquare(i * WALL_SIZE, startY * WALL_SIZE, WALL_SIZE, YELLOW);
-                board[i][startY] = BLOCKED;
+                board[i][startY] = BLOCKEDAA;
                 wait();
             }
 
             for (int j = startY; j < startY + lineLength; j++)
             {
                 sysPrintSquare(startX * WALL_SIZE, j * WALL_SIZE, WALL_SIZE, YELLOW);
-                board[startX][j] = BLOCKED;
+                board[startX][j] = BLOCKEDAA;
                 wait();
             }
         }

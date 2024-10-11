@@ -60,3 +60,34 @@ static void toLower(char *str)
         }
     }
 }
+
+char *hexToString(uint64_t value)
+{
+    static char str[17];
+    str[16] = '\0';
+
+    char hex[] = "0123456789ABCDEF";
+
+    uint64_t mask = 0xF;
+
+    for (int i = 15; i >= 0; --i)
+    {
+        int digit = (value >> (i * 4)) & mask;
+        str[15 - i] = hex[digit];
+    }
+
+    return str + 8;
+}
+
+int divideString(char *str)
+{
+    for (int i = 0; str[i] != '\0'; i++)
+    {
+        if (str[i] == ' ')
+        {
+            str[i] = '\0';
+            return i;
+        }
+    }
+    return -1;
+}

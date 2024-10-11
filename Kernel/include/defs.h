@@ -34,10 +34,10 @@ typedef long PID;
 
 typedef enum
 {
-  READY,
+  READY = 0,
   RUNNING,
   BLOCKED,
-  KILLED,
+  DEAD,
 } ProcessState;
 
 typedef unsigned int Priority;

@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 typedef long PID;
+#include "./processStructure.h"
 
 int sysWriteScreen(uint64_t fd, unsigned char *buffer, uint64_t len, uint64_t hexColor);
 int sysReadScreen(uint64_t fd, unsigned char *buffer, uint64_t len);
@@ -40,10 +41,8 @@ int sysHideCursor();
 int sysShowCursor();
 void *sysMalloc(int size);
 int sysFree(void *ptrBlock);
-int sysCreateProcess(const char *name, int argc, char *argv[], int priority, void *entryPoint, int foreground);
+int sysCreateProcess(creationParameters *params);
 int sysGetPID();
 int sysGetParentPID();
-int sysYield();
-int sysSuspendProcess(PID pid);
-int sysResumeProcess(PID pid);
+
 #endif

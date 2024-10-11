@@ -35,6 +35,8 @@ GLOBAL sysFree
 GLOBAL sysCreateProcess
 GLOBAL sysGetPID
 GLOBAL sysGetParentPID
+GLOBAL sysGetPS
+GLOBAL sysFreePS
 
 GLOBAL sysCtrlPressed
 GLOBAL sysYield
@@ -198,7 +200,6 @@ sysFree:
 
 sysCreateProcess:
     mov rax, 30
-    mov r10, rcx
     int 80h
     ret
 
@@ -213,16 +214,26 @@ sysGetParentPID:
     ret
 
 sysYield:
-    mov rax,33
+    mov rax,35
     int 80h
     ret
 
 sysSuspendProcess:
-    mov rax,34
+    mov rax,36
     int 80h
     ret
 
 sysResumeProcess:
-    mov rax,35
+    mov rax,37
+    int 80h
+    ret
+
+sysGetPS:
+    mov rax, 33
+    int 80h
+    ret
+
+sysFreePS:
+    mov rax, 34
     int 80h
     ret

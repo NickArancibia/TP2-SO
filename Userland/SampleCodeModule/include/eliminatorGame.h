@@ -8,7 +8,7 @@
 #define TICKS_PER_FRAME 1
 #define MS_PER_FRAME 180000
 
-#define BLOCKED 1
+#define BLOCKEDAA 1
 #define FREE 0
 
 #define SNAKE_HEAD_SIZE 8

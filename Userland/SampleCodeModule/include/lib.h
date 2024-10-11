@@ -8,6 +8,8 @@
 #ifndef __LIB_H_
 #define __LIB_H_
 
+#include "./processStructure.h"
+
 /**
  * Increments text size on screen.
  * Returns 0 if increment was successful, 1 if not (In case max. size has been reached).
@@ -40,6 +42,12 @@ void intToString(int num, char *buf, int minLen);
 /**
  * Used to create a new process
  */
-int createProcess(const char *name, int argc, char *argv[], int priority, void *entryPoint, int foreground);
+int createProcess(creationParameters *params);
+
+/**
+ * Receives a string and a pointer to an int.
+ * Converts the string to an int and leaves it in num.
+ */
+void stringToInt(char *str, int *num);
 
 #endif

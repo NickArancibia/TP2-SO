@@ -78,9 +78,22 @@ int main()
 
 	vdClearScreen();
 	initProcesses();
-	createProcess("init", 0, NULL, DEFAULT_PRIORITY, (entryPoint)&idle, 1);
+	creationParameters params;
+	params.name = "init";
+	params.argc = 0;
+	params.argv = NULL;
+	params.priority = DEFAULT_PRIORITY;
+	params.entryPoint = (entryPoint)&idle;
+	params.foreground = 1;
+	createProcess(&params);
 	initScheduler();
-	createProcess("shell", 0, NULL, DEFAULT_PRIORITY, (entryPoint)sampleCodeModuleAddress, 1);
+	params.name = "shell";
+	params.entryPoint = (entryPoint)sampleCodeModuleAddress;
+	params.foreground = 1;
+	params.argc = 0;
+	params.argv = NULL;
+	params.priority = DEFAULT_PRIORITY;
+	createProcess(&params);
 	forceSwitchContent();
 
 	return 0;
