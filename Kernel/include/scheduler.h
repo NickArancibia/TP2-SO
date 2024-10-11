@@ -5,7 +5,8 @@
 typedef struct Node
 {
     Process * pcb;
-   struct Node * next;
+    struct Node * next;
+    uint32_t executionsLeft;
 }Node;
 
 typedef struct List

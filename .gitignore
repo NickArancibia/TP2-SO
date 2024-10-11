@@ -7,3 +7,4 @@
 *vmdk
 *.sh
 .gdb_history
+.bash_history

@@ -16,6 +16,7 @@ void schedule(Process *pcb)
 {
     Node *node = mallocMM(sizeof(Node));
     node->pcb = pcb;
+    node->executionsLeft = pcb->priority - 1;
 
     if (list.head == NULL)
     {
@@ -68,12 +69,19 @@ uint64_t *switchContent(uint64_t *rsp)
     {
         return rsp;
     }
+
+    if(list.head->executionsLeft > 0){
+        list.head->executionsLeft--;
+        return rsp;
+    }
+    
     if (currentProcess->state == RUNNING)
     {
         currentProcess->stackEnd = rsp;
         schedule(currentProcess);
         currentProcess->state = READY;
     }
+
     currentProcess = unschedule();
 
     if (currentProcess == NULL)
