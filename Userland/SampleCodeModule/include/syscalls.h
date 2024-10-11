@@ -45,4 +45,10 @@ int sysCreateProcess(creationParameters *params);
 int sysGetPID();
 int sysGetParentPID();
 
+Process * sysGetPS();
+void sysFreePS(Process * ps);
+void sysYield();
+void sysSuspendProcess();
+void sysResumeProcess();
+
 #endif

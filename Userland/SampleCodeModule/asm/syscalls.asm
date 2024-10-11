@@ -213,6 +213,16 @@ sysGetParentPID:
     int 80h
     ret
 
+sysGetPS:
+    mov rax, 33
+    int 80h
+    ret
+
+sysFreePS:
+    mov rax, 34
+    int 80h
+    ret
+    
 sysYield:
     mov rax,35
     int 80h
@@ -225,15 +235,5 @@ sysSuspendProcess:
 
 sysResumeProcess:
     mov rax,37
-    int 80h
-    ret
-
-sysGetPS:
-    mov rax, 33
-    int 80h
-    ret
-
-sysFreePS:
-    mov rax, 34
     int 80h
     ret

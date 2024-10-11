@@ -59,12 +59,6 @@ Process *unschedule()
 
 uint64_t *switchContent(uint64_t *rsp)
 {
-    /*
-    if(ticksGlobalElapsed <  0  pcb->ticksElapsed ){
-        ticksGlobalElapsed++;
-        return rsp;
-    }
-    */
     if (currentProcess == NULL)
     {
         return rsp;

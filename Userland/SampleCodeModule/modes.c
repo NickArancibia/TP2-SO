@@ -35,6 +35,7 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "                            your registers by pressing ALT.\n",
                            "TESTING             ->      Start testing area\n",
                            "YIELD               ->      Relinquish voluntarily the CPU\n",
+                           "PS                  ->      Shows information about all processes\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};

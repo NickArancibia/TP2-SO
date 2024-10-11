@@ -18,8 +18,8 @@ void testBlock(){
     for(int i=0; i<200; i++){
         printf("Testing block %d\n", i);
     }
-    sysClearScreen();
     sysResumeProcess(2);
+    while(1);
 }
 
 int init()
@@ -61,21 +61,14 @@ int init()
             yield();
         else if (strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE)
             printProcessesInformation();
-        else if (strcasecmp(commandPrompt, "create") == SELECTED_MODE)
-        {
-            char *argv[] = {"arg1", "arg2", "arg3"};
-            params.name = "test";
-            params.argc = 3;
-            params.argv = argv;
+        else if(strcasecmp(commandPrompt, "create") == SELECTED_MODE){
+            params.name = "testBlock";
+            params.argc = 0;
+            params.argv = NULL;
             params.priority = 1;
-            params.entryPoint = NULL;
+            params.entryPoint = (entryPoint)testBlock;
             params.foreground = 1;
             createProcess(&params);
-        }
-        else if(strcasecmp(commandPrompt, "create") == SELECTED_MODE){
-            sysCreateProcess("block", 0, NULL, 1, testBlock, 1);
-            for(int i=0; i<9000000; i++);
-            printf("Process created\n");
         }
         else if(strcasecmp(commandPrompt, "suspend") == SELECTED_MODE){
             sysSuspendProcess(3);
