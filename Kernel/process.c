@@ -13,13 +13,17 @@
 Process processes[MAX_PROCESSES];
 PID current;
 
-int isValidPID(PID pid){
-    return pid > 0 && pid <= MAX_PID;
+int isValidPID(PID pid)
+{
+    return pid > 0 && pid <= MAX_PID && processes[pid - 1].state != DEAD;
 }
 
-void unblockWaitingProcesses(PID pid, int returnValue){
-    for(int i = 0; i < MAX_PROCESSES; i++){
-        if(processes[i].waitingPID == pid && processes[i].state == BLOCKED){
+void unblockWaitingProcesses(PID pid, int returnValue)
+{
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (processes[i].waitingPID == pid && processes[i].state == BLOCKED)
+        {
             processes[i].waitingPID = NONPID;
             processes[i].childReturnValue = returnValue;
             unblockProcess(processes[i].pid);
@@ -27,25 +31,29 @@ void unblockWaitingProcesses(PID pid, int returnValue){
     }
 }
 
-void waitProcess(PID pidToWait, int * wstatus){
-    Process * currentProcess = getCurrentProcess();
-    if(!isValidPID(pidToWait) || currentProcess->pid == pidToWait || processes[pidToWait-1].state == DEAD){
+void waitProcess(PID pidToWait, int *wstatus)
+{
+    Process *currentProcess = getCurrentProcess();
+    if (!isValidPID(pidToWait) || currentProcess->pid == pidToWait || processes[pidToWait - 1].state == DEAD)
+    {
         return;
     }
     currentProcess->waitingPID = pidToWait;
     blockProcess(currentProcess->pid);
-    if(wstatus != NULL){
+    if (wstatus != NULL)
+    {
         *wstatus = currentProcess->childReturnValue;
     }
 }
 
-int processLoader(int argc, char *argv[], entryPoint entry){
+int processLoader(int argc, char *argv[], entryPoint entry)
+{
     int returnValue = entry(argc, argv);
     PID processPid = getpid();
     unblockWaitingProcesses(processPid, returnValue);
     kill(processPid);
+    return returnValue;
 }
-
 
 PID initProcesses(void)
 {
@@ -170,16 +178,18 @@ PID getppid(void)
     return getCurrentProcess()->parentpid;
 }
 
-Process * getProcess(PID pid){
-    if(processes[pid-1].state != DEAD){
-        return &processes[pid-1];
+Process *getProcess(PID pid)
+{
+    if (processes[pid - 1].state != DEAD)
+    {
+        return &processes[pid - 1];
     }
     return NULL;
 }
 
 Process *getProcessesInformation()
 {
-    int count = getProcessesCount(), ansIndex=0;
+    int count = getProcessesCount(), ansIndex = 0;
     Process *ans = mallocMM((count + 1) * sizeof(Process));
     ans[count].pid = NONPID;
 
@@ -198,24 +208,30 @@ void freeProcessesInformation(Process *processesInfo)
     freeMM(processesInfo);
 }
 
-void kill(PID pid){
-    if(pid <= INITPID || pid > MAX_PID)
-        return;
-    Process * pcb = &processes[pid-1];
-    if(pcb->state == DEAD){
-        return;
+int kill(PID pid)
+{
+    if (pid <= INITPID || pid > MAX_PID)
+        return -1;
+    Process *pcb = &processes[pid - 1];
+    if (pcb->state == DEAD)
+    {
+        return -1;
     }
     freeMM(pcb->stackBase - STACK_SIZE);
-    if(pcb->argc > 0){
-    for(int i = 0; i < pcb->argc; i++){
-        freeMM(pcb->argv[i]);
+    if (pcb->argc > 0)
+    {
+        for (int i = 0; i < pcb->argc; i++)
+        {
+            freeMM(pcb->argv[i]);
+        }
+        freeMM(pcb->argv);
     }
-    freeMM(pcb->argv);
-    }
-    pcb->argv=NULL;
-    pcb->argc=0;
+    pcb->argv = NULL;
+    pcb->argc = 0;
     pcb->state = DEAD;
-    if(getCurrentProcess()->pid == pid){
+    if (getCurrentProcess()->pid == pid)
+    {
         forceSwitchContent();
     }
+    return 0;
 }

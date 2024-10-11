@@ -57,8 +57,8 @@ int resumeProcess(PID pid);
 
 Process *getPS(void);
 void freePS(Process *processesInfo);
-void killProcess(PID pid);
+int killProcess(PID pid);
 void exit();
-void wait(PID pidToWait, int * wstatus);
+void wait(PID pidToWait, int *wstatus);
 
 #endif
