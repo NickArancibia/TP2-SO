@@ -7,7 +7,7 @@
 #include "include/lib.h"
 #include <stdarg.h>
 #define MAXBUFLEN 100
-#define MINLEN 2
+#define MINLEN 1
 #define MAX_INPUTS_STORE 10
 
 /**

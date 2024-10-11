@@ -186,5 +186,7 @@ void kill(PID pid){
     pcb->argv=NULL;
     pcb->argc=0;
     pcb->state = DEAD;
-    forceSwitchContent();
+    if(getCurrentProcess()->pid == pid){
+        forceSwitchContent();
+    }
 }

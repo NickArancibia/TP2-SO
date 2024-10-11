@@ -36,6 +36,9 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "TESTING             ->      Start testing area\n",
                            "YIELD               ->      Relinquish voluntarily the CPU\n",
                            "PS                  ->      Shows information about all processes\n",
+                           "KILL [pid]          ->      Kills the process with the given pid\n",
+                           "SUSPEND [pid]       ->      Suspend a process with the given pid.\n",
+                           "RESUME [pid]        ->      Resume a process with the given pid.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};

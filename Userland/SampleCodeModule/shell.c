@@ -79,10 +79,14 @@ int init()
             sysKill(toKill);
         }
         else if(strcasecmp(commandPrompt, "suspend") == SELECTED_MODE){
-            sysSuspendProcess(3);
+            int toSuspend = 0;
+            stringToInt(&commandPrompt[separator+1], &toSuspend);
+            sysSuspendProcess(toSuspend);
         }
         else if(strcasecmp(commandPrompt, "resume") == SELECTED_MODE){
-            sysResumeProcess(3);
+            int toResume = 0;
+            stringToInt(&commandPrompt[separator+1], &toResume);
+            sysResumeProcess(toResume);
         }
         else
             notFound(commandPrompt);
