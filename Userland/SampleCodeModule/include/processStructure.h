@@ -29,7 +29,7 @@ typedef struct
 typedef struct
 {
     char name[MAX_NAME_LENGTH];
-    PID pid, parentpid;
+    PID pid, parentpid, waitingPID;
     int argc;
     char **argv;
     Priority priority;
@@ -37,6 +37,7 @@ typedef struct
     int foreground;
     ProcessState state;
     uint64_t *stackBase, *stackEnd;
+    int returnValue;
 } Process;
 
 #endif

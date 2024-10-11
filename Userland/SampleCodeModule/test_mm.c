@@ -7,6 +7,8 @@
 #include "./include/colors.h"
 #include "./include/testingArea.h"
 #include "./include/syscalls.h"
+#include "./include/lib.h"
+#include "./include/processStructure.h"
 #include <stdint.h>
 
 #define MAX_BLOCKS 10
@@ -114,4 +116,19 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     printColor("OK!", GREEN);
     iteration = 1;
   }
+}
+
+void testMM(void)
+{
+    char *argv[] = {"25000", 0};
+    creationParameters params;
+    params.name="test_mm";
+    params.argc=1;
+    params.argv=argv;
+    params.priority=1;
+    params.entryPoint=(entryPoint)test_mm;
+    params.foreground=1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
 }

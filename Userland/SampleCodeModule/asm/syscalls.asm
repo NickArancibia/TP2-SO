@@ -43,6 +43,8 @@ GLOBAL sysYield
 GLOBAL sysSuspendProcess
 GLOBAL sysResumeProcess
 GLOBAL sysKill
+GLOBAL sysExit
+GLOBAL sysWait
 
 section .text
 
@@ -241,5 +243,15 @@ sysResumeProcess:
 
 sysKill:
     mov rax,38
+    int 80h
+    ret
+
+sysExit:
+    mov rax, 39
+    int 80h
+    ret
+
+sysWait:
+    mov rax, 40
     int 80h
     ret

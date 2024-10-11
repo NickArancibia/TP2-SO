@@ -51,5 +51,7 @@ void sysYield();
 void sysSuspendProcess();
 void sysResumeProcess();
 void sysKill(PID pid);
+void sysExit();
+void sysWait(PID pid, int * wstatus);
 
 #endif

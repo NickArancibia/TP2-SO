@@ -99,7 +99,7 @@ Process *getCurrentProcess()
 
 
 int blockProcess(PID pid){
-     Process * pcb;
+    Process * pcb;
     if ((pcb = getProcess(pid)) == NULL)
         return 1;
     pcb->state = BLOCKED;

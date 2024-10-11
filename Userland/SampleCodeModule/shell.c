@@ -13,13 +13,11 @@ static const char *modes[] = {
 
 creationParameters params;
 
-void testBlock(){
-    sysSuspendProcess(2);
-    for(int i=0; i<100; i++){
+int testBlock(){
+    for(int i=0; i<20; i++){
         printf("Testing block %d\n", i);
     }
-    sysResumeProcess(2);
-    while(1);
+    return 1;
 }
 
 int init()
@@ -64,6 +62,7 @@ int init()
         else if (strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE)
             printProcessesInformation();
         else if(strcasecmp(commandPrompt, "create") == SELECTED_MODE){
+            int returnValue=0;
             params.name = "testBlock";
             params.argc = 0;
             params.argv = NULL;
@@ -71,7 +70,8 @@ int init()
             params.entryPoint = (entryPoint)testBlock;
             params.foreground = 1;
             int pid = createProcess(&params);
-            printf("Process created with pid %d\n", pid);
+            sysWait(pid, &returnValue);
+            printf("Process %d returned %d\n", pid, returnValue);
         }
         else if(strcasecmp(commandPrompt, "kill") == SELECTED_MODE){
             int toKill = 0;

@@ -13,10 +13,39 @@
 Process processes[MAX_PROCESSES];
 PID current;
 
+int isValidPID(PID pid){
+    return pid > 0 && pid <= MAX_PID;
+}
+
+void unblockWaitingProcesses(PID pid, int returnValue){
+    for(int i = 0; i < MAX_PROCESSES; i++){
+        if(processes[i].waitingPID == pid && processes[i].state == BLOCKED){
+            processes[i].waitingPID = NONPID;
+            processes[i].childReturnValue = returnValue;
+            unblockProcess(processes[i].pid);
+        }
+    }
+}
+
+void waitProcess(PID pidToWait, int * wstatus){
+    Process * currentProcess = getCurrentProcess();
+    if(!isValidPID(pidToWait) || currentProcess->pid == pidToWait || processes[pidToWait-1].state == DEAD){
+        return;
+    }
+    currentProcess->waitingPID = pidToWait;
+    blockProcess(currentProcess->pid);
+    if(wstatus != NULL){
+        *wstatus = currentProcess->childReturnValue;
+    }
+}
+
 int processLoader(int argc, char *argv[], entryPoint entry){
     int returnValue = entry(argc, argv);
-    kill(getpid());
+    PID processPid = getpid();
+    unblockWaitingProcesses(processPid, returnValue);
+    kill(processPid);
 }
+
 
 PID initProcesses(void)
 {
@@ -27,6 +56,7 @@ PID initProcesses(void)
         processes[i].state = DEAD;
         processes[i].argv = NULL;
         processes[i].argc = 0;
+        processes[i].waitingPID = NONPID;
     }
     return 0;
 }
@@ -102,6 +132,7 @@ PID createProcess(creationParameters *params)
     // Set current process Information
     memcpy(processes[allocatedProcess].name, params->name, strlen(params->name) + 1);
     processes[allocatedProcess].parentpid = (currentProcess = getCurrentProcess()) == NULL ? 0 : currentProcess->pid;
+    processes[allocatedProcess].waitingPID = NONPID;
     processes[allocatedProcess].argc = params->argc;
     processes[allocatedProcess].argv = args;
     processes[allocatedProcess].priority = params->priority;
@@ -140,10 +171,8 @@ PID getppid(void)
 }
 
 Process * getProcess(PID pid){
-    for (int i = 0; i < MAX_PROCESSES; i++)
-    {
-        if(pid == processes[i].pid)
-            return &processes[i];
+    if(processes[pid-1].state != DEAD){
+        return &processes[pid-1];
     }
     return NULL;
 }

@@ -27,7 +27,7 @@ typedef struct
 typedef struct
 {
     char name[MAX_NAME_LENGTH];
-    PID pid, parentpid;
+    PID pid, parentpid, waitingPID;
     int argc;
     char **argv;
     Priority priority;
@@ -35,6 +35,7 @@ typedef struct
     int foreground;
     ProcessState state;
     uint64_t *stackBase, *stackEnd;
+    int childReturnValue;
 } Process;
 
 PID initProcesses(void);
@@ -44,6 +45,7 @@ PID getpid(void);
 PID getppid(void);
 Process * getProcess(PID pid);
 void kill(PID pid);
+void waitProcess(PID pidToWait, int * wstatus);
 
 Process *getProcessesInformation();
 void freeProcessesInformation(Process *processesInfo);

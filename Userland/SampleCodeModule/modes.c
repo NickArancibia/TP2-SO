@@ -170,7 +170,6 @@ void playEasterEgg()
 
 void ps()
 {
-    printf("\n");
     Process *processes = sysGetPS();
     for (int i = 0; processes[i].pid != -1; i++)
     {
@@ -193,6 +192,7 @@ void ps()
 
 void printProcessesInformation()
 {
+    PID pid;
     creationParameters params;
     params.name = "ps";
     params.argc = 0;
@@ -200,6 +200,7 @@ void printProcessesInformation()
     params.priority = 1;
     params.entryPoint = (entryPoint)ps;
     params.foreground = 1;
-    createProcess(&params);
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
     return;
 }
