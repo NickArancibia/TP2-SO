@@ -10,10 +10,13 @@
 #include <scheduler.h>
 #include <videoDriver.h>
 
-extern void *setupStack(entryPoint entryPoint, void *stackBase, int argc, char *argv[]);
-
 Process processes[MAX_PROCESSES];
 PID current;
+
+int processLoader(int argc, char *argv[], entryPoint entry){
+    int returnValue = entry(argc, argv);
+    kill(getpid());
+}
 
 PID initProcesses(void)
 {
@@ -104,7 +107,7 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].foreground = params->foreground;
     processes[allocatedProcess].state = READY;
     processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
-    processes[allocatedProcess].stackEnd = setupStack(params->entryPoint, processes[allocatedProcess].stackBase, params->argc, args);
+    processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, processLoader);
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
@@ -162,4 +165,20 @@ Process *getProcessesInformation()
 void freeProcessesInformation(Process *processesInfo)
 {
     freeMM(processesInfo);
+}
+
+void kill(PID pid){
+    if(pid <= INITPID || pid > MAX_PID)
+        return;
+    Process * pcb = &processes[pid-1];
+    if(pcb->state == DEAD){
+        return;
+    }
+    freeMM(pcb->stackBase - STACK_SIZE);
+    for(int i = 0; i < pcb->argc; i++){
+        freeMM(pcb->argv[i]);
+    }
+    //freeMM(pcb->argv);                    ??????????????????????????????????
+    pcb->state = DEAD;
+    forceSwitchContent();
 }

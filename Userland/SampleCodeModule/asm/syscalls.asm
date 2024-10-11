@@ -42,6 +42,7 @@ GLOBAL sysCtrlPressed
 GLOBAL sysYield
 GLOBAL sysSuspendProcess
 GLOBAL sysResumeProcess
+GLOBAL sysKill
 
 section .text
 
@@ -235,5 +236,10 @@ sysSuspendProcess:
 
 sysResumeProcess:
     mov rax,37
+    int 80h
+    ret
+
+sysKill:
+    mov rax,38
     int 80h
     ret

@@ -42,6 +42,7 @@ PID createProcess(creationParameters *params);
 PID getpid(void);
 PID getppid(void);
 Process * getProcess(PID pid);
+void kill(PID pid);
 
 Process *getProcessesInformation();
 void freeProcessesInformation(Process *processesInfo);

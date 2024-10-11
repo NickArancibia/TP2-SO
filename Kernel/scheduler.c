@@ -69,8 +69,9 @@ uint64_t *switchContent(uint64_t *rsp)
         schedule(currentProcess);
         currentProcess->state = READY;
     }
-    if(currentProcess->state == BLOCKED)
+    if(currentProcess->state == BLOCKED){
         currentProcess->stackEnd = rsp;
+    }
     do{
         currentProcess = unschedule();
 
@@ -78,7 +79,7 @@ uint64_t *switchContent(uint64_t *rsp)
         {
             return rsp;
         }
-    } while(currentProcess->state == BLOCKED);
+    } while(currentProcess->state == BLOCKED || currentProcess->state == DEAD);
 
     currentProcess->state = RUNNING;
     return currentProcess->stackEnd;

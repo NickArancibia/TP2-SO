@@ -57,5 +57,6 @@ int resumeProcess(PID pid);
 
 Process *getPS(void);
 void freePS(Process *processesInfo);
+void killProcess(PID pid);
 
 #endif

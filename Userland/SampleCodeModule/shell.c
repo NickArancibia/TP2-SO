@@ -15,7 +15,7 @@ creationParameters params;
 
 void testBlock(){
     sysSuspendProcess(2);
-    for(int i=0; i<200; i++){
+    for(int i=0; i<100; i++){
         printf("Testing block %d\n", i);
     }
     sysResumeProcess(2);
@@ -26,6 +26,7 @@ int init()
 {
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
     char commandPrompt[32] = {0};
+    int separator;
     while (IDLE_MODE)
     {
         sysClearKbEntry();
@@ -33,6 +34,7 @@ int init()
         print("> ");
         sysShowCursor();
         scanf(commandPrompt, 32);
+        separator = divideString(commandPrompt);
         if (strcasecmp(commandPrompt, modes[HELP_MODE]) == SELECTED_MODE)
             help();
         else if (strcasecmp(commandPrompt, modes[ELIMINATOR_MODE]) == SELECTED_MODE)
@@ -68,7 +70,13 @@ int init()
             params.priority = 1;
             params.entryPoint = (entryPoint)testBlock;
             params.foreground = 1;
-            createProcess(&params);
+            int pid = createProcess(&params);
+            printf("Process created with pid %d\n", pid);
+        }
+        else if(strcasecmp(commandPrompt, "kill") == SELECTED_MODE){
+            int toKill = 0;
+            stringToInt(&commandPrompt[separator+1], &toKill);
+            sysKill(toKill);
         }
         else if(strcasecmp(commandPrompt, "suspend") == SELECTED_MODE){
             sysSuspendProcess(3);

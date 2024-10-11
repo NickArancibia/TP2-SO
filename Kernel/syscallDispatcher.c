@@ -12,7 +12,7 @@
 #include "speaker.h"
 #include "fonts.h"
 
-#define HANDLER_SIZE 38
+#define HANDLER_SIZE 39
 
 static int (*syscallHandlers[])() = {
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
@@ -20,7 +20,7 @@ static int (*syscallHandlers[])() = {
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)(void))malloc, (int (*)(void))free,
     (int (*)(void))processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)(void))getPS, (int (*)(void))freePS, yield,
-    suspendProcess, resumeProcess};
+    suspendProcess, resumeProcess, (int (*)(void))killProcess};
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax)
 {
@@ -253,7 +253,6 @@ void freePS(Process *processesInfo)
 }
 
 int yield(void){
-
     forceSwitchContent();
     return 0;
 }
@@ -264,4 +263,8 @@ int suspendProcess(PID pid){
 
 int resumeProcess(PID pid){
     return unblockProcess(pid);
+}
+
+void killProcess(PID pid){
+    kill(pid);
 }

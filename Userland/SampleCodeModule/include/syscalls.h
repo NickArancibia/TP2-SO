@@ -50,5 +50,6 @@ void sysFreePS(Process * ps);
 void sysYield();
 void sysSuspendProcess();
 void sysResumeProcess();
+void sysKill(PID pid);
 
 #endif

@@ -198,4 +198,5 @@ void printProcessesInformation()
     params.entryPoint = (entryPoint)ps;
     params.foreground = 1;
     createProcess(&params);
+    return;
 }
