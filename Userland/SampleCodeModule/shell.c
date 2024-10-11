@@ -13,6 +13,15 @@ static const char *modes[] = {
 
 creationParameters params;
 
+void testBlock(){
+    sysSuspendProcess(2);
+    for(int i=0; i<200; i++){
+        printf("Testing block %d\n", i);
+    }
+    sysClearScreen();
+    sysResumeProcess(2);
+}
+
 int init()
 {
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
@@ -62,6 +71,17 @@ int init()
             params.entryPoint = NULL;
             params.foreground = 1;
             createProcess(&params);
+        }
+        else if(strcasecmp(commandPrompt, "create") == SELECTED_MODE){
+            sysCreateProcess("block", 0, NULL, 1, testBlock, 1);
+            for(int i=0; i<9000000; i++);
+            printf("Process created\n");
+        }
+        else if(strcasecmp(commandPrompt, "suspend") == SELECTED_MODE){
+            sysSuspendProcess(3);
+        }
+        else if(strcasecmp(commandPrompt, "resume") == SELECTED_MODE){
+            sysResumeProcess(3);
         }
         else
             notFound(commandPrompt);
