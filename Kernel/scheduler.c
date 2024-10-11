@@ -7,6 +7,7 @@
 Quantum qtyQuantums;
 List list;
 Process *currentProcess = NULL;
+char isYield = YIELD_NOT_DONE;
 
 void initScheduler()
 {
@@ -65,7 +66,8 @@ uint64_t *switchContent(uint64_t *rsp)
         return rsp;
     }
 
-    if(list.head->executionsLeft > 0){
+    if(list.head->executionsLeft > 0 && getYield() != YIELD_DONE)
+    {
         list.head->executionsLeft--;
         return rsp;
     }
@@ -87,6 +89,7 @@ uint64_t *switchContent(uint64_t *rsp)
             return rsp;
         }
     } while(currentProcess->state == BLOCKED || currentProcess->state == DEAD);
+
 
     currentProcess->state = RUNNING;
     return currentProcess->stackEnd;
@@ -113,4 +116,14 @@ int unblockProcess(PID pid){
     pcb->state = READY;
     schedule(pcb);
     return 0;
+}
+
+void setYield(){
+    isYield = YIELD_DONE;
+}
+void clearYield(){
+    isYield = YIELD_NOT_DONE;
+}
+char getYield(){
+    return isYield;
 }

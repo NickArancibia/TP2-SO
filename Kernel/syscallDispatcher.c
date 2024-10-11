@@ -11,6 +11,7 @@
 #include <memoryManager.h>
 #include "speaker.h"
 #include "fonts.h"
+#include <scheduler.h>
 
 #define HANDLER_SIZE 41
 
@@ -253,7 +254,9 @@ void freePS(Process *processesInfo)
 }
 
 int yield(void){
+    setYield();
     forceSwitchContent();
+    clearYield();
     return 0;
 }
 
