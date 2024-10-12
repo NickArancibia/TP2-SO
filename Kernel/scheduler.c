@@ -66,9 +66,9 @@ uint64_t *switchContent(uint64_t *rsp)
         return rsp;
     }
 
-    if(list.head->executionsLeft > 0 && getYield() != YIELD_DONE)
+    if (list.head->executionsLeft > 0 && getYield() != YIELD_DONE)
     {
-        list.head->executionsLeft--;
+        (list.head->executionsLeft)--;
         return rsp;
     }
 
@@ -90,7 +90,7 @@ uint64_t *switchContent(uint64_t *rsp)
         {
             return rsp;
         }
-    } while(currentProcess->state == BLOCKED || currentProcess->state == DEAD);
+    } while (currentProcess->state == BLOCKED || currentProcess->state == DEAD);
 
     currentProcess->state = RUNNING;
     return currentProcess->stackEnd;
@@ -120,12 +120,15 @@ int unblockProcess(PID pid)
     return 0;
 }
 
-void setYield(){
+void setYield()
+{
     isYield = YIELD_DONE;
 }
-void clearYield(){
+void clearYield()
+{
     isYield = YIELD_NOT_DONE;
 }
-char getYield(){
+char getYield()
+{
     return isYield;
 }

@@ -253,7 +253,8 @@ void freePS(Process *processesInfo)
     freeProcessesInformation(processesInfo);
 }
 
-int yield(void){
+int yield(void)
+{
     setYield();
     forceSwitchContent();
     clearYield();
@@ -284,7 +285,8 @@ void wait(PID pidToWait, int *wstatus)
 {
     waitProcess(pidToWait, wstatus);
 }
-void nice(PID pid, Priority priority)
+
+int nice(PID pid, Priority priority)
 {
-    changeProccessPriority(pid, priority);
+    return changeProccessPriority(pid, priority);
 }

@@ -236,9 +236,12 @@ int kill(PID pid)
     return 0;
 }
 
-void changeProccessPriority(PID pid, Priority priority){
-    if(!isValidPID(pid) || !checkPriority(priority)){
-        return;
+int changeProccessPriority(PID pid, Priority priority)
+{
+    if (!isValidPID(pid) || !checkPriority(priority))
+    {
+        return -1;
     }
     processes[pid - 1].priority = priority;
+    return 0;
 }

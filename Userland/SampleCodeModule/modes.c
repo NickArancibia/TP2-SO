@@ -39,6 +39,7 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "KILL [pid]          ->      Kills the process with the given pid\n",
                            "SUSPEND [pid]       ->      Suspend a process with the given pid.\n",
                            "RESUME [pid]        ->      Resume a process with the given pid.\n",
+                           "NICE [pid] [prio]   ->      Change the priority of the process with the given pid to prio.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -112,8 +113,9 @@ void registers()
     }
 }
 
-void yield(){
-   sysYield();
+void yield()
+{
+    sysYield();
 }
 
 void notFound(char *commandNotFound)

@@ -20,8 +20,12 @@
 #define REGISTERS_MODE 11
 #define EASTEREGG_MODE 12
 #define TESTING_AREA 13
-#define YIELD 15
 #define PS 14
+#define YIELD 15
+#define KILL 16
+#define SUSPEND 17
+#define RESUME 18
+#define NICE 19
 
 int init();
 

@@ -10,7 +10,9 @@
 #include "include/test_util.h"
 
 static const char *modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time", "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps", "yield"};
+    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time",
+    "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps", "yield",
+    "kill", "suspend", "resume", "nice"};
 
 creationParameters params;
 
@@ -79,7 +81,7 @@ int init()
             sysWait(pid, &returnValue);
             printf("Process %d returned %d\n", pid, returnValue);
         }
-        else if (strcasecmp(commandPrompt, "kill") == SELECTED_MODE)
+        else if (strcasecmp(commandPrompt, modes[KILL]) == SELECTED_MODE)
         {
             int toKill = satoi(&commandPrompt[separator + 1]);
             if (toKill == 0)
@@ -99,7 +101,7 @@ int init()
                 }
             }
         }
-        else if (strcasecmp(commandPrompt, "suspend") == SELECTED_MODE)
+        else if (strcasecmp(commandPrompt, modes[SUSPEND]) == SELECTED_MODE)
         {
             int toSuspend = satoi(&commandPrompt[separator + 1]);
             if (toSuspend == 0)
@@ -115,7 +117,7 @@ int init()
                 }
             }
         }
-        else if (strcasecmp(commandPrompt, "resume") == SELECTED_MODE)
+        else if (strcasecmp(commandPrompt, modes[RESUME]) == SELECTED_MODE)
         {
             int toResume = satoi(&commandPrompt[separator + 1]);
             if (toResume == 0)
@@ -128,6 +130,31 @@ int init()
                 if (returnValue == -1)
                 {
                     printf("Invalid PID\n");
+                }
+            }
+        }
+        else if (strcasecmp(commandPrompt, modes[NICE]) == SELECTED_MODE)
+        {
+            int newSeparator = divideString(&commandPrompt[separator + 1]);
+            if (newSeparator == -1)
+            {
+                printf("Use: nice [pid] [priority] (e.g. nice 3 2)\n");
+            }
+            else
+            {
+                int toNice = satoi(&commandPrompt[separator + 1]);
+                int priority = satoi(&commandPrompt[separator + newSeparator + 2]);
+                if (toNice == 0 || priority == 0)
+                {
+                    printf("Use: nice [pid] [priority] (e.g. nice 3 2)\n");
+                }
+                else
+                {
+                    returnValue = sysNice(toNice, priority);
+                    if (returnValue == -1)
+                    {
+                        printf("Invalid PID or priority\n");
+                    }
                 }
             }
         }
