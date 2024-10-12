@@ -45,6 +45,7 @@ GLOBAL sysResumeProcess
 GLOBAL sysKill
 GLOBAL sysExit
 GLOBAL sysWait
+GLOBAL sysNice
 
 section .text
 
@@ -253,5 +254,10 @@ sysExit:
 
 sysWait:
     mov rax, 40
+    int 80h
+    ret
+
+sysNice:
+    mov rax, 41
     int 80h
     ret

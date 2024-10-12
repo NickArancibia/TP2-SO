@@ -53,5 +53,6 @@ int sysResumeProcess();
 int sysKill(PID pid);
 void sysExit();
 void sysWait(PID pid, int *wstatus);
+void sysNice(PID pid, Priority priority);
 
 #endif

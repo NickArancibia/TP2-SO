@@ -60,5 +60,6 @@ void freePS(Process *processesInfo);
 int killProcess(PID pid);
 void exit();
 void wait(PID pidToWait, int *wstatus);
+void nice(PID pid, Priority priority);
 
 #endif
