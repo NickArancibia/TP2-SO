@@ -212,7 +212,7 @@ void printProcessesInformation()
 
 void getMemoryStatus(){
     sysGetMemStatus(memoryStatus);
-    printf("Bloques ocupados=%d | ",memoryStatus[0]);
-    printf("Bytes ocupados=%d |  ",memoryStatus[1]);
-    printf("Bytes libres=%d\n",memoryStatus[2]);
+    printf("Bloques ocupados= %d | ",memoryStatus[0]);
+    printf("Bytes ocupados= %d |  ",memoryStatus[1]);
+    printf("Bytes libres= %d\n",memoryStatus[2]);
 }
