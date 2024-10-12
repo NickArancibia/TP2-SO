@@ -2,6 +2,8 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <memoryManager.h>
 #include "./include/defs.h"
+#include <stdint.h>
+#include <interrupts.h>
 
 #define BLOCK_COUNT 250
 #define ALIGNMENT 8
@@ -13,7 +15,7 @@
 //                    size   + 7 (111b)         & ~(111b)"
 //                                              &   (000b)
 #define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
-#define SIZE_MEM_HEADER() (sizeof(memHeader))
+
 
 typedef struct memHeader{
     int size;
@@ -36,11 +38,11 @@ void updateMemoryStats(int allocatedChange, int freeChange, int blockChange) {
 void initializeMemoryMM(void *memoryStart, int memorySize)
 {
     firstBlock = (memHeader *)memoryStart;
-    firstBlock->size = memorySize - (int)SIZE_MEM_HEADER();
+    firstBlock->size = memorySize - sizeof(memHeader);
     firstBlock->isFree = 1;
     firstBlock->next = NULL;
     firstBlock->prev = NULL;
-    updateMemoryStats((int)SIZE_MEM_HEADER(),firstBlock->size,0);
+    updateMemoryStats(sizeof(memHeader),firstBlock->size,0);
 }
 
 void *mallocMM(int size){
@@ -58,61 +60,64 @@ void *mallocMM(int size){
     {
         updateMemoryStats(size, -size, 1);
         curr->isFree = 0;
-        return ((void *)(((void *)curr) + (int)SIZE_MEM_HEADER()));
+        return ((void *)(((void *)curr) + sizeof(memHeader)));
     }
     if (curr->size > size)
     {
 
         splitBlock(curr, size);
         updateMemoryStats(size, -size, 1);
-        return ((void *)(((void *)curr) + (int)SIZE_MEM_HEADER()));
+        return ((void *)(((void *)curr) + sizeof(memHeader)));
     }
     return NULL;
 }
 
 void freeMM(void *memorySegment)
 {
+    
     if (memorySegment != NULL)
     {
-        memHeader *curr = (memHeader *)(memorySegment - (int)SIZE_MEM_HEADER());
+        memHeader *curr = (memHeader *)(memorySegment - sizeof(memHeader));
         curr->isFree = 1;
         updateMemoryStats(-(curr->size), curr->size, -1);
+        // TODO fixear el merge
+        /* 
         if (curr->prev != NULL && curr->prev->isFree)
         {
-            curr->prev->size += (curr->size + (int)SIZE_MEM_HEADER());
+            curr->prev->size += (curr->size + sizeof(memHeader));
             curr->prev->next = curr->next;
             if(curr->next != NULL){
                 curr->next->prev = curr->prev;
             }
             curr = curr->prev;
-            updateMemoryStats(-(int)SIZE_MEM_HEADER(),(int)SIZE_MEM_HEADER(),0);
+            updateMemoryStats(-sizeof(memHeader),sizeof(memHeader),0);
 
         }
         if (curr->next != NULL && curr->next->isFree)
         {
-            updateMemoryStats(-(int)SIZE_MEM_HEADER(),(int)SIZE_MEM_HEADER(),0);
-            curr->size += (curr->next->size + (int)SIZE_MEM_HEADER());
+            updateMemoryStats(-sizeof(memHeader),sizeof(memHeader),0);
+            curr->size += (curr->next->size + sizeof(memHeader));
             curr->next = curr->next->next;
             if(curr->next != NULL){
                 curr->next->prev = curr;
             }
             
         }
+        */
     }
-
 }
 
 void splitBlock(memHeader *block, int size)
 {
     memHeader *newBlock = NULL;
-    if(bytesFree >= (size + SIZE_MEM_HEADER()))
+    if(bytesFree >= (size + sizeof(memHeader)))
     {
-        newBlock = (memHeader *)((void *)block + size + SIZE_MEM_HEADER());
-        newBlock->size = block->size - size - (int)SIZE_MEM_HEADER();
+        newBlock = (memHeader *)((void *)block + size + sizeof(memHeader));
+        newBlock->size = block->size - size - sizeof(memHeader);
         newBlock->isFree = 1;
         newBlock->next = block->next;
         newBlock->prev = block;
-        updateMemoryStats((int)SIZE_MEM_HEADER(), -(int)SIZE_MEM_HEADER(), 0);
+        updateMemoryStats(sizeof(memHeader), -sizeof(memHeader), 0);
     }
     block->size = size;
     block->isFree = 0;

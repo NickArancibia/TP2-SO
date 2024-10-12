@@ -32,5 +32,5 @@ int unblockProcess(PID pid);
 void setYield();
 void clearYield();
 char getYield();
-
+void garbageCollect();
 #endif

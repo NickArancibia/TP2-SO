@@ -17,4 +17,6 @@ void testingArea();
 void yield();
 void printProcessesInformation();
 void getMemoryStatus();
+void testProc(void);
+
 #endif

@@ -13,10 +13,20 @@
 #include "include/utils.h"
 #include "include/testingArea.h"
 #include "include/processStructure.h"
+#include "include/test_util.h"
 
 char *dateTimeAux;
 int zoomAux, regAux;
 int memoryStatus[3];
+int64_t test_processes(uint64_t argc, char *argv[]);
+void endless_loop();
+int iteration;
+
+typedef struct P_rq
+{
+    int32_t pid;
+    ProcessState state;
+} p_rq;
 
 static char *helpText[] = {"Command information is displayed below:\n\n",
                            "HELP                ->      Shows a description on each available command.\n",
@@ -82,7 +92,7 @@ void date(void)
 {
     printDate();
 }
-
+void dummy(){}
 void zoomin()
 {
     zoomAux = incTextSize();
@@ -215,4 +225,128 @@ void getMemoryStatus(){
     printf("Bloques ocupados= %d | ",memoryStatus[0]);
     printf("Bytes ocupados= %d |  ",memoryStatus[1]);
     printf("Bytes libres= %d\n",memoryStatus[2]);
+}
+
+void testProc(void)
+{
+    sysHideCursor();
+    char *argv[] = {"6", 0};
+    creationParameters params;
+    params.name = "test_processes";
+    params.argc = 1;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_processes;
+    params.foreground = 1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+}
+
+int64_t test_processes(uint64_t argc, char *argv[])
+{
+    int iteration = 0;
+    uint8_t rq;
+    uint8_t alive = 0;
+    uint8_t action;
+    uint64_t max_processes;
+    char *argvAux[] = {0};
+    creationParameters params;
+    params.name = "endless_loop";
+    params.argc = 0;
+    params.argv = argvAux;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)endless_loop;
+    params.foreground = 1;
+
+    if (argc != 1)
+        return -1;
+
+    if ((max_processes = satoi(argv[0])) <= 0)
+        return -1;
+
+    p_rq p_rqs[max_processes];
+    while (1)
+    {
+
+        // Create max_processes processes
+        for (rq = 0; rq < max_processes; rq++)
+        {
+            p_rqs[rq].pid = createProcess(&params);
+
+            if (p_rqs[rq].pid == -1)
+            {
+                printf("test_processes: ERROR creating process\n");
+                return -1;
+            }
+            else
+            {
+                p_rqs[rq].state = RUNNING;
+                alive++;
+            }
+        }
+        printf("Cr %d\n",++iteration);
+
+        // Randomly kills, blocks or unblocks processes until every one has been killed
+        while (alive > 0)
+        {
+
+            for (rq = 0; rq < max_processes; rq++)
+            {
+                action = GetUniform(100) % 2;
+
+                switch (action)
+                {
+                case 0:
+                    if (p_rqs[rq].state == RUNNING || p_rqs[rq].state == BLOCKED)
+                    {
+                        if (sysKill(p_rqs[rq].pid) == -1)
+                        {
+                            printf("test_processes: ERROR killing process\n");
+                            return -1;
+                        }
+                        p_rqs[rq].state = DEAD;
+                        alive--;
+                    }
+                    break;
+                     case 1:
+                    if (p_rqs[rq].state == RUNNING)
+                    {
+                        if (sysSuspendProcess(p_rqs[rq].pid) == -1)
+                        {
+                            printf("test_processes: ERROR blocking process\n");
+                            return -1;
+                        }
+                        p_rqs[rq].state = BLOCKED;
+                    }
+                    break;
+                }
+            }
+
+            // Randomly unblocks processes
+            for (rq = 0; rq < max_processes; rq++)
+                if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2)
+                {
+                    if (sysResumeProcess(p_rqs[rq].pid) == -1)
+                    {
+                        printf("test_processes: ERROR unblocking process\n");
+                        return -1;
+                    }
+                    p_rqs[rq].state = RUNNING;
+                }
+        }
+     //    for (int i = 0; i < 9000000; i++)
+     //        ;
+     //    printColor("OK!", GREEN);
+        
+     //   dummy();
+       
+    }
+}
+
+void endless_loop()
+{
+    while (1)
+        ;
 }

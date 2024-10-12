@@ -217,7 +217,8 @@ int kill(PID pid)
     {
         return -1;
     }
-    freeMM(pcb->stackBase - STACK_SIZE);
+    
+    freeMM(((void*)pcb->stackBase - STACK_SIZE));
     if (pcb->argc > 0)
     {
         for (int i = 0; i < pcb->argc; i++)
@@ -226,9 +227,11 @@ int kill(PID pid)
         }
         freeMM(pcb->argv);
     }
+    pcb->state = DEAD;
     pcb->argv = NULL;
     pcb->argc = 0;
-    pcb->state = DEAD;
+    garbageCollect();
+    
     if (getCurrentProcess()->pid == pid)
     {
         forceSwitchContent();

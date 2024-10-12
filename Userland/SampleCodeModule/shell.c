@@ -12,7 +12,7 @@
 static const char *modes[] = {
     "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time",
     "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps", "yield",
-    "kill", "suspend", "resume", "nice","memstatus"};
+    "kill", "suspend", "resume", "nice","memstatus","proc"};
 
 creationParameters params;
 
@@ -68,6 +68,8 @@ int init()
             printProcessesInformation();
         else if (strcasecmp(commandPrompt, modes[MEMORY_STATUS]) == SELECTED_MODE)
             getMemoryStatus();
+        else if (strcasecmp(commandPrompt, modes[PROC]) == SELECTED_MODE)
+            testProc();
         /**
          * TODO: Remove this
          */

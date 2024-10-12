@@ -3,8 +3,8 @@
 #include "./include/memoryManager.h"
 #include "./include/scheduler.h"
 #include "./include/syscallHandle.h"
-
-Quantum qtyQuantums;
+#include <interrupts.h>
+Quantum quatumsLeft = 0;
 List list;
 Process *currentProcess = NULL;
 char isYield = YIELD_NOT_DONE;
@@ -12,6 +12,58 @@ char isYield = YIELD_NOT_DONE;
 void initScheduler()
 {
     currentProcess = list.head->pcb;
+}
+
+void garbageCollect()
+{
+    if (list.head == NULL)
+        return;
+
+    Node *current = list.head;
+    Node *previous = list.tail;  // To keep track of the previous node in the circular list
+    Node *temp;
+
+    do
+    {
+        // Check if the current process is BLOCKED or DEAD
+        if (current->pcb->state == BLOCKED || current->pcb->state == DEAD)
+        {
+            temp = current;
+
+            if (current == list.head)
+            {
+                // Move the head if we're removing the first node
+                list.head = list.head->next;
+                list.tail->next = list.head; // Keep the list circular
+            }
+            else
+            {
+                previous->next = current->next;  // Skip the current node
+                if (current == list.tail)
+                {
+                    // Move the tail if we're removing the last node
+                    list.tail = previous;
+                    list.tail->next = list.head; // Update the circular link
+                }
+            }
+
+            current = current->next;
+            freeMM(temp);  // Free the memory for the removed node
+
+            // If the list becomes empty after removing the node
+            if (list.head == NULL)
+            {
+                list.tail = NULL;
+                break;
+            }
+        }
+        else
+        {
+            previous = current;
+            current = current->next;
+        }
+    } while (current != list.head);  // Continue until we circle back to the head
+
 }
 
 void schedule(Process *pcb)
@@ -66,12 +118,11 @@ uint64_t *switchContent(uint64_t *rsp)
         return rsp;
     }
 
-    if (list.head->executionsLeft > 0 && getYield() != YIELD_DONE)
-    {
-        (list.head->executionsLeft)--;
-        return rsp;
-    }
-
+  //  if (quatumsLeft > 0 && getYield() != YIELD_DONE)
+  //  {
+  //     (quatumsLeft)--;
+  //     return rsp;
+  // }
     if (currentProcess->state == RUNNING)
     {
         currentProcess->stackEnd = rsp;
@@ -80,12 +131,15 @@ uint64_t *switchContent(uint64_t *rsp)
     }
     if (currentProcess->state == BLOCKED)
     {
+        quatumsLeft= 0;
         currentProcess->stackEnd = rsp;
     }
+  
     do
-    {
+    {  
+     
         currentProcess = unschedule();
-
+        quatumsLeft = currentProcess->priority;
         if (currentProcess == NULL)
         {
             return rsp;
@@ -107,8 +161,11 @@ int blockProcess(PID pid)
     if ((pcb = getProcess(pid)) == NULL)
         return 1;
     pcb->state = BLOCKED;
-    if (pcb->pid == currentProcess->pid)
+    garbageCollect();
+
+    if (pcb->pid == currentProcess->pid){
         return yield();
+    }
     return 0;
 }
 

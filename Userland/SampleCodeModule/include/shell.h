@@ -27,6 +27,7 @@
 #define RESUME 18
 #define NICE 19
 #define MEMORY_STATUS 20
+#define PROC 21
 
 int init();
 
