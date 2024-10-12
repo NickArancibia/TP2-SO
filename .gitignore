@@ -8,5 +8,5 @@
 *vmdk
 *.sh
 .gdb_history
-.gbdinit
+.gdbinit
 .bash_history
