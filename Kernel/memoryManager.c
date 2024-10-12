@@ -13,55 +13,59 @@
 //                    size   + 7 (111b)         & ~(111b)"
 //                                              &   (000b)
 #define ALIGN(size) (((size) + (ALIGNMENT - 1)) & ~(ALIGNMENT - 1))
+#define SIZE_MEM_HEADER() (sizeof(memHeader))
 
-typedef struct memHeader
-{
+typedef struct memHeader{
     int size;
     int isFree;
-    struct memHeader *next;
-    struct memHeader *prev;
+    struct memHeader * next;
+    struct memHeader * prev;
 } memHeader;
 
-memHeader *firstBlock;
+memHeader * firstBlock;
 int memSize, blockSize;
-
+int bytesAllocated,bytesFree,blocksAllocated;
 void splitBlock(memHeader *block, int size);
+
+void updateMemoryStats(int allocatedChange, int freeChange, int blockChange) {
+    bytesAllocated += allocatedChange;
+    bytesFree += freeChange;
+    blocksAllocated += blockChange;
+}
 
 void initializeMemoryMM(void *memoryStart, int memorySize)
 {
     firstBlock = (memHeader *)memoryStart;
-    firstBlock->size = memorySize - sizeof(memHeader);
+    firstBlock->size = memorySize - (int)SIZE_MEM_HEADER();
     firstBlock->isFree = 1;
     firstBlock->next = NULL;
     firstBlock->prev = NULL;
+    updateMemoryStats((int)SIZE_MEM_HEADER(),firstBlock->size,0);
 }
 
-void *mallocMM(int size)
-{
-    if (size <= 0)
-    {
+void *mallocMM(int size){
+    if(size <= 0){
         return NULL;
     }
-    memHeader *curr = firstBlock;
-
-    size = ALIGN(size);
-    while (curr != NULL && !(curr->isFree && curr->size >= size))
-    {
+    memHeader * curr = firstBlock;
+    while(curr != NULL && !(curr->isFree && curr->size >= size)){
         curr = curr->next;
     }
-    if (curr == NULL)
-    {
+    if(curr == NULL){
         return NULL;
     }
     if (curr->size == size)
     {
+        updateMemoryStats(size, -size, 1);
         curr->isFree = 0;
-        return ((void *)(((void *)curr) + sizeof(memHeader)));
+        return ((void *)(((void *)curr) + (int)SIZE_MEM_HEADER()));
     }
     if (curr->size > size)
     {
+
         splitBlock(curr, size);
-        return ((void *)(((void *)curr) + sizeof(memHeader)));
+        updateMemoryStats(size, -size, 1);
+        return ((void *)(((void *)curr) + (int)SIZE_MEM_HEADER()));
     }
     return NULL;
 }
@@ -70,38 +74,53 @@ void freeMM(void *memorySegment)
 {
     if (memorySegment != NULL)
     {
-        memHeader *curr = (memHeader *)(memorySegment - sizeof(memHeader));
+        memHeader *curr = (memHeader *)(memorySegment - (int)SIZE_MEM_HEADER());
         curr->isFree = 1;
+        updateMemoryStats(-(curr->size), curr->size, -1);
         if (curr->prev != NULL && curr->prev->isFree)
         {
-            curr->prev->size += (curr->size + sizeof(memHeader));
+            curr->prev->size += (curr->size + (int)SIZE_MEM_HEADER());
             curr->prev->next = curr->next;
-            if (curr->next != NULL)
-            {
+            if(curr->next != NULL){
                 curr->next->prev = curr->prev;
             }
             curr = curr->prev;
+            updateMemoryStats(-(int)SIZE_MEM_HEADER(),(int)SIZE_MEM_HEADER(),0);
+
         }
         if (curr->next != NULL && curr->next->isFree)
         {
-            curr->size += (curr->next->size + sizeof(memHeader));
+            updateMemoryStats(-(int)SIZE_MEM_HEADER(),(int)SIZE_MEM_HEADER(),0);
+            curr->size += (curr->next->size + (int)SIZE_MEM_HEADER());
             curr->next = curr->next->next;
-            if (curr->next != NULL)
-            {
+            if(curr->next != NULL){
                 curr->next->prev = curr;
             }
+            
         }
     }
+
 }
 
 void splitBlock(memHeader *block, int size)
 {
-    memHeader *newBlock = (memHeader *)((void *)block + size + sizeof(memHeader));
-    newBlock->size = block->size - size - sizeof(memHeader);
-    newBlock->isFree = 1;
-    newBlock->next = block->next;
-    newBlock->prev = block;
+    memHeader *newBlock = NULL;
+    if(bytesFree >= (size + SIZE_MEM_HEADER()))
+    {
+        newBlock = (memHeader *)((void *)block + size + SIZE_MEM_HEADER());
+        newBlock->size = block->size - size - (int)SIZE_MEM_HEADER();
+        newBlock->isFree = 1;
+        newBlock->next = block->next;
+        newBlock->prev = block;
+        updateMemoryStats((int)SIZE_MEM_HEADER(), -(int)SIZE_MEM_HEADER(), 0);
+    }
     block->size = size;
     block->isFree = 0;
     block->next = newBlock;
+}
+
+void getMemoryStatus(int* status){
+    status[0] = blocksAllocated;
+    status[1] = bytesAllocated;
+    status[2] = bytesFree;
 }

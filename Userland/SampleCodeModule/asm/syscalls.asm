@@ -46,7 +46,7 @@ GLOBAL sysKill
 GLOBAL sysExit
 GLOBAL sysWait
 GLOBAL sysNice
-
+GLOBAL sysGetMemStatus
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -259,5 +259,10 @@ sysWait:
 
 sysNice:
     mov rax, 41
+    int 80h
+    ret
+
+sysGetMemStatus
+    mov rax,42
     int 80h
     ret

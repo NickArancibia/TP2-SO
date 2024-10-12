@@ -16,4 +16,5 @@ void playEasterEgg();
 void testingArea();
 void yield();
 void printProcessesInformation();
+void getMemoryStatus();
 #endif

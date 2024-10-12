@@ -54,5 +54,5 @@ int sysKill(PID pid);
 void sysExit();
 void sysWait(PID pid, int *wstatus);
 int sysNice(PID pid, Priority priority);
-
+void sysGetMemStatus(int* memStatus);
 #endif

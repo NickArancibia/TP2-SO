@@ -61,5 +61,6 @@ int killProcess(PID pid);
 void exit();
 void wait(PID pidToWait, int *wstatus);
 int nice(PID pid, Priority priority);
+void getMemStatus(int * memStatus);
 
 #endif

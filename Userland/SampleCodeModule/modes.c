@@ -16,6 +16,7 @@
 
 char *dateTimeAux;
 int zoomAux, regAux;
+int memoryStatus[3];
 
 static char *helpText[] = {"Command information is displayed below:\n\n",
                            "HELP                ->      Shows a description on each available command.\n",
@@ -40,6 +41,8 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "SUSPEND [pid]       ->      Suspend a process with the given pid.\n",
                            "RESUME [pid]        ->      Resume a process with the given pid.\n",
                            "NICE [pid] [prio]   ->      Change the priority of the process with the given pid to prio.\n",
+                           "MEMSTATUS           ->      Prints how many blocks and bytes were allocated \n",
+                           "                            and how many bytes are still free.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -205,4 +208,11 @@ void printProcessesInformation()
     pid = createProcess(&params);
     sysWait(pid, NULL);
     return;
+}
+
+void getMemoryStatus(){
+    sysGetMemStatus(memoryStatus);
+    printf("Bloques ocupados=%d | ",memoryStatus[0]);
+    printf("Bytes ocupados=%d |  ",memoryStatus[1]);
+    printf("Bytes libres=%d\n",memoryStatus[2]);
 }

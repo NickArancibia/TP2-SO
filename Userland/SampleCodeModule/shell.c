@@ -12,7 +12,7 @@
 static const char *modes[] = {
     "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time",
     "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps", "yield",
-    "kill", "suspend", "resume", "nice"};
+    "kill", "suspend", "resume", "nice","memstatus"};
 
 creationParameters params;
 
@@ -66,6 +66,8 @@ int init()
             yield();
         else if (strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE)
             printProcessesInformation();
+        else if (strcasecmp(commandPrompt, modes[MEMORY_STATUS]) == SELECTED_MODE)
+            getMemoryStatus();
         /**
          * TODO: Remove this
          */
