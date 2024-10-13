@@ -3,6 +3,7 @@
 #include "./include/memoryManager.h"
 #include "./include/scheduler.h"
 #include "./include/syscallHandle.h"
+#include "./include/videoDriver.h"
 #include <interrupts.h>
 Quantum quantumsLeft = 0;
 List list;
@@ -20,7 +21,7 @@ void garbageCollect()
         return;
 
     Node *current = list.head;
-    Node *previous = list.tail;  // To keep track of the previous node in the circular list
+    Node *previous = list.tail; // To keep track of the previous node in the circular list
     Node *temp;
 
     do
@@ -38,7 +39,7 @@ void garbageCollect()
             }
             else
             {
-                previous->next = current->next;  // Skip the current node
+                previous->next = current->next; // Skip the current node
                 if (current == list.tail)
                 {
                     // Move the tail if we're removing the last node
@@ -48,7 +49,7 @@ void garbageCollect()
             }
 
             current = current->next;
-            freeMM(temp);  // Free the memory for the removed node
+            freeMM(temp); // Free the memory for the removed node
 
             // If the list becomes empty after removing the node
             if (list.head == NULL)
@@ -62,8 +63,7 @@ void garbageCollect()
             previous = current;
             current = current->next;
         }
-    } while (current != list.head);  // Continue until we circle back to the head
-
+    } while (current != list.head); // Continue until we circle back to the head
 }
 
 void schedule(Process *pcb)
@@ -118,7 +118,6 @@ uint64_t *switchContent(uint64_t *rsp)
         return rsp;
     }
 
-
     if (currentProcess->state == RUNNING)
     {
         if (quantumsLeft > 0 && getYield() != YIELD_DONE)
@@ -132,21 +131,22 @@ uint64_t *switchContent(uint64_t *rsp)
     }
     if (currentProcess->state == BLOCKED)
     {
-        quantumsLeft= 0;
+        quantumsLeft = 0;
         currentProcess->stackEnd = rsp;
     }
-  
+
     do
-    {  
-     
+    {
+
         currentProcess = unschedule();
-        quantumsLeft = currentProcess->priority -1;
+        quantumsLeft = currentProcess->priority - 1;
         if (currentProcess == NULL)
         {
             return rsp;
         }
     } while (currentProcess->state == BLOCKED || currentProcess->state == DEAD);
 
+    clearYield();
     currentProcess->state = RUNNING;
     return currentProcess->stackEnd;
 }
@@ -164,7 +164,8 @@ int blockProcess(PID pid)
     pcb->state = BLOCKED;
     garbageCollect();
 
-    if (pcb->pid == currentProcess->pid){
+    if (pcb->pid == currentProcess->pid)
+    {
         return yield();
     }
     return 0;

@@ -10,8 +10,8 @@
 #include "./include/processStructure.h"
 #include "./include/test_util.h"
 #include "./include/lib.h"
-#define MINOR_WAIT 900
-#define WAIT 10000000
+#define MINOR_WAIT 9000000
+#define WAIT 100000000
 
 #define TOTAL_PROCESSES 3
 #define LOWEST 1

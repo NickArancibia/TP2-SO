@@ -21,7 +21,7 @@ static int (*syscallHandlers[])() = {
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)(void))malloc, (int (*)(void))free,
     (int (*)(void))processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)(void))getPS, (int (*)(void))freePS, yield,
-    suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice,(int (*)(void))getMemStatus};
+    suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus};
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax)
 {
@@ -257,7 +257,6 @@ int yield(void)
 {
     setYield();
     forceSwitchContent();
-    clearYield();
     return 0;
 }
 
@@ -291,6 +290,7 @@ int nice(PID pid, Priority priority)
     return changeProccessPriority(pid, priority);
 }
 
-void getMemStatus(int * memStatus){
+void getMemStatus(int *memStatus)
+{
     getMemoryStatus(memStatus);
 }

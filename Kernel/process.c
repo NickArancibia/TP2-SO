@@ -108,7 +108,7 @@ PID createProcess(creationParameters *params)
     }
 
     // Copy args
-    
+
     for (int i = 0; i < params->argc; i++)
     {
         int len = strlen(params->argv[i]);
@@ -123,7 +123,7 @@ PID createProcess(creationParameters *params)
             return -1;
         }
 
-           memcpy(args[i], params->argv[i], len+1);
+        memcpy(args[i], params->argv[i], len + 1);
     }
 
     Process *currentProcess;
@@ -219,8 +219,8 @@ int kill(PID pid)
     {
         return -1;
     }
-    
-    freeMM(((void*)pcb->stackBase - STACK_SIZE));
+
+    freeMM(((void *)pcb->stackBase - STACK_SIZE));
     if (pcb->argc > 0)
     {
         for (int i = 0; i < pcb->argc; i++)
@@ -233,7 +233,7 @@ int kill(PID pid)
     pcb->argv = NULL;
     pcb->argc = 0;
     garbageCollect();
-    
+
     if (getCurrentProcess()->pid == pid)
     {
         forceSwitchContent();
