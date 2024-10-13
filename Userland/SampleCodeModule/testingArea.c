@@ -9,7 +9,7 @@
 #include "./include/shell.h"
 
 static const char *commands[] = {
-    "", "", "help", "testMM", "q"};
+    "", "", "help", "testMM", "testProc", "testPrio", "q"};
 
 void initTestingArea()
 {
@@ -27,6 +27,10 @@ void initTestingArea()
             helpCommands();
         else if (strcasecmp(commandPrompt, commands[TEST_MM]) == SELECTED_MODE)
             testMM();
+        else if (strcasecmp(commandPrompt, commands[PROCS]) == SELECTED_MODE)
+            testProc();
+        else if (strcasecmp(commandPrompt, commands[PRIO]) == SELECTED_MODE)
+            testPrio();
         else if (strcasecmp(commandPrompt, commands[EXIT]) == SELECTED_MODE)
             quit();
         else

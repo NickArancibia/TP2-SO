@@ -12,7 +12,7 @@
 static const char *modes[] = {
     "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time",
     "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps", "yield",
-    "kill", "suspend", "resume", "nice","memstatus","proc"};
+    "kill", "suspend", "resume", "nice", "memstatus"};
 
 creationParameters params;
 
@@ -68,23 +68,6 @@ int init()
             printProcessesInformation();
         else if (strcasecmp(commandPrompt, modes[MEMORY_STATUS]) == SELECTED_MODE)
             getMemoryStatus();
-        else if (strcasecmp(commandPrompt, modes[PROC]) == SELECTED_MODE)
-            testProc();
-        /**
-         * TODO: Remove this
-         */
-        else if (strcasecmp(commandPrompt, "create") == SELECTED_MODE)
-        {
-            params.name = "testBlock";
-            params.argc = 0;
-            params.argv = NULL;
-            params.priority = 1;
-            params.entryPoint = (entryPoint)testBlock;
-            params.foreground = 1;
-            int pid = createProcess(&params);
-            sysWait(pid, &returnValue);
-            printf("Process %d returned %d\n", pid, returnValue);
-        }
         else if (strcasecmp(commandPrompt, modes[KILL]) == SELECTED_MODE)
         {
             int toKill = satoi(&commandPrompt[separator + 1]);

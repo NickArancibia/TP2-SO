@@ -4,6 +4,8 @@
 #include <stdint.h>
 
 void testMM(void);
+void testProc(void);
+void testPrio(void);
 void helpCommands(void);
 void quit(void);
 void commandNotFound(char *commandNotFound);
