@@ -26,7 +26,7 @@ int checkExit()
 {
   if (getchar() == 'q')
   {
-    for (int i = 0; i < rq; i++)
+    for (int i = 0; i < MAX_BLOCKS; i++)
     {
       if (mm_rqs[i].address != 0)
       {

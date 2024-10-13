@@ -81,7 +81,7 @@ void freeMM(void *memorySegment)
         curr->isFree = 1;
         updateMemoryStats(-(curr->size), curr->size, -1);
         // TODO fixear el merge
-        /* 
+        
         if (curr->prev != NULL && curr->prev->isFree)
         {
             curr->prev->size += (curr->size + sizeof(memHeader));
@@ -103,7 +103,7 @@ void freeMM(void *memorySegment)
             }
             
         }
-        */
+        
     }
 }
 
@@ -119,6 +119,9 @@ void splitBlock(memHeader *block, int size)
         newBlock->prev = block;
         updateMemoryStats(sizeof(memHeader), -sizeof(memHeader), 0);
     }
+    if (newBlock->next != NULL) {
+        newBlock->next->prev = newBlock;
+    }
     block->size = size;
     block->isFree = 0;
     block->next = newBlock;
@@ -129,3 +132,4 @@ void getMemoryStatus(int* status){
     status[1] = bytesAllocated;
     status[2] = bytesFree;
 }
+

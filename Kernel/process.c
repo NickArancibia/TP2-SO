@@ -108,6 +108,7 @@ PID createProcess(creationParameters *params)
     }
 
     // Copy args
+    
     for (int i = 0; i < params->argc; i++)
     {
         int len = strlen(params->argv[i]);
@@ -121,7 +122,8 @@ PID createProcess(creationParameters *params)
             freeMM(stackLimit);
             return -1;
         }
-        memcpy(args[i], params->argv[i], len);
+
+           memcpy(args[i], params->argv[i], len+1);
     }
 
     Process *currentProcess;
