@@ -4,7 +4,7 @@
 #include "./include/scheduler.h"
 #include "./include/syscallHandle.h"
 #include <interrupts.h>
-Quantum quatumsLeft = 0;
+Quantum quantumsLeft = 0;
 List list;
 Process *currentProcess = NULL;
 char isYield = YIELD_NOT_DONE;
@@ -118,20 +118,21 @@ uint64_t *switchContent(uint64_t *rsp)
         return rsp;
     }
 
-  //  if (quatumsLeft > 0 && getYield() != YIELD_DONE)
-  //  {
-  //     (quatumsLeft)--;
-  //     return rsp;
-  // }
+
     if (currentProcess->state == RUNNING)
     {
+        if (quantumsLeft > 0 && getYield() != YIELD_DONE)
+        {
+            (quantumsLeft)--;
+            return rsp;
+        }
         currentProcess->stackEnd = rsp;
         schedule(currentProcess);
         currentProcess->state = READY;
     }
     if (currentProcess->state == BLOCKED)
     {
-        quatumsLeft= 0;
+        quantumsLeft= 0;
         currentProcess->stackEnd = rsp;
     }
   
@@ -139,7 +140,7 @@ uint64_t *switchContent(uint64_t *rsp)
     {  
      
         currentProcess = unschedule();
-        quatumsLeft = currentProcess->priority;
+        quantumsLeft = currentProcess->priority -1;
         if (currentProcess == NULL)
         {
             return rsp;
