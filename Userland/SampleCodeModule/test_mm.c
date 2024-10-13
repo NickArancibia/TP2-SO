@@ -34,7 +34,6 @@ int checkExit()
       }
     }
 
-    printColor("OK!", GREEN);
     print("\n");
     return 1;
   }
@@ -46,12 +45,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
 
   uint32_t total;
   uint64_t max_memory;
-  // if (argc != 1)
-  //   return -1;
-  sysHideCursor();
-  print("You are testing memory manager\n");
-  print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-  print("Press 'q' to finish the test\n\n");
   int iteration = 0;
   if ((max_memory = satoi(argv[0])) <= 0)
     return -1;
@@ -122,6 +115,10 @@ uint64_t test_mm(uint64_t argc, char *argv[])
 
 void testMM(void)
 {
+  sysHideCursor();
+  print("You are testing memory manager\n");
+  print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+  print("Press 'q' to finish the test\n\n");
   char *argv[] = {"25000", 0};
   creationParameters params;
   params.name = "test_mm";
@@ -133,4 +130,5 @@ void testMM(void)
 
   int pid = createProcess(&params);
   sysWait(pid, NULL);
+  sysShowCursor();
 }

@@ -10,7 +10,7 @@
 #include "./include/processStructure.h"
 #include "./include/test_util.h"
 #include "./include/lib.h"
-#define MINOR_WAIT 1000000
+#define MINOR_WAIT 90000
 #define WAIT 10000000
 
 #define TOTAL_PROCESSES 3
@@ -60,10 +60,22 @@ void commandNotFound(char *commandNotFound)
     print(": command not found.\n");
 }
 
+int checkProcsExit()
+{
+    if (getchar() == 'q')
+    {
+        return 1;
+    }
+    return 0;
+}
+
 void testProc(void)
 {
     sysHideCursor();
-    char *argv[] = {"5", 0};
+    print("You are testing processes\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    print("Press 'q' to finish the test\n\n");
+    char *argv[] = {"6", 0};
     creationParameters params;
     params.name = "test_processes";
     params.argc = 1;
@@ -173,11 +185,21 @@ int64_t test_processes(uint64_t argc, char *argv[])
                     p_rqs[rq].state = RUNNING;
                 }
         }
+        if (checkProcsExit())
+        {
+            printf("\n");
+            return 0;
+        }
     }
 }
 
 void testPrio()
 {
+    sysHideCursor();
+    print("You are testing processes priorities\n");
+    print("Below you will see information on running processes\n");
+    print("Each process will print its PID an amount of times based on its priority\n\n");
+    PID pid;
     creationParameters params;
     params.name = "test_prio";
     params.argc = 0;
@@ -185,7 +207,10 @@ void testPrio()
     params.priority = 1;
     params.entryPoint = (entryPoint)test_prio;
     params.foreground = 1;
-    createProcess(&params);
+    sysSleep(1, 0);
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
 }
 
 void test_prio()
@@ -240,7 +265,7 @@ void endless_loop_print(uint64_t wait)
     while (1)
     {
         printf("%d ", pid);
-        bussy_wait(wait);
+        bussy_wait(MINOR_WAIT);
     }
 }
 
