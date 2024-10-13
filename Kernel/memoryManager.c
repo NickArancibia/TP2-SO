@@ -49,6 +49,7 @@ void *mallocMM(int size){
     if(size <= 0){
         return NULL;
     }
+    size = ALIGN(size);
     memHeader * curr = firstBlock;
     while(curr != NULL && !(curr->isFree && curr->size >= size)){
         curr = curr->next;
