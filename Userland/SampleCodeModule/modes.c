@@ -214,6 +214,7 @@ void printProcessesInformation()
 void getMemoryStatus()
 {
     sysGetMemStatus(memoryStatus);
+    printf("Memoria total= %d |  ", memoryStatus[3]);
     printf("Bloques ocupados= %d | ", memoryStatus[0]);
     printf("Bytes ocupados= %d |  ", memoryStatus[1]);
     printf("Bytes libres= %d\n", memoryStatus[2]);

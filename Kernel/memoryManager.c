@@ -26,7 +26,7 @@ typedef struct memHeader
 
 memHeader *firstBlock;
 int memSize, blockSize;
-int bytesAllocated, bytesFree, blocksAllocated;
+int bytesAllocated, bytesFree, blocksAllocated,bytesTotal;
 void splitBlock(memHeader *block, int size);
 
 void updateMemoryStats(int allocatedChange, int freeChange, int blockChange)
@@ -43,6 +43,7 @@ void initializeMemoryMM(void *memoryStart, int memorySize)
     firstBlock->isFree = 1;
     firstBlock->next = NULL;
     firstBlock->prev = NULL;
+    bytesTotal = memorySize;
     updateMemoryStats(sizeof(memHeader), firstBlock->size, 0);
 }
 
@@ -86,7 +87,7 @@ void freeMM(void *memorySegment)
         memHeader *curr = (memHeader *)(memorySegment - sizeof(memHeader));
         curr->isFree = 1;
         updateMemoryStats(-(curr->size), curr->size, -1);
-        // TODO fixear el merge
+
 
         if (curr->prev != NULL && curr->prev->isFree)
         {
@@ -123,10 +124,10 @@ void splitBlock(memHeader *block, int size)
         newBlock->next = block->next;
         newBlock->prev = block;
         updateMemoryStats(sizeof(memHeader), -1 * (int)sizeof(memHeader), 0);
-    }
-    if (newBlock->next != NULL)
-    {
+        if (newBlock->next != NULL)
+        {
         newBlock->next->prev = newBlock;
+        }   
     }
     block->size = size;
     block->isFree = 0;
@@ -138,4 +139,5 @@ void getMemoryStatus(int *status)
     status[0] = blocksAllocated;
     status[1] = bytesAllocated;
     status[2] = bytesFree;
+    status[3] = bytesTotal;
 }
