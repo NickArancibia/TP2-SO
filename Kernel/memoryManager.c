@@ -139,5 +139,5 @@ void getMemoryStatus(int *status)
     status[0] = blocksAllocated;
     status[1] = bytesAllocated;
     status[2] = bytesFree;
-    status[3] = bytesTotal;
+    status[3] = bytesFree + blocksAllocated;
 }
