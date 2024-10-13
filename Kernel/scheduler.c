@@ -70,7 +70,6 @@ void schedule(Process *pcb)
 {
     Node *node = mallocMM(sizeof(Node));
     node->pcb = pcb;
-    node->executionsLeft = pcb->priority - 1;
 
     if (list.head == NULL)
     {
