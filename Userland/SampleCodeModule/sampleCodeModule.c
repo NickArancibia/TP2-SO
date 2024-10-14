@@ -6,7 +6,8 @@
 #include "include/stdio.h"
 #include "include/shell.h"
 
-int main() {
+int main()
+{
 	init();
 	return 0xDEADBEEF;
 }

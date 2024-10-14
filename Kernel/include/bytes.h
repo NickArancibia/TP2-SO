@@ -5,7 +5,6 @@
 #ifndef _bytes_
 #define _bytes_
 
-
 #define ________ 0x00
 #define _______X 0x01
 #define ______X_ 0x02

@@ -15,6 +15,8 @@ all: $(KERNEL) move_objects
 
 $(KERNEL): $(LOADEROBJECT) $(OBJECTS) $(STATICLIBS) $(OBJECTS_ASM)
 	$(LD) $(LDFLAGS) -T kernel.ld -o $(KERNEL) $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+	$(LD) $(LDFLAGS) -T kernel.ld --oformat=elf64-x86-64 -o kernel.elf $(LOADEROBJECT) $(OBJECTS) $(OBJECTS_ASM) $(STATICLIBS)
+
 
 %.o: %.c
 	$(GCC) $(GCCFLAGS) -I./include -c $< -o $@
@@ -33,6 +35,6 @@ move_objects: $(OBJDIR)
 	mv *.o $(OBJDIR)
 	mv asm/*.o $(OBJDIR)
 clean:
-	rm -rf $(OBJDIR) *.bin
+	rm -rf $(OBJDIR) *.bin *.elf
 
 .PHONY: all clean

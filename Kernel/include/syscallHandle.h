@@ -2,6 +2,8 @@
 #define __SYSCALLHANDLE_H_
 
 #include <stdint.h>
+#include <process.h>
+#include <scheduler.h>
 
 int setCursor(uint64_t x, uint64_t y);
 int hideCursor();
@@ -13,11 +15,11 @@ int leftArrowValue();
 int downArrowValue();
 int rightArrowValue();
 
-int printRect(int x,int y,int base,int height,uint32_t hexColor);
-int printSquare (int x, int y,int side, uint32_t hexColor);
+int printRect(int x, int y, int base, int height, uint32_t hexColor);
+int printSquare(int x, int y, int side, uint32_t hexColor);
 
 int clearScreen();
-int msSleep(uint64_t secs, uint64_t ticks);     // rdi : ms
+int msSleep(uint64_t secs, uint64_t ticks); // rdi : ms
 int printRegs(void);
 
 int sound(uint64_t ms, uint64_t freq);
@@ -35,8 +37,8 @@ int decSize();
 int getZoomLevel();
 int setZoomLevel(int zoomLevel);
 
-int read(uint64_t fd, char * buf, uint64_t count);
-int write(uint64_t fd, char * buf, uint64_t count, uint64_t hexColor);
+int read(uint64_t fd, char *buf, uint64_t count);
+int write(uint64_t fd, char *buf, uint64_t count, uint64_t hexColor);
 
 int cleanKbBuffer(void);
 
@@ -44,6 +46,21 @@ int isctrlPressed(void);
 
 void *malloc(int size);
 
-int free(void * memorySegment);
+void free(void *memorySegment);
+
+PID processCreate(creationParameters *params);
+PID getProcesspid(void);
+PID getProcessParentpid(void);
+int yield(void);
+int suspendProcess(PID pid);
+int resumeProcess(PID pid);
+
+Process *getPS(void);
+void freePS(Process *processesInfo);
+int killProcess(PID pid);
+void exit();
+void wait(PID pidToWait, int *wstatus);
+int nice(PID pid, Priority priority);
+void getMemStatus(int * memStatus);
 
 #endif

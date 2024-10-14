@@ -32,9 +32,21 @@ GLOBAL sysShowCursor
 GLOBAL sysSetCursorPosition
 GLOBAL sysMalloc
 GLOBAL sysFree
+GLOBAL sysCreateProcess
+GLOBAL sysGetPID
+GLOBAL sysGetParentPID
+GLOBAL sysGetPS
+GLOBAL sysFreePS
 
 GLOBAL sysCtrlPressed
-
+GLOBAL sysYield
+GLOBAL sysSuspendProcess
+GLOBAL sysResumeProcess
+GLOBAL sysKill
+GLOBAL sysExit
+GLOBAL sysWait
+GLOBAL sysNice
+GLOBAL sysGetMemStatus
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -180,14 +192,77 @@ sysClearKbEntry:
     int 80h
     ret
 
-
 sysMalloc:
     mov rax, 28
     int 80h
     ret
 
-
 sysFree:
     mov rax, 29
+    int 80h
+    ret
+
+sysCreateProcess:
+    mov rax, 30
+    int 80h
+    ret
+
+sysGetPID:
+    mov rax, 31
+    int 80h
+    ret
+
+sysGetParentPID:
+    mov rax, 32
+    int 80h
+    ret
+
+sysGetPS:
+    mov rax, 33
+    int 80h
+    ret
+
+sysFreePS:
+    mov rax, 34
+    int 80h
+    ret
+    
+sysYield:
+    mov rax,35
+    int 80h
+    ret
+
+sysSuspendProcess:
+    mov rax,36
+    int 80h
+    ret
+
+sysResumeProcess:
+    mov rax,37
+    int 80h
+    ret
+
+sysKill:
+    mov rax,38
+    int 80h
+    ret
+
+sysExit:
+    mov rax, 39
+    int 80h
+    ret
+
+sysWait:
+    mov rax, 40
+    int 80h
+    ret
+
+sysNice:
+    mov rax, 41
+    int 80h
+    ret
+
+sysGetMemStatus
+    mov rax,42
     int 80h
     ret

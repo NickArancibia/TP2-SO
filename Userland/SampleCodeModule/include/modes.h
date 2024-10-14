@@ -11,7 +11,12 @@ void date(void);
 void clear(void);
 void registers(void);
 void eliminator(void);
-void notFound(char* commandNotFound);
+void notFound(char *commandNotFound);
 void playEasterEgg();
 void testingArea();
+void yield();
+void printProcessesInformation();
+void getMemoryStatus();
+void testProc(void);
+
 #endif
