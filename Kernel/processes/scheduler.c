@@ -1,9 +1,9 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
-#include "./include/memoryManager.h"
-#include "./include/scheduler.h"
-#include "./include/syscallHandle.h"
-#include "./include/videoDriver.h"
+#include "../include/memoryManager.h"
+#include "../include/scheduler.h"
+#include "../include/syscallHandle.h"
+#include "../include/videoDriver.h"
 #include <interrupts.h>
 Quantum quantumsLeft = 0;
 List list;
