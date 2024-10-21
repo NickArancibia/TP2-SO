@@ -10,20 +10,10 @@
 #include "include/test_util.h"
 
 static const char *modes[] = {
-    "shell", "idle", "help", "divbyzero", "invalidopcode", "zoomin", "zoomout", "time",
-    "date", "eliminator", "clear", "registers", "easteregg", "testing", "ps", "yield",
-    "kill", "suspend", "resume", "nice", "memstatus"};
-
-creationParameters params;
-
-int testBlock()
-{
-    for (int i = 0; i < 20; i++)
-    {
-        printf("Testing block %d\n", i);
-    }
-    return 1;
-}
+    "shell", "idle", "help", "time",
+    "date", "clear", "registers", "easteregg", "ps", "yield",
+    "kill", "suspend", "resume", "nice", "memstatus", "testmm",
+    "testproc", "testprio"};
 
 int init()
 {
@@ -40,8 +30,6 @@ int init()
         separator = divideString(commandPrompt);
         if (strcasecmp(commandPrompt, modes[HELP_MODE]) == SELECTED_MODE)
             help();
-        else if (strcasecmp(commandPrompt, modes[ELIMINATOR_MODE]) == SELECTED_MODE)
-            eliminator();
         else if (strcasecmp(commandPrompt, modes[CLEAR_MODE]) == SELECTED_MODE)
             clear();
         else if (strcasecmp(commandPrompt, modes[TIME_MODE]) == SELECTED_MODE)
@@ -50,18 +38,8 @@ int init()
             date();
         else if (strcasecmp(commandPrompt, modes[EASTEREGG_MODE]) == SELECTED_MODE)
             playEasterEgg();
-        else if (strcasecmp(commandPrompt, modes[ZOOMIN_MODE]) == SELECTED_MODE)
-            zoomin();
-        else if (strcasecmp(commandPrompt, modes[ZOOMOUT_MODE]) == SELECTED_MODE)
-            zoomout();
-        else if (strcasecmp(commandPrompt, modes[DIVBYZERO_MODE]) == SELECTED_MODE)
-            divByZero();
-        else if (strcasecmp(commandPrompt, modes[INVALIDOPCODE_MODE]) == SELECTED_MODE)
-            invalidOp();
         else if (strcasecmp(commandPrompt, modes[REGISTERS_MODE]) == SELECTED_MODE)
             registers();
-        else if (strcasecmp(commandPrompt, modes[TESTING_AREA]) == SELECTED_MODE)
-            testingArea();
         else if (strcasecmp(commandPrompt, modes[YIELD]) == SELECTED_MODE)
             yield();
         else if (strcasecmp(commandPrompt, modes[PS]) == SELECTED_MODE)
@@ -145,6 +123,12 @@ int init()
                 }
             }
         }
+        else if (strcasecmp(commandPrompt, modes[TEST_MM]) == SELECTED_MODE)
+            testMM();
+        else if (strcasecmp(commandPrompt, modes[TEST_PROCS]) == SELECTED_MODE)
+            testProc();
+        else if (strcasecmp(commandPrompt, modes[TEST_PRIO]) == SELECTED_MODE)
+            testPrio();
         else
             notFound(commandPrompt);
     }

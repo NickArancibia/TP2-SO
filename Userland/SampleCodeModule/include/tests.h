@@ -6,7 +6,6 @@
 #include "stdlib.h"
 #include "string.h"
 #include "colors.h"
-#include "testingArea.h"
 #include "syscalls.h"
 #include "lib.h"
 #include "processStructure.h"
