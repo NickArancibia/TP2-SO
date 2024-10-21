@@ -10,13 +10,7 @@
 #include "./include/processStructure.h"
 #include "./include/test_util.h"
 #include "./include/lib.h"
-#define MINOR_WAIT 9000000
-#define WAIT 100000000
-
-#define TOTAL_PROCESSES 3
-#define LOWEST 1
-#define MEDIUM 3
-#define HIGHEST 5
+#include "./include/tests.h"
 
 static char *helpTextTestingArea[] = {"Tests command information is displayed below\n",
                                       "Disclaimer: each test loops forever, you can finish it pressing 'q'\n\n",
@@ -26,19 +20,6 @@ static char *helpTextTestingArea[] = {"Tests command information is displayed be
                                       "TestPrio            ->      Test processes priority.\n",
                                       "q                   ->      Return to shell.\n",
                                       "end"};
-
-int64_t test_processes(uint64_t argc, char *argv[]);
-void test_prio();
-void endless_loop();
-void endless_loop_print(uint64_t wait);
-int iteration;
-int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
-
-typedef struct P_rq
-{
-    int32_t pid;
-    ProcessState state;
-} p_rq;
 
 void helpCommands(void)
 {
@@ -58,15 +39,6 @@ void commandNotFound(char *commandNotFound)
 {
     print(commandNotFound);
     print(": command not found.\n");
-}
-
-int checkProcsExit()
-{
-    if (getchar() == 'q')
-    {
-        return 1;
-    }
-    return 0;
 }
 
 void testProc(void)
@@ -89,110 +61,6 @@ void testProc(void)
     sysShowCursor();
 }
 
-int64_t test_processes(uint64_t argc, char *argv[])
-{
-    int iteration = 0;
-    uint8_t rq;
-    uint8_t alive = 0;
-    uint8_t action;
-    uint64_t max_processes;
-    char *argvAux[] = {0};
-    creationParameters params;
-    params.name = "endless_loop";
-    params.argc = 0;
-    params.argv = argvAux;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)endless_loop;
-    params.foreground = 1;
-
-    if (argc != 1)
-        return -1;
-
-    if ((max_processes = satoi(argv[0])) <= 0)
-        return -1;
-
-    p_rq p_rqs[max_processes];
-    while (1)
-    {
-        if (iteration)
-        {
-            print("\b\b\b");
-        }
-        printColor("OK!", GREEN);
-        iteration = 1;
-        // Create max_processes processes
-        for (rq = 0; rq < max_processes; rq++)
-        {
-            p_rqs[rq].pid = createProcess(&params);
-
-            if (p_rqs[rq].pid == -1)
-            {
-                printf("test_processes: ERROR creating process\n");
-                return -1;
-            }
-            else
-            {
-                p_rqs[rq].state = RUNNING;
-                alive++;
-            }
-        }
-
-        // Randomly kills, blocks or unblocks processes until every one has been killed
-        while (alive > 0)
-        {
-
-            for (rq = 0; rq < max_processes; rq++)
-            {
-                action = GetUniform(100) % 2;
-
-                switch (action)
-                {
-                case 0:
-                    if (p_rqs[rq].state == RUNNING || p_rqs[rq].state == BLOCKED)
-                    {
-                        if (sysKill(p_rqs[rq].pid) == -1)
-                        {
-                            printf("test_processes: ERROR killing process\n");
-                            return -1;
-                        }
-                        p_rqs[rq].state = DEAD;
-                        alive--;
-                    }
-                    break;
-                case 1:
-                    if (p_rqs[rq].state == RUNNING)
-                    {
-                        if (sysSuspendProcess(p_rqs[rq].pid) == -1)
-                        {
-                            printf("test_processes: ERROR blocking process\n");
-                            return -1;
-                        }
-                        p_rqs[rq].state = BLOCKED;
-                    }
-                    break;
-                }
-            }
-
-            // Randomly unblocks processes
-            for (rq = 0; rq < max_processes; rq++)
-                if (p_rqs[rq].state == BLOCKED && GetUniform(100) % 2)
-                {
-                    if (sysResumeProcess(p_rqs[rq].pid) == -1)
-                    {
-                        printf("test_processes: ERROR unblocking process\n");
-                        return -1;
-                    }
-                    p_rqs[rq].state = RUNNING;
-                }
-        }
-        if (checkProcsExit())
-        {
-            printf("\n");
-            return 0;
-        }
-    }
-}
-
 void testPrio()
 {
     sysHideCursor();
@@ -213,64 +81,22 @@ void testPrio()
     sysShowCursor();
 }
 
-void test_prio()
+void testMM(void)
 {
-    int64_t pids[TOTAL_PROCESSES];
-    char *argv[] = {0};
-    uint64_t i;
+    sysHideCursor();
+    print("You are testing memory manager\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    print("Press 'q' to finish the test\n\n");
+    char *argv[] = {"25000", 0};
     creationParameters params;
-    params.name = "endless_loop_print";
-    params.argc = 0;
+    params.name = "test_mm";
+    params.argc = 1;
     params.argv = argv;
     params.priority = 1;
-    params.entryPoint = (entryPoint)endless_loop_print;
+    params.entryPoint = (entryPoint)test_mm;
     params.foreground = 1;
 
-    for (i = 0; i < TOTAL_PROCESSES; i++)
-        pids[i] = createProcess(&params);
-
-    bussy_wait(WAIT);
-    printf("\nCHANGING PRIORITIES...\n");
-
-    for (i = 0; i < TOTAL_PROCESSES; i++)
-        sysNice(pids[i], prio[i]);
-
-    bussy_wait(WAIT);
-    printf("\nBLOCKING...\n");
-
-    for (i = 0; i < TOTAL_PROCESSES; i++)
-        sysSuspendProcess(pids[i]);
-
-    printf("CHANGING PRIORITIES WHILE BLOCKED...\n");
-
-    for (i = 0; i < TOTAL_PROCESSES; i++)
-        sysNice(pids[i], MEDIUM);
-
-    printf("UNBLOCKING...\n");
-
-    for (i = 0; i < TOTAL_PROCESSES; i++)
-        sysResumeProcess(pids[i]);
-
-    bussy_wait(WAIT);
-    printf("\nKILLING...\n");
-
-    for (i = 0; i < TOTAL_PROCESSES; i++)
-        sysKill(pids[i]);
-}
-
-void endless_loop_print(uint64_t wait)
-{
-    int64_t pid = sysGetPID();
-
-    while (1)
-    {
-        printf("%d ", pid);
-        bussy_wait(MINOR_WAIT);
-    }
-}
-
-void endless_loop()
-{
-    while (1)
-        ;
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
 }
