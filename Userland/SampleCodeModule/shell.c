@@ -13,7 +13,7 @@ static const char *modes[] = {
     "shell", "idle", "help", "time",
     "date", "clear", "registers", "easteregg", "ps", "yield",
     "kill", "suspend", "resume", "nice", "memstatus", "testmm",
-    "testproc", "testprio"};
+    "testproc", "testprio", "testsync", "testnosync"};
 
 int init()
 {
@@ -129,6 +129,10 @@ int init()
             testProc();
         else if (strcasecmp(commandPrompt, modes[TEST_PRIO]) == SELECTED_MODE)
             testPrio();
+        else if (strcasecmp(commandPrompt, modes[TEST_SYNC]) == SELECTED_MODE)
+            testSync();
+        else if (strcasecmp(commandPrompt, modes[TEST_NO_SYNC]) == SELECTED_MODE)
+            testNoSync();
         else
             notFound(commandPrompt);
     }

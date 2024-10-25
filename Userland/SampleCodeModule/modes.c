@@ -35,6 +35,8 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "TESTMM              ->      Test memory manager.\n",
                            "TESTPROC            ->      Test processes creation.\n",
                            "TESTPRIO            ->      Test processes priority.\n",
+                           "TESTSYNC            ->      Test syncronization with semaphores.\n",
+                           "TESTNOSYNC          ->      Test syncronization without semaphores.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -229,6 +231,44 @@ void testMM(void)
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_mm;
+    params.foreground = 1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+    printf("\n");
+}
+
+void testSync(void){
+    sysHideCursor();
+    print("You are testing syncronization with semaphores\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    char *argv[] = {"10", "1", 0};
+    creationParameters params;
+    params.name = "test_sync";
+    params.argc = 2;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_sync;
+    params.foreground = 1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+    printf("\n");
+}
+
+void testNoSync(void){
+    sysHideCursor();
+    print("You are testing syncronization without semaphores\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    char *argv[] = {"10", "0", 0};
+    creationParameters params;
+    params.name = "test_sync";
+    params.argc = 2;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_sync;
     params.foreground = 1;
 
     int pid = createProcess(&params);

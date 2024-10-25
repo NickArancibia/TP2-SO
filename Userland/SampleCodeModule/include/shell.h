@@ -24,6 +24,8 @@
 #define TEST_MM 15
 #define TEST_PROCS 16
 #define TEST_PRIO 17
+#define TEST_SYNC 18
+#define TEST_NO_SYNC 19
 
 int init();
 

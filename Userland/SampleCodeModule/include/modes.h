@@ -14,5 +14,7 @@ void getMemoryStatus();
 void testMM();
 void testPrio();
 void testProc();
+void testNoSync();
+void testSync();
 
 #endif

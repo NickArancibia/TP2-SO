@@ -62,5 +62,9 @@ void exit();
 void wait(PID pidToWait, int *wstatus);
 int nice(PID pid, Priority priority);
 void getMemStatus(int * memStatus);
+int sem_open( char *sem_id, int initialValue );
+void sem_wait( char *sem_id );
+void sem_post( char *sem_id );
+int sem_close( char *sem_id );
 
 #endif
