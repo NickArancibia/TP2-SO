@@ -12,6 +12,7 @@
 #include "speaker.h"
 #include "fonts.h"
 #include <scheduler.h>
+#include "semaphore.h"
 
 #define HANDLER_SIZE 47
 
@@ -22,7 +23,7 @@ static int (*syscallHandlers[])() = {
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)(void))malloc, (int (*)(void))free,
     (int (*)(void))processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)(void))getPS, (int (*)(void))freePS, yield,
     suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus, 
-    (int (*)(void))sem_open, (int (*)(void))sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post};
+    sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post};
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax)
 {
@@ -297,17 +298,17 @@ void getMemStatus(int *memStatus)
 }
 
 int sem_open( char *sem_id, int initialValue ){
-    
+    return semOpen(sem_id,initialValue);
 }
 
 void sem_wait( char *sem_id ){
-
+    semWait(sem_id);
 }
 
 void sem_post( char *sem_id ){
-
+    semPost(sem_id);
 }
 
 int sem_close( char *sem_id ){
-
+   return semClose(sem_id);
 }

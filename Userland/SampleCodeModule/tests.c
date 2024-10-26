@@ -296,7 +296,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
     return -1;
 
   if (use_sem)
-    if (!sysSemOpen(SEM_ID, 1)) {
+    if (sysSemOpen(SEM_ID, 1)) {
       printf("test_sync: ERROR opening semaphore\n");
       return -1;
     }
@@ -310,8 +310,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[]) {
       sysSemPost(SEM_ID);
   }
 
-  if (use_sem)
-    sysSemClose(SEM_ID);
+
 
   return 0;
 }
@@ -326,7 +325,7 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
     char *argvInc[] = {argv[0], "1", argv[1], NULL};
 
     creationParameters paramsDec;
-    paramsDec.name = "my_process_inc";
+    paramsDec.name = "my_process_dec";
     paramsDec.argc = 3;
     paramsDec.argv = argvDec;
     paramsDec.priority = 1;
@@ -334,27 +333,27 @@ uint64_t test_sync(uint64_t argc, char *argv[]) { //{n, use_sem, 0}
     paramsDec.foreground = 1;
 
     creationParameters paramsInc;
-    paramsDec.name = "my_process_inc";
-    paramsDec.argc = 3;
-    paramsDec.argv = argvInc;
-    paramsDec.priority = 1;
-    paramsDec.entryPoint = (entryPoint)my_process_inc;
-    paramsDec.foreground = 1;
+    paramsInc.name = "my_process_inc";
+    paramsInc.argc = 3;
+    paramsInc.argv = argvInc;
+    paramsInc.priority = 1;
+    paramsInc.entryPoint = (entryPoint)my_process_inc;
+    paramsInc.foreground = 1;
 
     global = 0;
 
-    uint64_t i;
-    for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-        pids[i] = sysCreateProcess(&paramsDec);
-        pids[i + TOTAL_PAIR_PROCESSES] = sysCreateProcess(&paramsInc);
-    }
+    uint64_t i,j;
+   for (i = 0,j=0; j < TOTAL_PAIR_PROCESSES;j++, i += 2) {
+    pids[i] = sysCreateProcess(&paramsDec);
+    pids[i + 1] = sysCreateProcess(&paramsInc);
+}
 
-    for (i = 0; i < TOTAL_PAIR_PROCESSES; i++) {
-        sysWait(pids[i], NULL);
-        sysWait(pids[i + TOTAL_PAIR_PROCESSES], NULL);
-    }
+for (i = 0,j=0; j < TOTAL_PAIR_PROCESSES;j++, i += 2) {
+    sysWait(pids[i], NULL);
+    sysWait(pids[i + 1], NULL);
+}
 
     printf("Final value: %d\n", global);
-
+    sysSemClose(SEM_ID);
     return 0;
 }

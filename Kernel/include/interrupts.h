@@ -32,6 +32,9 @@ void picMasterMask(uint8_t mask);
 
 void picSlaveMask(uint8_t mask);
 
+int acquire(void *lock);
+void release(void *lock);
+
 // The CPU execution ends.
 void haltcpu(void);
 

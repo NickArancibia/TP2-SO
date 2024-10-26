@@ -267,27 +267,27 @@ sysNice:
     int 80h
     ret
 
-sysGetMemStatus
+sysGetMemStatus:
     mov rax, 42
     int 80h
     ret
 
-sysSemOpen
+sysSemOpen:
     mov rax, 43
     int 80h
     ret
 
-sysSemClose
+sysSemClose:
     mov rax, 44
     int 80h
     ret
 
-sysSemWait
+sysSemWait:
     mov rax, 45
     int 80h
     ret
 
-sysSemPost
+sysSemPost:
     mov rax, 46
     int 80h
     ret

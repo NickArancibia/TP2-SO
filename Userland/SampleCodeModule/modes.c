@@ -243,7 +243,7 @@ void testSync(void){
     sysHideCursor();
     print("You are testing syncronization with semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"10", "1", 0};
+    char *argv[] = {"1", "1", 0};
     creationParameters params;
     params.name = "test_sync";
     params.argc = 2;
@@ -262,7 +262,7 @@ void testNoSync(void){
     sysHideCursor();
     print("You are testing syncronization without semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"10", "0", 0};
+    char *argv[] = {"1", "0", 0};
     creationParameters params;
     params.name = "test_sync";
     params.argc = 2;
