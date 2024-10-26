@@ -92,6 +92,7 @@ int semOpen( char *sem_id, int initialValue ){
     {
         return -1;
     }
+
     setOpenBy(idx,getpid());
     int len = strlen(sem_id)+1;
     semaphores[idx].name = mallocMM(len);
@@ -146,7 +147,7 @@ int semClose( char *sem_id ){
     }
 
     
-    memset(semaphores[idx].openBy,0,sizeof(semaphores[idx].openBy));
+    memset(semaphores[idx].openBy,-1,sizeof(semaphores[idx].openBy));
     semaphores[idx].isAvailable = 1;
     semaphores[idx].isInUse = 0;
     memset(semaphores[idx].name,0,strlen(semaphores[idx].name)+1);
