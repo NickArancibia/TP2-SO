@@ -239,7 +239,8 @@ void testMM(void)
     printf("\n");
 }
 
-void testSync(void){
+void testSync(void)
+{
     sysHideCursor();
     print("You are testing syncronization with semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
@@ -258,11 +259,12 @@ void testSync(void){
     printf("\n");
 }
 
-void testNoSync(void){
+void testNoSync(void)
+{
     sysHideCursor();
     print("You are testing syncronization without semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"1", "0", 0};
+    char *argv[] = {"20", "0", 0};
     creationParameters params;
     params.name = "test_sync";
     params.argc = 2;

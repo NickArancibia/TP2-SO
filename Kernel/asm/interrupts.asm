@@ -277,15 +277,15 @@ haltcpu:
 	ret
 
 acquire:
-mov rax, 0
-  mov al, 1
-  xchg al, [rdi]
-  cmp al, 0
-  jne acquire
-  ret
+	mov rax, 0
+	mov al, 1
+	xchg al, [rdi]
+	cmp al, 0
+	jne acquire
+	ret
 
 release:
-	 mov byte [rdi], 0
+	mov byte [rdi], 0
     ret
 
 setupStack:
