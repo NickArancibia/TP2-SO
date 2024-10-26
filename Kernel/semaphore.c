@@ -41,6 +41,18 @@ int wasOpenBy(sem semaphore, PID pid)
     return -1;
 }
 
+int isOpenByEmpty(sem semaphore)
+{
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (semaphore.openBy[i] != -1)
+        {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 int setOpenBy(int idx, PID pid)
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
@@ -161,11 +173,11 @@ int semClose(char *sem_id)
         return 1;
     }
 
-    if(!isEmpty(semaphores[idx].waitingProcess)){
+    if(!isEmpty(semaphores[idx].waitingProcess) && !isOpenByEmpty(semaphores[idx])){
         removeOpenBy(idx,getpid());
         return 0;
     }
-    
+
     memset(semaphores[idx].openBy, -1, sizeof(semaphores[idx].openBy));
     semaphores[idx].isAvailable = 1;
     semaphores[idx].isInUse = 0;
