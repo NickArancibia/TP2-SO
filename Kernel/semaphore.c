@@ -161,6 +161,11 @@ int semClose(char *sem_id)
         return 1;
     }
 
+    if(!isEmpty(semaphores[idx].waitingProcess)){
+        removeOpenBy(idx,getpid());
+        return 0;
+    }
+    
     memset(semaphores[idx].openBy, -1, sizeof(semaphores[idx].openBy));
     semaphores[idx].isAvailable = 1;
     semaphores[idx].isInUse = 0;

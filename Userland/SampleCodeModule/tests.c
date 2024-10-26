@@ -313,6 +313,8 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
         if (use_sem)
             sysSemPost(SEM_ID);
     }
+    if (use_sem)
+    sysSemClose(SEM_ID);
 
     return 0;
 }
@@ -359,6 +361,5 @@ uint64_t test_sync(uint64_t argc, char *argv[])
     }
 
     printf("Final value: %d\n", global);
-    sysSemClose(SEM_ID);
     return 0;
 }
