@@ -172,17 +172,18 @@ int semClose(char *sem_id)
     {
         return 1;
     }
-
+    acquire(&semaphores[idx].isInUse);
     if(!isEmpty(semaphores[idx].waitingProcess) && !isOpenByEmpty(semaphores[idx])){
         removeOpenBy(idx,getpid());
+        release(&semaphores[idx].isInUse);
         return 0;
     }
 
     memset(semaphores[idx].openBy, -1, sizeof(semaphores[idx].openBy));
     semaphores[idx].isAvailable = 1;
-    semaphores[idx].isInUse = 0;
     memset(semaphores[idx].name, 0, strlen(semaphores[idx].name) + 1);
     freeMM(semaphores[idx].name);
+    release(&semaphores[idx].isInUse);
     //  freeQueue(semaphores[idx].waitingProcess);
     return 0;
 }
