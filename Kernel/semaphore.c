@@ -114,6 +114,7 @@ int semWait(char *sem_id)
         queue(semaphores[idx].waitingProcess, getpid());
         release(&semaphores[idx].isInUse);
         blockProcess(getpid());
+        
         acquire(&semaphores[idx].isInUse);
     }
     semaphores[idx].value--;
@@ -139,19 +140,17 @@ int semPost( char *sem_id ){
 
 int semClose( char *sem_id ){
      int idx;
-    if ((idx = semGet(sem_id)) == -1 || wasOpenBy(semaphores[idx],getpid()) == -1)
+    if ((idx = semGet(sem_id)) == -1 )
     {
         return 1;
     }
 
-    if(!isEmpty(semaphores[idx].waitingProcess)){
-        removeOpenBy(idx,getpid());
-        return 0;
-    }
-
+    
+    memset(semaphores[idx].openBy,0,sizeof(semaphores[idx].openBy));
     semaphores[idx].isAvailable = 1;
     semaphores[idx].isInUse = 0;
+    memset(semaphores[idx].name,0,strlen(semaphores[idx].name)+1);
     freeMM(semaphores[idx].name);
-    freeQueue(semaphores[idx].waitingProcess);
+  //  freeQueue(semaphores[idx].waitingProcess);
     return 0;
 }
