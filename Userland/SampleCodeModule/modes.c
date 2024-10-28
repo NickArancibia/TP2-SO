@@ -171,18 +171,18 @@ void getMemoryStatus()
 {
     sysGetMemStatus(memoryStatus);
     printf("Memoria total= %d B |  ", memoryStatus[3]);
-    printf("Memoria ocupada ocupados= %d B |  ", memoryStatus[1]);
+    printf("Memoria ocupada= %d B |  ", memoryStatus[1]);
     printf("Memoria libre= %d B | ", memoryStatus[2]);
     printf("Bloques ocupados= %d\n", memoryStatus[0]);
 }
 
-void testProc(void)
+int testProc(void)
 {
     sysHideCursor();
     print("You are testing processes\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
     print("Press 'q' to finish the test\n\n");
-    char *argv[] = {"6", 0};
+    char *argv[] = {"2", 0};
     creationParameters params;
     params.name = "test_processes";
     params.argc = 1;
@@ -191,19 +191,15 @@ void testProc(void)
     params.entryPoint = (entryPoint)test_processes;
     params.foreground = 1;
 
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    return createProcess(&params);
 }
 
-void testPrio()
+int testPrio()
 {
     sysHideCursor();
     print("You are testing processes priorities\n");
     print("Below you will see information on running processes\n");
     print("Each process will print its PID an amount of times based on its priority\n\n");
-    PID pid;
     creationParameters params;
     params.name = "test_prio";
     params.argc = 0;
@@ -211,14 +207,11 @@ void testPrio()
     params.priority = 1;
     params.entryPoint = (entryPoint)test_prio;
     params.foreground = 1;
-    sysSleep(1, 0);
-    pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+
+    return createProcess(&params);
 }
 
-void testMM(void)
+int testMM(void)
 {
     sysHideCursor();
     print("You are testing memory manager\n");
@@ -233,18 +226,15 @@ void testMM(void)
     params.entryPoint = (entryPoint)test_mm;
     params.foreground = 1;
 
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    return createProcess(&params);
 }
 
-void testSync(void)
+int testSync(void)
 {
     sysHideCursor();
     print("You are testing syncronization with semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"1", "1", 0};
+    char *argv[] = {"10", "1", 0};
     creationParameters params;
     params.name = "test_sync";
     params.argc = 2;
@@ -253,18 +243,15 @@ void testSync(void)
     params.entryPoint = (entryPoint)test_sync;
     params.foreground = 1;
 
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    return createProcess(&params);
 }
 
-void testNoSync(void)
+int testNoSync(void)
 {
     sysHideCursor();
     print("You are testing syncronization without semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"20", "0", 0};
+    char *argv[] = {"10", "0", 0};
     creationParameters params;
     params.name = "test_sync";
     params.argc = 2;
@@ -273,8 +260,5 @@ void testNoSync(void)
     params.entryPoint = (entryPoint)test_sync;
     params.foreground = 1;
 
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    return createProcess(&params);
 }

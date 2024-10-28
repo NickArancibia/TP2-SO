@@ -124,15 +124,52 @@ int init()
             }
         }
         else if (strcasecmp(commandPrompt, modes[TEST_MM]) == SELECTED_MODE)
-            testMM();
+        {
+            char isForeground = commandPrompt[separator + 1];
+            int pid = testMM();
+            if (isForeground == -1 || isForeground != '&')
+                sysWait(pid, NULL);
+            sysShowCursor();
+            printf("\n");
+        }
         else if (strcasecmp(commandPrompt, modes[TEST_PROCS]) == SELECTED_MODE)
-            testProc();
+        {
+            char isForeground = commandPrompt[separator + 1];
+            int pid = testProc();
+            if (isForeground == -1 || isForeground != '&')
+                sysWait(pid, NULL);
+            sysShowCursor();
+            printf("\n");
+        }
         else if (strcasecmp(commandPrompt, modes[TEST_PRIO]) == SELECTED_MODE)
-            testPrio();
+        {
+            char isForeground = commandPrompt[separator + 1];
+            int pid = testPrio();
+            if (isForeground == -1 || isForeground != '&')
+                sysWait(pid, NULL);
+            sysShowCursor();
+            printf("\n");
+        }
         else if (strcasecmp(commandPrompt, modes[TEST_SYNC]) == SELECTED_MODE)
-            testSync();
+        {
+            char isForeground = commandPrompt[separator + 1];
+            int pid = testSync();
+
+            if (isForeground == -1 || isForeground != '&')
+                sysWait(pid, NULL);
+            sysShowCursor();
+            printf("\n");
+        }
         else if (strcasecmp(commandPrompt, modes[TEST_NO_SYNC]) == SELECTED_MODE)
-            testNoSync();
+        {
+            char isForeground = commandPrompt[separator + 1];
+            int pid = testNoSync();
+
+            if (isForeground == -1 || isForeground != '&')
+                sysWait(pid, NULL);
+            sysShowCursor();
+            printf("\n");
+        }
         else
             notFound(commandPrompt);
     }

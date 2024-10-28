@@ -27,7 +27,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
 
     uint32_t total;
     uint64_t max_memory;
-    int iteration = 0;
     if ((max_memory = satoi(argv[0])) <= 0)
         return -1;
 
@@ -42,8 +41,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
         {
             mm_rqs[rq].size = GetUniform(max_memory - total - 1) + 1;
             mm_rqs[rq].address = malloc(mm_rqs[rq].size);
-            if (checkMemExit())
-                return 0;
             if (mm_rqs[rq].address)
             {
                 total += mm_rqs[rq].size;
@@ -55,8 +52,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
         uint32_t i;
         for (i = 0; i < rq; i++)
         {
-            if (checkMemExit())
-                return 0;
             if (mm_rqs[i].address)
                 memset(mm_rqs[i].address, i, mm_rqs[i].size);
         }
@@ -64,8 +59,6 @@ uint64_t test_mm(uint64_t argc, char *argv[])
         // Check
         for (i = 0; i < rq; i++)
         {
-            if (checkMemExit())
-                return 0;
             if (mm_rqs[i].address)
                 if (!memcheck(mm_rqs[i].address, i, mm_rqs[i].size))
                 {
@@ -77,27 +70,17 @@ uint64_t test_mm(uint64_t argc, char *argv[])
         // Free
         for (i = 0; i < rq; i++)
         {
-            if (checkMemExit())
-                return 0;
             if (mm_rqs[i].address)
             {
                 free(mm_rqs[i].address);
                 mm_rqs[i].address = 0;
             }
         }
-
-        if (iteration)
-        {
-            print("\b\b\b");
-        }
-        printColor("OK!", GREEN);
-        iteration = 1;
     }
 }
 
 int64_t test_processes(uint64_t argc, char *argv[])
 {
-    int iteration = 0;
     uint8_t rq;
     uint8_t alive = 0;
     uint8_t action;
@@ -120,12 +103,6 @@ int64_t test_processes(uint64_t argc, char *argv[])
     p_rq p_rqs[max_processes];
     while (1)
     {
-        if (iteration)
-        {
-            print("\b\b\b");
-        }
-        printColor("OK!", GREEN);
-        iteration = 1;
         // Create max_processes processes
         for (rq = 0; rq < max_processes; rq++)
         {
@@ -314,13 +291,13 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
             sysSemPost(SEM_ID);
     }
     if (use_sem)
-    sysSemClose(SEM_ID);
+        sysSemClose(SEM_ID);
 
     return 0;
 }
 
 uint64_t test_sync(uint64_t argc, char *argv[])
-{ //{n, use_sem, 0}
+{
     uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
 
     if (argc != 2)

@@ -11,10 +11,10 @@ void playEasterEgg();
 void yield();
 void printProcessesInformation();
 void getMemoryStatus();
-void testMM();
-void testPrio();
-void testProc();
-void testNoSync();
-void testSync();
+int testMM();
+int testPrio();
+int testProc();
+int testNoSync();
+int testSync();
 
 #endif
