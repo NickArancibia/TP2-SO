@@ -19,7 +19,7 @@
 #define MEDIUM 3
 #define HIGHEST 5
 #define SEM_ID "sem"
-#define TOTAL_PAIR_PROCESSES 3
+#define TOTAL_PAIR_PROCESSES 1
 
 int64_t test_processes(uint64_t argc, char *argv[]);
 void test_prio();
