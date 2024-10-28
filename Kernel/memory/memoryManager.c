@@ -65,7 +65,7 @@ void *mallocMM(int size)
     }
     if (curr->size >= size && (curr->size < (size + sizeof(memHeader))))
     {
-        updateMemoryStats(size, -size, 1);
+        updateMemoryStats(curr->size, -curr->size, 1);
         curr->isFree = 0;
         return ((void *)(((void *)curr) + sizeof(memHeader)));
     }
@@ -97,11 +97,11 @@ void freeMM(void *memorySegment)
                 curr->next->prev = curr->prev;
             }
             curr = curr->prev;
-            updateMemoryStats(-1 * (int)sizeof(memHeader), sizeof(memHeader), 0);
+            updateMemoryStats( -1 * (int)sizeof(memHeader), sizeof(memHeader), 0);
         }
         if (curr->next != NULL && curr->next->isFree)
         {
-            updateMemoryStats(-1 * (int)sizeof(memHeader), sizeof(memHeader), 0);
+            updateMemoryStats( -1 * (int)sizeof(memHeader), sizeof(memHeader), 0);
             curr->size += (curr->next->size + sizeof(memHeader));
             curr->next = curr->next->next;
             if (curr->next != NULL)
