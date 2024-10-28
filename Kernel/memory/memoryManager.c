@@ -65,7 +65,7 @@ void *mallocMM(int size)
     }
     if (curr->size >= size && (curr->size < (size + sizeof(memHeader))))
     {
-        updateMemoryStats(size, -size, 1);
+        updateMemoryStats(curr->size, -curr->size, 1);
         curr->isFree = 0;
         return ((void *)(((void *)curr) + sizeof(memHeader)));
     }
