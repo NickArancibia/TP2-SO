@@ -44,7 +44,8 @@ uint64_t *setupStack(int argc, char **argv, entryPoint entry, uint64_t *stackBas
 PID getpid(void);
 PID getppid(void);
 Process *getProcess(PID pid);
-int kill(PID pid);
+int kill(PID pid, int returnValue);
+int killAllChildren(PID pid);
 void waitProcess(PID pidToWait, int *wstatus);
 
 Process *getProcessesInformation();

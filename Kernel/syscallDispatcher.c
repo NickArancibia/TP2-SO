@@ -22,7 +22,7 @@ static int (*syscallHandlers[])() = {
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)(void))malloc, (int (*)(void))free,
     (int (*)(void))processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)(void))getPS, (int (*)(void))freePS, yield,
-    suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus, 
+    suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus,
     sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post};
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax)
@@ -274,12 +274,12 @@ int resumeProcess(PID pid)
 
 int killProcess(PID pid)
 {
-    return kill(pid);
+    return kill(pid, -1);
 }
 
 void exit()
 {
-    kill(getpid());
+    kill(getpid(), 0);
 }
 
 void wait(PID pidToWait, int *wstatus)
@@ -297,18 +297,22 @@ void getMemStatus(int *memStatus)
     getMemoryStatus(memStatus);
 }
 
-int sem_open( char *sem_id, int initialValue ){
-    return semOpen(sem_id,initialValue);
+int sem_open(char *sem_id, int initialValue)
+{
+    return semOpen(sem_id, initialValue);
 }
 
-void sem_wait( char *sem_id ){
+void sem_wait(char *sem_id)
+{
     semWait(sem_id);
 }
 
-void sem_post( char *sem_id ){
+void sem_post(char *sem_id)
+{
     semPost(sem_id);
 }
 
-int sem_close( char *sem_id ){
-   return semClose(sem_id);
+int sem_close(char *sem_id)
+{
+    return semClose(sem_id);
 }

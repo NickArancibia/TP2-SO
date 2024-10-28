@@ -50,8 +50,7 @@ int processLoader(int argc, char *argv[], entryPoint entry)
 {
     int returnValue = entry(argc, argv);
     PID processPid = getpid();
-    unblockWaitingProcesses(processPid, returnValue);
-    kill(processPid);
+    kill(processPid, returnValue);
     return returnValue;
 }
 
@@ -210,7 +209,7 @@ void freeProcessesInformation(Process *processesInfo)
     freeMM(processesInfo);
 }
 
-int kill(PID pid)
+int kill(PID pid, int returnValue)
 {
     if (pid <= INITPID || pid > MAX_PID)
         return -1;
@@ -233,10 +232,27 @@ int kill(PID pid)
     pcb->argv = NULL;
     pcb->argc = 0;
     garbageCollect();
+    unblockWaitingProcesses(pid, returnValue);
 
     if (getCurrentProcess()->pid == pid)
     {
         forceSwitchContent();
+    }
+    return 0;
+}
+
+int killAllChildren(PID pid)
+{
+    if (!isValidPID(pid))
+    {
+        return -1;
+    }
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (processes[i].parentpid == pid)
+        {
+            kill(processes[i].pid, -1);
+        }
     }
     return 0;
 }
