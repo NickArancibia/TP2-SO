@@ -47,6 +47,11 @@ GLOBAL sysExit
 GLOBAL sysWait
 GLOBAL sysNice
 GLOBAL sysGetMemStatus
+GLOBAL sysSemOpen
+GLOBAL sysSemClose
+GLOBAL sysSemWait
+GLOBAL sysSemPost
+
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -262,7 +267,27 @@ sysNice:
     int 80h
     ret
 
-sysGetMemStatus
-    mov rax,42
+sysGetMemStatus:
+    mov rax, 42
+    int 80h
+    ret
+
+sysSemOpen:
+    mov rax, 43
+    int 80h
+    ret
+
+sysSemClose:
+    mov rax, 44
+    int 80h
+    ret
+
+sysSemWait:
+    mov rax, 45
+    int 80h
+    ret
+
+sysSemPost:
+    mov rax, 46
     int 80h
     ret

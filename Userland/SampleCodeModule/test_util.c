@@ -2,6 +2,9 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <stdint.h>
 #include <stdio.h>
+#include "./include/test_util.h"
+#include "./include/syscalls.h"
+#define MINOR_WAIT 9000000
 
 // Random
 static uint32_t m_z = 362436069;
@@ -67,6 +70,19 @@ void bussy_wait(uint64_t n)
     ;
 }
 
+void endless_loop_print(uint64_t wait)
+{
+  int64_t pid = sysGetPID();
 
+  while (1)
+  {
+    printf("%d ", pid);
+    bussy_wait(MINOR_WAIT);
+  }
+}
 
-
+void endless_loop()
+{
+  while (1)
+    ;
+}

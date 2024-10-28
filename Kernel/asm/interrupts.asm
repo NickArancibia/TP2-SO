@@ -27,6 +27,8 @@ EXTERN getStackBase
 EXTERN switchContent
 GLOBAL saveRegsInBuffer
 GLOBAL setupStack
+GLOBAL acquire
+GLOBAL release
 
 SECTION .text
 
@@ -273,6 +275,18 @@ haltcpu:
 	cli
 	hlt
 	ret
+
+acquire:
+	mov rax, 0
+	mov al, 1
+	xchg al, [rdi]
+	cmp al, 0
+	jne acquire
+	ret
+
+release:
+	mov byte [rdi], 0
+    ret
 
 setupStack:
 	push rbp

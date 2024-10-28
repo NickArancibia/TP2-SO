@@ -13,7 +13,7 @@
 #include "./include/process.h"
 #include "./include/scheduler.h"
 #include <startup.h>
-
+#include "./include/semaphore.h"
 void load_idt(void);
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax);
@@ -66,6 +66,7 @@ void idle()
 
 int main()
 {
+	
 	load_idt();
 
 	initializeMemoryMM(memoryStart, memorySize);
@@ -75,8 +76,9 @@ int main()
 
 	drawBootLogo();
 	playBootSound();
-
+	
 	vdClearScreen();
+	initializeSems();
 	initProcesses();
 	creationParameters params;
 	params.name = "init";

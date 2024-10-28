@@ -2,18 +2,16 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "include/modes.h"
 #include "include/shell.h"
-#include "include/eliminatorGame.h"
 #include "include/stdio.h"
 #include "include/string.h"
 #include "include/syscalls.h"
 #include "include/lib.h"
-#include "include/exceptions.h"
 #include "include/dateTime.h"
 #include "include/colors.h"
 #include "include/utils.h"
-#include "include/testingArea.h"
 #include "include/processStructure.h"
 #include "include/test_util.h"
+#include "include/tests.h"
 
 char *dateTimeAux;
 int zoomAux, regAux;
@@ -21,21 +19,11 @@ int memoryStatus[3];
 
 static char *helpText[] = {"Command information is displayed below:\n\n",
                            "HELP                ->      Shows a description on each available command.\n",
-                           "DIVBYZERO           ->      Shows handling in case of division by zero.\n",
-                           "INVALIDOPCODE       ->      Shows handling in case of an invalid operation code.\n",
-                           "ZOOMIN              ->      Enlarges text size on screen. In case maximum size is reached,\n",
-                           "                            it is properly indicated without making any changes.\n",
-                           "                            Can be alternatively activated with CTRL + i\n",
-                           "ZOOMOUT             ->      Reduces text size on screen. In case minimum size is reached,\n",
-                           "                            it is properly indicated without making any changes.\n",
-                           "                            Can be alternatively activated with CTRL + o\n",
                            "TIME                ->      Shows current time in HH:MM:SS format.\n",
                            "DATE                ->      Shows current date in DD/MM/YY format.\n",
-                           "ELIMINATOR          ->      Opens ELIMINATOR game.\n",
                            "CLEAR               ->      Clears the screen\n",
                            "REGISTERS           ->      Prints registers values. To do this, first you need to save\n",
                            "                            your registers by pressing ALT.\n",
-                           "TESTING             ->      Start testing area\n",
                            "YIELD               ->      Relinquish voluntarily the CPU\n",
                            "PS                  ->      Shows information about all processes\n",
                            "KILL [pid]          ->      Kills the process with the given pid\n",
@@ -44,14 +32,14 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "NICE [pid] [prio]   ->      Change the priority of the process with the given pid to prio.\n",
                            "MEMSTATUS           ->      Prints how many blocks and bytes were allocated \n",
                            "                            and how many bytes are still free.\n",
+                           "TESTMM              ->      Test memory manager.\n",
+                           "TESTPROC            ->      Test processes creation.\n",
+                           "TESTPRIO            ->      Test processes priority.\n",
+                           "TESTSYNC            ->      Test syncronization with semaphores.\n",
+                           "TESTNOSYNC          ->      Test syncronization without semaphores.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
-
-void testingArea()
-{
-    initTestingArea();
-}
 
 void help(void)
 {
@@ -59,14 +47,6 @@ void help(void)
     {
         printColor(helpText[i], YELLOW);
     }
-}
-
-void eliminator()
-{
-    sysHideCursor();
-    print("\nLoading eliminator...");
-    sysSleep(2, 0);
-    eliminatorGame();
 }
 
 void clear(void)
@@ -82,30 +62,6 @@ void time(void)
 void date(void)
 {
     printDate();
-}
-void dummy() {}
-void zoomin()
-{
-    zoomAux = incTextSize();
-    if (zoomAux)
-        print("Maximum size reached.\n");
-}
-
-void zoomout()
-{
-    zoomAux = decTextSize();
-    if (zoomAux)
-        print("Minimum size reached.\n");
-}
-
-void divByZero()
-{
-    divZero();
-}
-
-void invalidOp()
-{
-    invalidOpcode();
 }
 
 void registers()
@@ -216,6 +172,109 @@ void getMemoryStatus()
     sysGetMemStatus(memoryStatus);
     printf("Memoria total= %d B |  ", memoryStatus[3]);
     printf("Memoria ocupada ocupados= %d B |  ", memoryStatus[1]);
-    printf("Memoria libre= %d B | ", memoryStatus[2]); 
+    printf("Memoria libre= %d B | ", memoryStatus[2]);
     printf("Bloques ocupados= %d\n", memoryStatus[0]);
+}
+
+void testProc(void)
+{
+    sysHideCursor();
+    print("You are testing processes\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    print("Press 'q' to finish the test\n\n");
+    char *argv[] = {"6", 0};
+    creationParameters params;
+    params.name = "test_processes";
+    params.argc = 1;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_processes;
+    params.foreground = 1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+    printf("\n");
+}
+
+void testPrio()
+{
+    sysHideCursor();
+    print("You are testing processes priorities\n");
+    print("Below you will see information on running processes\n");
+    print("Each process will print its PID an amount of times based on its priority\n\n");
+    PID pid;
+    creationParameters params;
+    params.name = "test_prio";
+    params.argc = 0;
+    params.argv = NULL;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_prio;
+    params.foreground = 1;
+    sysSleep(1, 0);
+    pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+    printf("\n");
+}
+
+void testMM(void)
+{
+    sysHideCursor();
+    print("You are testing memory manager\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    print("Press 'q' to finish the test\n\n");
+    char *argv[] = {"25000", 0};
+    creationParameters params;
+    params.name = "test_mm";
+    params.argc = 1;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_mm;
+    params.foreground = 1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+    printf("\n");
+}
+
+void testSync(void)
+{
+    sysHideCursor();
+    print("You are testing syncronization with semaphores\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    char *argv[] = {"1", "1", 0};
+    creationParameters params;
+    params.name = "test_sync";
+    params.argc = 2;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_sync;
+    params.foreground = 1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+    printf("\n");
+}
+
+void testNoSync(void)
+{
+    sysHideCursor();
+    print("You are testing syncronization without semaphores\n");
+    print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    char *argv[] = {"20", "0", 0};
+    creationParameters params;
+    params.name = "test_sync";
+    params.argc = 2;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)test_sync;
+    params.foreground = 1;
+
+    int pid = createProcess(&params);
+    sysWait(pid, NULL);
+    sysShowCursor();
+    printf("\n");
 }

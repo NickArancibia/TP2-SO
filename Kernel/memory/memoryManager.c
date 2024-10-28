@@ -1,7 +1,7 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <memoryManager.h>
-#include "./include/defs.h"
+#include "../include/defs.h"
 #include <stdint.h>
 #include <interrupts.h>
 
@@ -63,13 +63,13 @@ void *mallocMM(int size)
     {
         return NULL;
     }
-    if (curr->size == size)
+    if (curr->size >= size && (curr->size < (size + sizeof(memHeader))))
     {
         updateMemoryStats(size, -size, 1);
         curr->isFree = 0;
         return ((void *)(((void *)curr) + sizeof(memHeader)));
     }
-    if (curr->size > size)
+    if (curr->size >= (size + sizeof(memHeader)))
     {
 
         splitBlock(curr, size);
