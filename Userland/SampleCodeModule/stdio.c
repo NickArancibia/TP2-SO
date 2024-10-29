@@ -69,7 +69,7 @@ int printf(char *str, ...)
         if (str[i] == '%' && str[i + 1] == 'd')
         {
             i++;
-            intToString(va_arg(args, int), numStr, MINLEN);
+            intToString((int64_t)(va_arg(args, int)), numStr, MINLEN);
             for (int j = 0; numStr[j] != '\0'; ++j)
             {
                 buffer[bufferIndex++] = numStr[j];

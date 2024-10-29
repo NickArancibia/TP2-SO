@@ -1,15 +1,17 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./include/tests.h"
-
+#include "./include/lib.h"
+  void dummy3(){}
+   void dummy2(){}
+    void dummy(){}
 typedef struct MM_rq
 {
     void *address;
     uint32_t size;
 } mm_rq;
 
-uint8_t rq;
-mm_rq mm_rqs[MAX_BLOCKS];
+
 
 typedef struct P_rq
 {
@@ -20,10 +22,12 @@ typedef struct P_rq
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
 
 int checkMemExit();
-int checkProcsExit();
+
 
 uint64_t test_mm(uint64_t argc, char *argv[])
 {
+    uint8_t rq;
+    mm_rq mm_rqs[MAX_BLOCKS];
 
     uint32_t total;
     uint64_t max_memory;
@@ -168,11 +172,6 @@ int64_t test_processes(uint64_t argc, char *argv[])
                     p_rqs[rq].state = RUNNING;
                 }
         }
-        if (checkProcsExit())
-        {
-            printf("\n");
-            return 0;
-        }
     }
 }
 
@@ -221,23 +220,6 @@ void test_prio()
         sysKill(pids[i]);
 }
 
-int checkMemExit()
-{
-    if (getchar() == 'q')
-    {
-        for (int i = 0; i < MAX_BLOCKS; i++)
-        {
-            if (mm_rqs[i].address != 0)
-            {
-                free(mm_rqs[i].address);
-            }
-        }
-
-        print("\n");
-        return 1;
-    }
-    return 0;
-}
 
 int checkProcsExit()
 {
@@ -248,7 +230,6 @@ int checkProcsExit()
     return 0;
 }
 
-int64_t global; // shared memory
 
 void slowInc(int64_t *p, int64_t inc)
 {
@@ -260,20 +241,25 @@ void slowInc(int64_t *p, int64_t inc)
 
 uint64_t my_process_inc(uint64_t argc, char *argv[])
 {
+    
+   
     uint64_t n;
     int8_t inc;
     int8_t use_sem;
-
-    if (argc != 3)
+    int64_t *global;
+    if (argc != 4){
+        printf("termine %d\n",argc);
         return -1;
-
+    }
     if ((n = satoi(argv[0])) <= 0)
         return -1;
     if ((inc = satoi(argv[1])) == 0)
         return -1;
     if ((use_sem = satoi(argv[2])) < 0)
         return -1;
-
+   dummy2(); 
+    global =(int64_t*) satoi(argv[3]);
+dummy();
     if (use_sem)
         if (sysSemOpen(SEM_ID, 1))
         {
@@ -286,7 +272,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
     {
         if (use_sem)
             sysSemWait(SEM_ID);
-        slowInc(&global, inc);
+        slowInc(global, inc);
         if (use_sem)
             sysSemPost(SEM_ID);
     }
@@ -298,17 +284,23 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
 
 uint64_t test_sync(uint64_t argc, char *argv[])
 {
-    uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
 
+    int64_t global; // shared memory
+    uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
+    global = 0; 
     if (argc != 2)
         return -1;
 
-    char *argvDec[] = {argv[0], "-1", argv[1], NULL};
-    char *argvInc[] = {argv[0], "1", argv[1], NULL};
+    int64_t *p = &global;
+    dummy3();
+    char buff[20]={0};
+    intToString((int64_t)p,buff,1);
+    char *argvDec[] = {argv[0], "-1", argv[1],buff, NULL};
+    char *argvInc[] = {argv[0], "1", argv[1],buff, NULL};
 
     creationParameters paramsDec;
     paramsDec.name = "my_process_dec";
-    paramsDec.argc = 3;
+    paramsDec.argc = 4;
     paramsDec.argv = argvDec;
     paramsDec.priority = 1;
     paramsDec.entryPoint = (entryPoint)my_process_inc;
@@ -316,13 +308,13 @@ uint64_t test_sync(uint64_t argc, char *argv[])
 
     creationParameters paramsInc;
     paramsInc.name = "my_process_inc";
-    paramsInc.argc = 3;
+    paramsInc.argc = 4;
     paramsInc.argv = argvInc;
     paramsInc.priority = 1;
     paramsInc.entryPoint = (entryPoint)my_process_inc;
     paramsInc.foreground = 1;
 
-    global = 0;
+    
 
     uint64_t i, j;
     for (i = 0, j = 0; j < TOTAL_PAIR_PROCESSES; j++, i += 2)
@@ -340,3 +332,4 @@ uint64_t test_sync(uint64_t argc, char *argv[])
     printf("Final value: %d\n", global);
     return 0;
 }
+

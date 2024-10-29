@@ -24,7 +24,7 @@ int intLength(int num, int minLen)
     return length < minLen ? minLen : length;
 }
 
-void intToString(int num, char *buf, int minLen)
+void intToString(int64_t num, char *buf, int minLen)
 {
     int length = intLength(num, minLen);
 
