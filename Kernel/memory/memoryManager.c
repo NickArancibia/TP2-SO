@@ -5,6 +5,7 @@
 #include <stdint.h>
 #include <interrupts.h>
 
+#define SIZE_BLOCK_CONTROL sizeof(memHeader)
 #define BLOCK_COUNT 250
 #define ALIGNMENT 8
 
