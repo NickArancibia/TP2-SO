@@ -87,6 +87,8 @@ int main()
 	params.priority = DEFAULT_PRIORITY;
 	params.entryPoint = (entryPoint)&idle;
 	params.foreground = 1;
+	params.fds[0] = STDIN;
+	params.fds[1] = STDOUT;
 	createProcess(&params);
 	initScheduler();
 	params.name = "shell";
@@ -95,6 +97,8 @@ int main()
 	params.argc = 0;
 	params.argv = NULL;
 	params.priority = DEFAULT_PRIORITY;
+	params.fds[0] = STDIN;
+	params.fds[1] = STDOUT;
 	createProcess(&params);
 	forceSwitchContent();
 

@@ -14,7 +14,7 @@
 #include <scheduler.h>
 #include "semaphore.h"
 
-#define HANDLER_SIZE 47
+#define HANDLER_SIZE 48
 
 static int (*syscallHandlers[])() = {
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
@@ -23,7 +23,7 @@ static int (*syscallHandlers[])() = {
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)(void))malloc, (int (*)(void))free,
     (int (*)(void))processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)(void))getPS, (int (*)(void))freePS, yield,
     suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus,
-    sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post};
+    sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post,getFDs};
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax)
 {
@@ -315,4 +315,9 @@ void sem_post(char *sem_id)
 int sem_close(char *sem_id)
 {
     return semClose(sem_id);
+}
+
+int getFDs(int fds[2])
+{
+    return getFileDescriptors(fds);
 }

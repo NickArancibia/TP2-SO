@@ -66,5 +66,6 @@ int sem_open( char *sem_id, int initialValue );
 void sem_wait( char *sem_id );
 void sem_post( char *sem_id );
 int sem_close( char *sem_id );
+int getFDs(int fds[2]);
 
 #endif

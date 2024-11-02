@@ -58,6 +58,7 @@ void sysGetMemStatus(int* memStatus);
 
 int sysSemOpen( char *sem_id, int initialValue );
 int sysSemClose( char *sem_id);
+int sysGetFDs(int fds[2]);
 void sysSemWait( char *sem_id);
 void sysSemPost( char *sem_id);
 #endif

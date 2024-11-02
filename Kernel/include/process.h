@@ -22,6 +22,7 @@ typedef struct
     Priority priority;
     entryPoint entryPoint;
     int foreground;
+    int fds[2];
 } creationParameters;
 
 typedef struct
@@ -36,6 +37,7 @@ typedef struct
     ProcessState state;
     uint64_t *stackBase, *stackEnd;
     int childReturnValue;
+    int fds[2];
 } Process;
 
 PID initProcesses(void);

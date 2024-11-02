@@ -51,6 +51,7 @@ GLOBAL sysSemOpen
 GLOBAL sysSemClose
 GLOBAL sysSemWait
 GLOBAL sysSemPost
+GLOBAL sysGetFDs
 
 section .text
 
@@ -289,5 +290,10 @@ sysSemWait:
 
 sysSemPost:
     mov rax, 46
+    int 80h
+    ret
+
+sysGetFDs:
+    mov rax,47
     int 80h
     ret

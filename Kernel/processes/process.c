@@ -150,6 +150,7 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].state = READY;
     processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
     processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, (entryPoint)processLoader);
+    memcpy(processes[allocatedProcess].fds, params->fds, 2 * sizeof(int));
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
@@ -264,5 +265,16 @@ int changeProccessPriority(PID pid, Priority priority)
         return -1;
     }
     processes[pid - 1].priority = priority;
+    return 0;
+}
+
+int getFileDescriptors(int *fds)
+{
+    Process *currentProcess = getCurrentProcess();
+    if (currentProcess == NULL)
+    {
+        return -1;
+    }
+    memcpy(fds, currentProcess->fds, 2 * sizeof(int));
     return 0;
 }

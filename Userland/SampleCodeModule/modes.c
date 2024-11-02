@@ -156,6 +156,8 @@ void printProcessesInformation()
 {
     PID pid;
     creationParameters params;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.name = "ps";
     params.argc = 0;
     params.argv = NULL;
@@ -176,7 +178,7 @@ void getMemoryStatus()
     printf("Bloques ocupados= %d\n", memoryStatus[0]);
 }
 
-int testProc(void)
+int testProc()
 {
     sysHideCursor();
     print("You are testing processes\n");
@@ -184,6 +186,9 @@ int testProc(void)
     print("Press 'q' to finish the test\n\n");
     char *argv[] = {"2", 0};
     creationParameters params;
+
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.name = "test_processes";
     params.argc = 1;
     params.argv = argv;
@@ -203,6 +208,8 @@ int testPrio()
     creationParameters params;
     params.name = "test_prio";
     params.argc = 0;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.argv = NULL;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_prio;
@@ -222,6 +229,8 @@ int testMM(void)
     params.name = "test_mm";
     params.argc = 1;
     params.argv = argv;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_mm;
     params.foreground = 1;
@@ -240,6 +249,8 @@ int testSync(void)
     params.argc = 2;
     params.argv = argv;
     params.priority = 1;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.entryPoint = (entryPoint)test_sync;
     params.foreground = 1;
 
@@ -257,6 +268,8 @@ int testNoSync(void)
     params.argc = 2;
     params.argv = argv;
     params.priority = 1;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.entryPoint = (entryPoint)test_sync;
     params.foreground = 1;
 
