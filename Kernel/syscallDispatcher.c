@@ -302,19 +302,19 @@ int sem_open(char *sem_id, int initialValue)
     return semOpen(sem_id, initialValue);
 }
 
-void sem_wait(char *sem_id)
+void sem_wait(sem_t sem)
 {
-    semWait(sem_id);
+    semWait(sem);
 }
 
-void sem_post(char *sem_id)
+void sem_post(sem_t sem)
 {
-    semPost(sem_id);
+    semPost(sem);
 }
 
-int sem_close(char *sem_id)
+int sem_close(sem_t sem)
 {
-    return semClose(sem_id);
+    return semClose(sem);
 }
 
 int getFDs(int fds[2])

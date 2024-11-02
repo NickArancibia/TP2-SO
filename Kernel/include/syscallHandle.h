@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <process.h>
 #include <scheduler.h>
+#include "semaphore.h"
 
 int setCursor(uint64_t x, uint64_t y);
 int hideCursor();
@@ -63,9 +64,9 @@ void wait(PID pidToWait, int *wstatus);
 int nice(PID pid, Priority priority);
 void getMemStatus(int * memStatus);
 int sem_open( char *sem_id, int initialValue );
-void sem_wait( char *sem_id );
-void sem_post( char *sem_id );
-int sem_close( char *sem_id );
+void sem_wait( sem_t sem);
+void sem_post( sem_t sem);
+int sem_close( sem_t sem);
 int getFDs(int fds[2]);
 
 #endif
