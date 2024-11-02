@@ -52,6 +52,6 @@ void waitProcess(PID pidToWait, int *wstatus);
 
 Process *getProcessesInformation();
 void freeProcessesInformation(Process *processesInfo);
-
+int getFileDescriptors(int *fds);
 int changeProccessPriority(PID pid, Priority priority);
 #endif
