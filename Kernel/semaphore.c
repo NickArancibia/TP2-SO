@@ -33,7 +33,7 @@ int wasOpenBy(sem semaphore, PID pid)
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (semaphore.openBy[i] == pid)
+        if (pid == 1 || semaphore.openBy[i] == pid)
         {
             return 1;
         }
@@ -109,7 +109,7 @@ int semOpen(char *sem_id, int initialValue)
 
     if (sem_id != NULL && (idx = semGet(sem_id)) != -1)
     {
-        setOpenBy(idx, getpid());
+      //  setOpenBy(idx, getpid());
         return idx;
     }
     if ((idx = getAvailableSem()) == -1)
@@ -117,10 +117,26 @@ int semOpen(char *sem_id, int initialValue)
         return -1;
     }
 
-    setOpenBy(idx, getpid());
-    int len = strlen(sem_id) + 1;
-    semaphores[idx].name = mallocMM(len);
-    memcpy(semaphores[idx].name, sem_id, len);
+   // setOpenBy(idx, getpid());
+    if (sem_id != NULL)
+    {
+        int len = strlen(sem_id) + 1;
+        semaphores[idx].name = mallocMM(len);
+        memcpy(semaphores[idx].name, sem_id, len);
+    }
+    semaphores[idx].isAvailable = 0;
+    semaphores[idx].value = initialValue;
+    return idx;
+}
+
+int semCreateBy(int initialValue, PID pid)
+{
+    int idx;
+    if ((idx = getAvailableSem()) == -1)
+    {
+        return -1;
+    }
+    //setOpenBy(idx, pid);
     semaphores[idx].isAvailable = 0;
     semaphores[idx].value = initialValue;
     return idx;
@@ -128,10 +144,7 @@ int semOpen(char *sem_id, int initialValue)
 
 int semWait(int sem_id)
 {
-    if (wasOpenBy(semaphores[sem_id], getpid()) == -1)
-    {
-        return -1;
-    }
+   
     acquire(&semaphores[sem_id].isInUse);
     while (semaphores[sem_id].value == 0)
     {
@@ -149,10 +162,7 @@ int semWait(int sem_id)
 int semPost(int sem_id)
 {
   
-    if ( wasOpenBy(semaphores[sem_id], getpid()) == -1)
-    {
-        return -1;
-    }
+   
     acquire(&semaphores[sem_id].isInUse);
     semaphores[sem_id].value++;
     if (!isEmpty(semaphores[sem_id].waitingProcess))
@@ -166,7 +176,7 @@ int semPost(int sem_id)
 
 int semClose(int sem_id)
 {
-    if (semaphores[sem_id].isAvailable || wasOpenBy(semaphores[sem_id], getpid()) == -1)
+    if (semaphores[sem_id].isAvailable )
     {
         return -1;
     }

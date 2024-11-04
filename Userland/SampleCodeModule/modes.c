@@ -37,6 +37,7 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "TESTPRIO            ->      Test processes priority.\n",
                            "TESTSYNC            ->      Test syncronization with semaphores.\n",
                            "TESTNOSYNC          ->      Test syncronization without semaphores.\n",
+                           "TESTPIPE            ->      Test pipes.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -275,3 +276,64 @@ int testNoSync(void)
 
     return createProcess(&params);
 }
+
+int64_t inputP(uint64_t argc, char *argv[]){
+    
+    char c;
+    while(1){
+        c = getchar();
+        if(c == 'q'){
+            putchar(c);
+            break;
+        }
+        putchar(c);
+    }
+    return 0;
+}
+ 
+int64_t outputP(uint64_t argc, char *argv[]){
+    
+    char c;
+    while(1){
+         c = getchar();
+        if(c == 'q'){
+            break;
+        }
+        putchar(c);
+    }
+    return 0;
+}
+int testPipe(void)
+{
+    sysHideCursor();
+    print("Testing pipes\n");
+    print("Two processes were created, one reads from STDIN, the other writes to STDOUT \n");
+    print("this test works like 'input | output'\n");
+    print("Press q to exit\n");
+
+  //  print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    char *argv[] = {0};
+    int fds[2];
+    sysPipe(fds);
+    creationParameters params;
+    params.name = "inputP";
+    params.argc =0;
+    params.argv = argv;
+    params.priority = 1;
+     params.fds[0] = STDIN;
+    params.fds[1] = fds[1];
+    params.entryPoint = (entryPoint)inputP;
+    params.foreground = 1;
+    createProcess(&params);
+    params.name = "outputP";
+    params.argc =0;
+    params.argv = argv;
+    params.priority = 1;
+    params.fds[0] = fds[0];
+    params.fds[1] = STDOUT;
+    params.entryPoint = (entryPoint)outputP;
+    params.foreground = 1;
+
+    return createProcess(&params);
+}
+

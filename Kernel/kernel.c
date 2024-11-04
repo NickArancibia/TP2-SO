@@ -7,6 +7,7 @@
 #include <fonts.h>
 #include "include/time.h"
 #include <defs.h>
+#include "../include/fileDescriptors.h"
 #include "interrupts.h"
 #include "time.h"
 #include "./include/memoryManager.h"
@@ -79,6 +80,7 @@ int main()
 	
 	vdClearScreen();
 	initializeSems();
+	initFileDescriptors();
 	initProcesses();
 	creationParameters params;
 	params.name = "init";

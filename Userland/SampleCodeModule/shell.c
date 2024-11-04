@@ -13,7 +13,7 @@ static const char *modes[] = {
     "shell", "idle", "help", "time",
     "date", "clear", "registers", "easteregg", "ps", "yield",
     "kill", "suspend", "resume", "nice", "memstatus", "testmm",
-    "testproc", "testprio", "testsync", "testnosync"};
+    "testproc", "testprio", "testsync", "testnosync", "testpipe"};
 
 int init()
 {
@@ -32,6 +32,13 @@ int init()
             help();
         else if (strcasecmp(commandPrompt, modes[CLEAR_MODE]) == SELECTED_MODE)
             clear();
+        else if (strcasecmp(commandPrompt, modes[TEST_PIPES]) == SELECTED_MODE){
+          PID pid =    testPipe();
+          sysWait(pid, NULL);
+          sysShowCursor();
+          printf("\n");
+        }
+          
         else if (strcasecmp(commandPrompt, modes[TIME_MODE]) == SELECTED_MODE)
             time();
         else if (strcasecmp(commandPrompt, modes[DATE_MODE]) == SELECTED_MODE)

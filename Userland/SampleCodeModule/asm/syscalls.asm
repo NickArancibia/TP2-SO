@@ -52,7 +52,7 @@ GLOBAL sysSemClose
 GLOBAL sysSemWait
 GLOBAL sysSemPost
 GLOBAL sysGetFDs
-
+GLOBAL sysPipe
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -295,5 +295,10 @@ sysSemPost:
 
 sysGetFDs:
     mov rax,47
+    int 80h
+    ret
+
+sysPipe:
+    mov rax,48
     int 80h
     ret

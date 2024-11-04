@@ -16,5 +16,5 @@ int testPrio();
 int testProc();
 int testNoSync();
 int testSync();
-
+int testPipe(void);
 #endif
