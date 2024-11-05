@@ -1,10 +1,10 @@
 // This is a personal academic project. Dear PVS-Studio, please check it.
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include <memoryManager.h>
+
 #include "../include/defs.h"
 #include <stdint.h>
 #include <interrupts.h>
-
 #define SIZE_BLOCK_CONTROL sizeof(memHeader)
 #define BLOCK_COUNT 250
 #define ALIGNMENT 8

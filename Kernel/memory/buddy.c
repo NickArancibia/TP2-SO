@@ -1,7 +1,7 @@
 #include <memoryManager.h>
-#include <stddef.h>
 
-#define MIN_BLOCK_SIZE 4096
+#include <stddef.h>
+#define MIN_BLOCK_SIZE 8
 #define MAX_LEVELS 20
 
 typedef struct Block
@@ -10,18 +10,26 @@ typedef struct Block
     int level;
 } Block;
 
-static Block *freeLists[MAX_LEVELS];
+int bytesAllocated, bytesFree, blocksAllocated, bytesTotal;
+
+static Block *buddyLists[MAX_LEVELS];
 static void *memoryBase;
-static int totalMemorySize;
+
+void updateMemoryStats(int allocatedChange, int freeChange, int blockChange)
+{
+    bytesAllocated += allocatedChange;
+    bytesFree += freeChange;
+    blocksAllocated += blockChange;
+}
 
 void initializeMemoryMM(void *memoryStart, int memorySize)
 {
+    bytesFree = memorySize;
     memoryBase = memoryStart;
-    totalMemorySize = memorySize;
 
     for (int i = 0; i < MAX_LEVELS; i++)
     {
-        freeLists[i] = NULL;
+        buddyLists[i] = NULL;
     }
 
     int initialLevel = 0;
@@ -33,7 +41,7 @@ void initializeMemoryMM(void *memoryStart, int memorySize)
     Block *initialBlock = (Block *)memoryStart;
     initialBlock->next = NULL;
     initialBlock->level = initialLevel;
-    freeLists[initialLevel] = initialBlock;
+    buddyLists[initialLevel] = initialBlock;
 }
 
 void *mallocMM(int size)
@@ -51,22 +59,23 @@ void *mallocMM(int size)
 
     for (int i = level; i < MAX_LEVELS; i++)
     {
-        if (freeLists[i] != NULL)
+        if (buddyLists[i] != NULL)
         {
-            Block *block = freeLists[i];
-            freeLists[i] = block->next;
+            Block *block = buddyLists[i];
+            buddyLists[i] = block->next;
 
-            while (i > level)
+            while (i > level) // We divide the block if it is bigger than the requested size
             {
                 i--;
-                Block *buddy = (Block *)((char *)block + (1 << i) * MIN_BLOCK_SIZE);
-                buddy->next = freeLists[i];
+                Block *buddy = (Block *)((void *)block + (1 << i) * MIN_BLOCK_SIZE); // Divide the block
+                buddy->next = buddyLists[i];
                 buddy->level = i;
-                freeLists[i] = buddy;
+                buddyLists[i] = buddy;
             }
 
             block->level = level;
-            return (void *)((char *)block + sizeof(Block));
+            updateMemoryStats((1 << level) * MIN_BLOCK_SIZE, -1 * (1 << level) * MIN_BLOCK_SIZE, 1);
+            return (void *)((void *)block + sizeof(Block));
         }
     }
 
@@ -80,14 +89,15 @@ void freeMM(void *memorySegment)
         return;
     }
 
-    Block *block = (Block *)((char *)memorySegment - sizeof(Block));
+    Block *block = (Block *)((void *)memorySegment - sizeof(Block));
     int level = block->level;
+    int freedSize = (1 << level) * MIN_BLOCK_SIZE;
 
     while (level < MAX_LEVELS - 1)
     {
-        Block *buddy = (Block *)((char *)memoryBase + (((char *)block - (char *)memoryBase) ^ ((1 << level) * MIN_BLOCK_SIZE)));
+        Block *buddy = (Block *)((void *)memoryBase + (((void *)block - (void *)memoryBase) ^ ((1 << level) * MIN_BLOCK_SIZE)));
 
-        Block **current = &freeLists[level];
+        Block **current = &buddyLists[level];
         while (*current != NULL && *current != buddy)
         {
             current = &(*current)->next;
@@ -96,7 +106,7 @@ void freeMM(void *memorySegment)
         if (*current == buddy)
         {
             *current = buddy->next;
-            block = (Block *)((char *)block < (char *)buddy ? (char *)block : (char *)buddy);
+            block = (Block *)((void *)block < (void *)buddy ? (void *)block : (void *)buddy);
             level++;
             block->level = level;
         }
@@ -106,11 +116,15 @@ void freeMM(void *memorySegment)
         }
     }
 
-    block->next = freeLists[level];
-    freeLists[level] = block;
+    updateMemoryStats(-1 * freedSize, freedSize, -1);
+    block->next = buddyLists[level];
+    buddyLists[level] = block;
 }
 
 void getMemoryStatus(int *status)
 {
-    return;
+    status[0] = blocksAllocated;
+    status[1] = bytesAllocated;
+    status[2] = bytesFree;
+    status[3] = bytesFree + bytesAllocated;
 }
