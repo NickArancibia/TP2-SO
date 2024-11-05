@@ -8,8 +8,6 @@
 #define STDERR 2
 #define NULL 0
 
-typedef unsigned int size_t;
-
 /**
  * Reads STDIN and returns the next char in it.
  * If STDIN buffer is empty, waits for input and returns it
@@ -47,7 +45,7 @@ int print(char *str);
  *
  * Returns length print
  */
-int printf(char *str,...);
+int printf(char *str, ...);
 
 /**
  * Receives a buffer and size as parameters

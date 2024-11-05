@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./include/semaphore.h"
 #include "./include/queueADT.h"
 #include "./include/memoryManager.h"
@@ -173,8 +175,9 @@ int semClose(char *sem_id)
         return 1;
     }
     acquire(&semaphores[idx].isInUse);
-    if(!isEmpty(semaphores[idx].waitingProcess) && !isOpenByEmpty(semaphores[idx])){
-        removeOpenBy(idx,getpid());
+    if (!isEmpty(semaphores[idx].waitingProcess) && !isOpenByEmpty(semaphores[idx]))
+    {
+        removeOpenBy(idx, getpid());
         release(&semaphores[idx].isInUse);
         return 0;
     }

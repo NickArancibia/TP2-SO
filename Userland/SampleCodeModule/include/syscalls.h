@@ -48,16 +48,16 @@ int sysGetParentPID();
 Process *sysGetPS();
 void sysFreePS(Process *ps);
 void sysYield();
-int sysSuspendProcess();
-int sysResumeProcess();
+int sysSuspendProcess(PID pid);
+int sysResumeProcess(PID pid);
 int sysKill(PID pid);
 void sysExit();
 void sysWait(PID pid, int *wstatus);
 int sysNice(PID pid, Priority priority);
-void sysGetMemStatus(int* memStatus);
+void sysGetMemStatus(int *memStatus);
 
-int sysSemOpen( char *sem_id, int initialValue );
-int sysSemClose( char *sem_id);
-void sysSemWait( char *sem_id);
-void sysSemPost( char *sem_id);
+int sysSemOpen(char *sem_id, int initialValue);
+int sysSemClose(char *sem_id);
+void sysSemWait(char *sem_id);
+void sysSemPost(char *sem_id);
 #endif

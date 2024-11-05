@@ -2,16 +2,11 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "./include/tests.h"
 #include "./include/lib.h"
-  void dummy3(){}
-   void dummy2(){}
-    void dummy(){}
 typedef struct MM_rq
 {
     void *address;
     uint32_t size;
 } mm_rq;
-
-
 
 typedef struct P_rq
 {
@@ -22,7 +17,6 @@ typedef struct P_rq
 int64_t prio[TOTAL_PROCESSES] = {LOWEST, MEDIUM, HIGHEST};
 
 int checkMemExit();
-
 
 uint64_t test_mm(uint64_t argc, char *argv[])
 {
@@ -220,7 +214,6 @@ void test_prio()
         sysKill(pids[i]);
 }
 
-
 int checkProcsExit()
 {
     if (getchar() == 'q')
@@ -229,7 +222,6 @@ int checkProcsExit()
     }
     return 0;
 }
-
 
 void slowInc(int64_t *p, int64_t inc)
 {
@@ -241,14 +233,14 @@ void slowInc(int64_t *p, int64_t inc)
 
 uint64_t my_process_inc(uint64_t argc, char *argv[])
 {
-    
-   
+
     uint64_t n;
     int8_t inc;
     int8_t use_sem;
     int64_t *global;
-    if (argc != 4){
-        printf("termine %d\n",argc);
+    if (argc != 4)
+    {
+        printf("termine %d\n", (int32_t)argc);
         return -1;
     }
     if ((n = satoi(argv[0])) <= 0)
@@ -257,9 +249,8 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
         return -1;
     if ((use_sem = satoi(argv[2])) < 0)
         return -1;
-   dummy2(); 
-    global =(int64_t*) satoi(argv[3]);
-dummy();
+
+    global = (int64_t *)satoi(argv[3]);
     if (use_sem)
         if (sysSemOpen(SEM_ID, 1))
         {
@@ -287,16 +278,16 @@ uint64_t test_sync(uint64_t argc, char *argv[])
 
     int64_t global; // shared memory
     uint64_t pids[2 * TOTAL_PAIR_PROCESSES];
-    global = 0; 
+    global = 0;
     if (argc != 2)
         return -1;
 
     int64_t *p = &global;
-    dummy3();
-    char buff[20]={0};
-    intToString((int64_t)p,buff,1);
-    char *argvDec[] = {argv[0], "-1", argv[1],buff, NULL};
-    char *argvInc[] = {argv[0], "1", argv[1],buff, NULL};
+
+    char buff[20] = {0};
+    intToString((int64_t)p, buff, 1);
+    char *argvDec[] = {argv[0], "-1", argv[1], buff, NULL};
+    char *argvInc[] = {argv[0], "1", argv[1], buff, NULL};
 
     creationParameters paramsDec;
     paramsDec.name = "my_process_dec";
@@ -314,8 +305,6 @@ uint64_t test_sync(uint64_t argc, char *argv[])
     paramsInc.entryPoint = (entryPoint)my_process_inc;
     paramsInc.foreground = 1;
 
-    
-
     uint64_t i, j;
     for (i = 0, j = 0; j < TOTAL_PAIR_PROCESSES; j++, i += 2)
     {
@@ -329,7 +318,6 @@ uint64_t test_sync(uint64_t argc, char *argv[])
         sysWait(pids[i + 1], NULL);
     }
 
-    printf("Final value: %d\n", global);
+    printf("Final value: %d\n", (int32_t)global);
     return 0;
 }
-

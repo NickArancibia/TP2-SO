@@ -15,7 +15,7 @@
 
 char *dateTimeAux;
 int zoomAux, regAux;
-int memoryStatus[3];
+int memoryStatus[4];
 
 static char *helpText[] = {"Command information is displayed below:\n\n",
                            "HELP                ->      Shows a description on each available command.\n",
@@ -136,12 +136,12 @@ void ps()
     for (int i = 0; processes[i].pid != -1; i++)
     {
         printf("PID=%d | Name=",
-               processes[i].pid);
+               (int32_t)processes[i].pid);
         print(processes[i].name);
         printf(" | ParentPID=%d | Priority=%d | Foreground=%d | State=",
-               processes[i].parentpid,
-               processes[i].priority,
-               processes[i].foreground);
+               (int32_t)processes[i].parentpid,
+               (int32_t)processes[i].priority,
+               (int32_t)processes[i].foreground);
         print(states[processes[i].state]);
         printf(" | StackBase=0x");
         print(hexToString((uint64_t)processes[i].stackBase));

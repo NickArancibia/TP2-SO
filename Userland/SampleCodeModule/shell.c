@@ -127,7 +127,7 @@ int init()
         {
             char isForeground = commandPrompt[separator + 1];
             int pid = testMM();
-            if (isForeground == -1 || isForeground != '&')
+            if (isForeground == -1 || strcasecmp(&commandPrompt[separator + 1], "&") != 0)
                 sysWait(pid, NULL);
             sysShowCursor();
             printf("\n");
@@ -136,7 +136,7 @@ int init()
         {
             char isForeground = commandPrompt[separator + 1];
             int pid = testProc();
-            if (isForeground == -1 || isForeground != '&')
+            if (isForeground == -1 || strcmp(&commandPrompt[separator + 1], "&") != 0)
                 sysWait(pid, NULL);
             sysShowCursor();
             printf("\n");
@@ -145,7 +145,7 @@ int init()
         {
             char isForeground = commandPrompt[separator + 1];
             int pid = testPrio();
-            if (isForeground == -1 || isForeground != '&')
+            if (isForeground == -1 || strcasecmp(&commandPrompt[separator + 1], "&") != 0)
                 sysWait(pid, NULL);
             sysShowCursor();
             printf("\n");
@@ -155,7 +155,7 @@ int init()
             char isForeground = commandPrompt[separator + 1];
             int pid = testSync();
 
-            if (isForeground == -1 || isForeground != '&')
+            if (isForeground == -1 || strcasecmp(&commandPrompt[separator + 1], "&") != 0)
                 sysWait(pid, NULL);
             sysShowCursor();
             printf("\n");
@@ -165,7 +165,7 @@ int init()
             char isForeground = commandPrompt[separator + 1];
             int pid = testNoSync();
 
-            if (isForeground == -1 || isForeground != '&')
+            if (isForeground == -1 || strcasecmp(&commandPrompt[separator + 1], "&") != 0)
                 sysWait(pid, NULL);
             sysShowCursor();
             printf("\n");
