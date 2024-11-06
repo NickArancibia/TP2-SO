@@ -9,7 +9,7 @@
 #include <interrupts.h>
 #include <scheduler.h>
 #include <videoDriver.h>
-
+#include "../include/fileDescriptors.h"
 Process processes[MAX_PROCESSES];
 PID current;
 
@@ -232,6 +232,8 @@ int kill(PID pid, int returnValue)
     pcb->state = DEAD;
     pcb->argv = NULL;
     pcb->argc = 0;
+    closeFD(pcb->fds[0]);
+    closeFD(pcb->fds[1]);
     garbageCollect();
     unblockWaitingProcesses(pid, returnValue);
 

@@ -8,19 +8,21 @@
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
-
 typedef enum
 {
-    R = 1,
-    W = 2,
-    RW = 3
+    R = 1 << 0,  
+    W = 1 << 1,  
+    RW = R | W   
 } Mode;
 
 typedef struct
 {
-    char buffer[BUFFER_SIZE];
+    unsigned char buffer[BUFFER_SIZE];
     int readPos;
     int writePos;
+    int referenceCountByMode[2];
+    int eof;
+    int dataAvailable;
     sem_t readSem;
     sem_t writeSem;
 } Stream;
@@ -37,5 +39,6 @@ void initFileDescriptors();
 int writeToFD(int fd, char *buf, uint64_t count,uint64_t hexColor);
 int readFromFD(int fd, char *buf, uint64_t count);
 int createPipe(int fds[2]);
+int setEOF(int fd);
 
 #endif

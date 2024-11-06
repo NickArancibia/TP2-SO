@@ -280,13 +280,14 @@ int testNoSync(void)
 int64_t inputP(uint64_t argc, char *argv[]){
     
     char c;
+    char buffer[100] = {'\0'};
+    return 0;
     while(1){
-        c = getchar();
-        if(c == 'q'){
-            putchar(c);
-            break;
-        }
-        putchar(c);
+        scanf(buffer, 100);
+        if (strcmp(buffer, "exit") == 0)
+        {
+            return 0;
+        }  
     }
     return 0;
 }
@@ -294,46 +295,64 @@ int64_t inputP(uint64_t argc, char *argv[]){
 int64_t outputP(uint64_t argc, char *argv[]){
     
     char c;
+    char buffer[100] = {'\0'};
     while(1){
-         c = getchar();
-        if(c == 'q'){
-            break;
-        }
+        scanf(buffer, 100);
+        if (strcmp(buffer, "exit") == 0)
+        {
+            return 0;
+        }  
+    }
+    return 0;
+}
+void dummy(){}
+int outputAlone(uint64_t argc, char *argv[]){
+    
+   unsigned char c;
+    char buffer[100] = {'\0'};
+
+    while((c = getchar()) != EOF){
         putchar(c);
     }
     return 0;
 }
+
 int testPipe(void)
 {
     sysHideCursor();
     print("Testing pipes\n");
     print("Two processes were created, one reads from STDIN, the other writes to STDOUT \n");
     print("this test works like 'input | output'\n");
-    print("Press q to exit\n");
+    print("Type 'exit' and press enter to exit\n");
 
   //  print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
     char *argv[] = {0};
     int fds[2];
-    sysPipe(fds);
+    int pids[2];
+  //  sysPipe(fds);
     creationParameters params;
-    params.name = "inputP";
-    params.argc =0;
-    params.argv = argv;
-    params.priority = 1;
-     params.fds[0] = STDIN;
-    params.fds[1] = fds[1];
-    params.entryPoint = (entryPoint)inputP;
-    params.foreground = 1;
-    createProcess(&params);
+  //  params.name = "inputP";
+  //  params.argc =0;
+  //  params.argv = argv;
+  //  params.priority = 1;
+  //   params.fds[0] = STDIN;
+ //   params.fds[1] = fds[1];
+ //   params.entryPoint = (entryPoint)inputP;
+ //   params.foreground = 1;
+ // pids[0] = createProcess(&params);
     params.name = "outputP";
     params.argc =0;
     params.argv = argv;
     params.priority = 1;
-    params.fds[0] = fds[0];
+    params.fds[0] = STDIN;
     params.fds[1] = STDOUT;
-    params.entryPoint = (entryPoint)outputP;
+    params.entryPoint = (entryPoint)outputAlone;
     params.foreground = 1;
+pids[1] = createProcess(&params);
+ //   sysWait(pids[0], NULL);
+    sysWait(pids[1], NULL);
+    dummy();
+    return 0;
 
-    return createProcess(&params);
 }
 

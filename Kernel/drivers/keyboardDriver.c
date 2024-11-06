@@ -123,6 +123,15 @@ void updateBuffer()
             }
             return;
         }
+         if (ctrlPressed && (c == 'd' || c == 'D'))
+        {
+            Process *pcb = getCurrentProcess();
+            ctrlPressed = 0;
+            if(pcb->fds[0] == STDIN)
+                setEOF(pcb->fds[0]);
+            setEOF(pcb->fds[1]);
+            return;
+        }
         bufferPos++;
         writeToFD(STDIN, &c, 1, 0);
         if (bufferPos >= MAXSIZE)

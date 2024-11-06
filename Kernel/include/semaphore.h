@@ -5,10 +5,11 @@
 #include <process.h>
 #include "interrupts.h"
 
-#define MAX_SEMAPHORES 300
+#define MAX_SEMAPHORES 2048
 typedef int sem_t;
+
 int initializeSems();
-int semCreateBy(int initialValue, PID pid);
+int semCreate(int initialValue);
 int semOpen( char *sem_id, int initialValue );
 
 int semWait( int sem_id );

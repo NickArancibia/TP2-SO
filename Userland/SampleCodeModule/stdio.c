@@ -31,7 +31,7 @@ unsigned char getchar(void)
 {
     int fds[2];
     sysGetFDs(fds);
-    unsigned char read = 0;
+    unsigned char read = EOF;
     readSizeFlag = sysReadScreen(fds[0], &read, 1);
     return read;
 }
@@ -100,7 +100,7 @@ int scanf(char *buffer, int size)
         ctrlFlag = sysCtrlPressed();
         read = getchar();
         if (!readSizeFlag)
-            continue;
+            break;;
 
         if (ctrlFlag)
         {
