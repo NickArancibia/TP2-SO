@@ -87,6 +87,8 @@ int64_t test_processes(uint64_t argc, char *argv[])
     creationParameters params;
     params.name = "endless_loop";
     params.argc = 0;
+    params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.argv = argvAux;
     params.priority = 1;
     params.entryPoint = (entryPoint)endless_loop;
@@ -177,6 +179,8 @@ void test_prio()
     creationParameters params;
     params.name = "endless_loop_print";
     params.argc = 0;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)endless_loop_print;
@@ -238,6 +242,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
     int8_t inc;
     int8_t use_sem;
     int64_t *global;
+    sem_t sem;
     if (argc != 4)
     {
         printf("termine %d\n", (int32_t)argc);
@@ -252,7 +257,7 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
 
     global = (int64_t *)satoi(argv[3]);
     if (use_sem)
-        if (sysSemOpen(SEM_ID, 1))
+        if ((sem = sysSemOpen(SEM_ID, 1)) == -1)
         {
             printf("test_sync: ERROR opening semaphore\n");
             return -1;
@@ -262,13 +267,13 @@ uint64_t my_process_inc(uint64_t argc, char *argv[])
     for (i = 0; i < n; i++)
     {
         if (use_sem)
-            sysSemWait(SEM_ID);
+            sysSemWait(sem);
         slowInc(global, inc);
         if (use_sem)
-            sysSemPost(SEM_ID);
+            sysSemPost(sem);
     }
     if (use_sem)
-        sysSemClose(SEM_ID);
+        sysSemClose(sem);
 
     return 0;
 }
@@ -294,6 +299,8 @@ uint64_t test_sync(uint64_t argc, char *argv[])
     paramsDec.argc = 4;
     paramsDec.argv = argvDec;
     paramsDec.priority = 1;
+    paramsDec.fds[0] = STDIN;
+    paramsDec.fds[1] = STDOUT;
     paramsDec.entryPoint = (entryPoint)my_process_inc;
     paramsDec.foreground = 1;
 
@@ -301,6 +308,8 @@ uint64_t test_sync(uint64_t argc, char *argv[])
     paramsInc.name = "my_process_inc";
     paramsInc.argc = 4;
     paramsInc.argv = argvInc;
+    paramsInc.fds[0] = STDIN;
+    paramsInc.fds[1] = STDOUT;
     paramsInc.priority = 1;
     paramsInc.entryPoint = (entryPoint)my_process_inc;
     paramsInc.foreground = 1;

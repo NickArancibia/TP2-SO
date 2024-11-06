@@ -5,8 +5,9 @@
 #include <videoDriver.h>
 #include "../include/scheduler.h"
 #include "../include/process.h"
+#include "../include/fileDescriptors.h"
 
-#define MAXSIZE 128
+#define MAXSIZE 1024
 
 #define UP_ARROW_VAL 0xE0
 #define LEFT_ARROW_VAL 0xE1
@@ -122,7 +123,17 @@ void updateBuffer()
             }
             return;
         }
-        buffer[bufferPos++] = c;
+         if (ctrlPressed && (c == 'd' || c == 'D'))
+        {
+            Process *pcb = getCurrentProcess();
+            ctrlPressed = 0;
+            if(pcb->fds[0] == STDIN)
+                setEOF(pcb->fds[0]);
+            setEOF(pcb->fds[1]);
+            return;
+        }
+        bufferPos++;
+        writeToFD(STDIN, &c, 1, 0);
         if (bufferPos >= MAXSIZE)
         {
             bufferPos = 0;

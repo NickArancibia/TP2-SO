@@ -16,5 +16,5 @@ int testPrio(int foreground);
 int testProc(int processCount, int foreground);
 int testNoSync(int n, int foreground);
 int testSync(int n, int foreground);
-
+int testPipe(void);
 #endif

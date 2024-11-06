@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 typedef long PID;
+typedef int sem_t;
 #include "./processStructure.h"
 
 int sysWriteScreen(uint64_t fd, unsigned char *buffer, uint64_t len, uint64_t hexColor);
@@ -44,6 +45,7 @@ int sysFree(void *ptrBlock);
 int sysCreateProcess(creationParameters *params);
 int sysGetPID();
 int sysGetParentPID();
+int sysGetFDs(int fds[2]);
 
 Process *sysGetPS();
 void sysFreePS(Process *ps);
@@ -56,8 +58,10 @@ void sysWait(PID pid, int *wstatus);
 int sysNice(PID pid, Priority priority);
 void sysGetMemStatus(int *memStatus);
 
-int sysSemOpen(char *sem_id, int initialValue);
-int sysSemClose(char *sem_id);
-void sysSemWait(char *sem_id);
-void sysSemPost(char *sem_id);
+int sysSemOpen( char *sem_id, int initialValue );
+int sysSemClose( sem_t sem);
+void sysSemWait( sem_t sem);
+void sysSemPost( sem_t sem);
+int sysPipe(int fds[2]);
+int sysChangeFDs(int fds[2]);
 #endif

@@ -7,6 +7,7 @@
 #include <fonts.h>
 #include "include/time.h"
 #include <defs.h>
+#include "../include/fileDescriptors.h"
 #include "interrupts.h"
 #include "time.h"
 #include "./include/memoryManager.h"
@@ -79,6 +80,7 @@ int main()
 	
 	vdClearScreen();
 	initializeSems();
+	initFileDescriptors();
 	initProcesses();
 	creationParameters params;
 	params.name = "init";
@@ -87,6 +89,8 @@ int main()
 	params.priority = DEFAULT_PRIORITY;
 	params.entryPoint = (entryPoint)&idle;
 	params.foreground = 1;
+	params.fds[0] = STDIN;
+	params.fds[1] = STDOUT;
 	createProcess(&params);
 	initScheduler();
 	params.name = "shell";
@@ -95,6 +99,8 @@ int main()
 	params.argc = 0;
 	params.argv = NULL;
 	params.priority = DEFAULT_PRIORITY;
+	params.fds[0] = STDIN;
+	params.fds[1] = STDOUT;
 	createProcess(&params);
 	forceSwitchContent();
 

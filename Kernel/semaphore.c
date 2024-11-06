@@ -14,7 +14,6 @@ typedef struct
     PID openBy[MAX_PROCESSES];
     QueueADT waitingProcess;
 } sem;
-
 sem semaphores[MAX_SEMAPHORES];
 int totalControl;
 
@@ -27,6 +26,7 @@ int initializeSems()
         semaphores[i].waitingProcess = newQueue();
         memset(semaphores[i].openBy, -1, sizeof(semaphores[i].openBy));
         semaphores[i].isInUse = 0;
+        semaphores[i].name = NULL;
     }
     return 0;
 }
@@ -35,7 +35,7 @@ int wasOpenBy(sem semaphore, PID pid)
 {
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
-        if (semaphore.openBy[i] == pid)
+        if (pid == 1 || semaphore.openBy[i] == pid)
         {
             return 1;
         }
@@ -109,84 +109,106 @@ int semOpen(char *sem_id, int initialValue)
 {
     int idx;
 
-    if ((idx = semGet(sem_id)) != -1)
+    if (sem_id != NULL && (idx = semGet(sem_id)) != -1)
     {
         setOpenBy(idx, getpid());
-        return 0;
+        return idx;
     }
     if ((idx = getAvailableSem()) == -1)
     {
         return -1;
     }
 
-    setOpenBy(idx, getpid());
-    int len = strlen(sem_id) + 1;
-    semaphores[idx].name = mallocMM(len);
-    memcpy(semaphores[idx].name, sem_id, len);
+    if (sem_id != NULL)
+    {
+        setOpenBy(idx, getpid());
+        int len = strlen(sem_id) + 1;
+        semaphores[idx].name = mallocMM(len);
+        memcpy(semaphores[idx].name, sem_id, len);
+    }
     semaphores[idx].isAvailable = 0;
     semaphores[idx].value = initialValue;
-    return 0;
+    return idx;
 }
 
-int semWait(char *sem_id)
+int semCreate(int initialValue)
 {
     int idx;
-    if ((idx = semGet(sem_id)) == -1 || wasOpenBy(semaphores[idx], getpid()) == -1)
+    if ((idx = getAvailableSem()) == -1)
     {
         return -1;
     }
-    acquire(&semaphores[idx].isInUse);
-    while (semaphores[idx].value == 0)
+    semaphores[idx].isAvailable = 0;
+    semaphores[idx].value = initialValue;
+    return idx;
+}
+
+int semWait(int sem_id)
+{
+   
+    acquire(&semaphores[sem_id].isInUse);
+    if (semaphores[sem_id].name != NULL && !wasOpenBy(semaphores[sem_id], getpid()))
     {
-        queue(semaphores[idx].waitingProcess, getpid());
-        release(&semaphores[idx].isInUse);
+        release(&semaphores[sem_id].isInUse);
+        return -1;
+    }
+    
+    while (semaphores[sem_id].value == 0)
+    {
+        queue(semaphores[sem_id].waitingProcess, getpid());
+        release(&semaphores[sem_id].isInUse);
         blockProcess(getpid());
 
-        acquire(&semaphores[idx].isInUse);
+        acquire(&semaphores[sem_id].isInUse);
     }
-    semaphores[idx].value--;
-    release(&semaphores[idx].isInUse);
+    semaphores[sem_id].value--;
+    release(&semaphores[sem_id].isInUse);
     return 0;
 }
 
-int semPost(char *sem_id)
+int semPost(int sem_id)
 {
-    int idx;
-    if ((idx = semGet(sem_id)) == -1 || wasOpenBy(semaphores[idx], getpid()) == -1)
+  
+   
+    acquire(&semaphores[sem_id].isInUse);
+    if (semaphores[sem_id].name !=NULL && !wasOpenBy(semaphores[sem_id], getpid()))
+    {
+        release(&semaphores[sem_id].isInUse);
+        return -1;
+    }
+    semaphores[sem_id].value++;
+    if (!isEmpty(semaphores[sem_id].waitingProcess))
+    {
+        PID pid = dequeue(semaphores[sem_id].waitingProcess);
+        unblockProcess(pid);
+    }
+    release(&semaphores[sem_id].isInUse);
+    return 0;
+}
+
+int semClose(int sem_id)
+{
+    if (semaphores[sem_id].isAvailable )
     {
         return -1;
     }
-    acquire(&semaphores[idx].isInUse);
-    semaphores[idx].value++;
-    if (!isEmpty(semaphores[idx].waitingProcess))
-    {
-        PID pid = dequeue(semaphores[idx].waitingProcess);
-        unblockProcess(pid);
-    }
-    release(&semaphores[idx].isInUse);
-    return 0;
-}
-
-int semClose(char *sem_id)
-{
-    int idx;
-    if ((idx = semGet(sem_id)) == -1)
-    {
-        return 1;
-    }
-    acquire(&semaphores[idx].isInUse);
-    if (!isEmpty(semaphores[idx].waitingProcess) && !isOpenByEmpty(semaphores[idx]))
-    {
-        removeOpenBy(idx, getpid());
-        release(&semaphores[idx].isInUse);
+    acquire(&semaphores[sem_id].isInUse);
+    if(!isEmpty(semaphores[sem_id].waitingProcess) ){
+        removeOpenBy(sem_id,getpid());
+        release(&semaphores[sem_id].isInUse);
         return 0;
     }
-
-    memset(semaphores[idx].openBy, -1, sizeof(semaphores[idx].openBy));
-    semaphores[idx].isAvailable = 1;
-    memset(semaphores[idx].name, 0, strlen(semaphores[idx].name) + 1);
-    freeMM(semaphores[idx].name);
-    release(&semaphores[idx].isInUse);
-    //  freeQueue(semaphores[idx].waitingProcess);
+    if (semaphores[sem_id].name == NULL || isOpenByEmpty(semaphores[sem_id]))
+    {
+        memset(semaphores[sem_id].openBy, -1, sizeof(semaphores[sem_id].openBy));
+        semaphores[sem_id].isAvailable = 1;
+        if (semaphores[sem_id].name != NULL)
+        {
+            memset(semaphores[sem_id].name, 0, strlen(semaphores[sem_id].name) + 1);
+            freeMM(semaphores[sem_id].name);
+        }
+        release(&semaphores[sem_id].isInUse);
+    }
     return 0;
 }
+

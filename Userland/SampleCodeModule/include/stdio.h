@@ -7,6 +7,7 @@
 #define STDOUT 1
 #define STDERR 2
 #define NULL 0
+#define EOF 0
 
 /**
  * Reads STDIN and returns the next char in it.

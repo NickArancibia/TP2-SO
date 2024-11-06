@@ -9,7 +9,7 @@
 #include <interrupts.h>
 #include <scheduler.h>
 #include <videoDriver.h>
-
+#include "../include/fileDescriptors.h"
 Process processes[MAX_PROCESSES];
 PID current;
 
@@ -150,6 +150,7 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].state = READY;
     processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
     processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, (entryPoint)processLoader);
+    memcpy(processes[allocatedProcess].fds, params->fds, 2 * sizeof(int));
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
@@ -231,6 +232,8 @@ int kill(PID pid, int returnValue)
     pcb->state = DEAD;
     pcb->argv = NULL;
     pcb->argc = 0;
+    closeFD(pcb->fds[0]);
+    closeFD(pcb->fds[1]);
     garbageCollect();
     unblockWaitingProcesses(pid, returnValue);
 
@@ -264,5 +267,26 @@ int changeProccessPriority(PID pid, Priority priority)
         return -1;
     }
     processes[pid - 1].priority = priority;
+    return 0;
+}
+
+int getFileDescriptors(int *fds)
+{
+    Process *currentProcess = getCurrentProcess();
+    if (currentProcess == NULL)
+    {
+        return -1;
+    }
+    memcpy(fds, currentProcess->fds, 2 * sizeof(int));
+    return 0;
+}
+
+int changeFileDescriptors(int *fds){
+    Process *currentProcess = getCurrentProcess();
+    if (currentProcess == NULL || fds == NULL || fds[0] < 0 || fds[1] < 0 || fds[0] >= MAX_FDS || fds[1] >= MAX_FDS) 
+    {
+        return -1;
+    }
+    memcpy(currentProcess->fds, fds, 2 * sizeof(int));
     return 0;
 }

@@ -39,6 +39,7 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "TESTPRIO            ->      Test processes priority.\n",
                            "TESTSYNC            ->      Test syncronization with semaphores.\n",
                            "TESTNOSYNC          ->      Test syncronization without semaphores.\n",
+                           "TESTPIPE            ->      Test pipes.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -158,6 +159,8 @@ void printProcessesInformation()
 {
     PID pid;
     creationParameters params;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.name = "ps";
     params.argc = 0;
     params.argv = NULL;
@@ -188,6 +191,9 @@ int testProc(int processCount, int foreground)
     print("Press 'q' to finish the test\n\n");
     char *argv[] = {count, 0};
     creationParameters params;
+
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.name = "test_processes";
     params.argc = 1;
     params.argv = argv;
@@ -207,6 +213,8 @@ int testPrio(int foreground)
     creationParameters params;
     params.name = "test_prio";
     params.argc = 0;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.argv = NULL;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_prio;
@@ -227,6 +235,8 @@ int testMM(int maxMem, int foreground)
     params.name = "test_mm";
     params.argc = 1;
     params.argv = argv;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_mm;
     params.foreground = foreground;
@@ -247,6 +257,8 @@ int testSync(int n, int foreground)
     params.argc = 2;
     params.argv = argv;
     params.priority = 1;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.entryPoint = (entryPoint)test_sync;
     params.foreground = foreground;
 
@@ -266,8 +278,90 @@ int testNoSync(int n, int foreground)
     params.argc = 2;
     params.argv = argv;
     params.priority = 1;
+     params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
     params.entryPoint = (entryPoint)test_sync;
     params.foreground = foreground;
 
     return createProcess(&params);
 }
+
+int64_t inputP(uint64_t argc, char *argv[]){
+    
+    char c;
+    char buffer[100] = {'\0'};
+    return 0;
+    while(1){
+        scanf(buffer, 100);
+        if (strcmp(buffer, "exit") == 0)
+        {
+            return 0;
+        }  
+    }
+    return 0;
+}
+ 
+int64_t outputP(uint64_t argc, char *argv[]){
+    
+    char c;
+    char buffer[100] = {'\0'};
+    while(1){
+        scanf(buffer, 100);
+        if (strcmp(buffer, "exit") == 0)
+        {
+            return 0;
+        }  
+    }
+    return 0;
+}
+void dummy(){}
+int outputAlone(uint64_t argc, char *argv[]){
+    
+   unsigned char c;
+    char buffer[100] = {'\0'};
+
+    while((c = getchar()) != EOF){
+        putchar(c);
+    }
+    return 0;
+}
+
+int testPipe(void)
+{
+    sysHideCursor();
+    print("Testing pipes\n");
+    print("Two processes were created, one reads from STDIN, the other writes to STDOUT \n");
+    print("this test works like 'input | output'\n");
+    print("Type 'exit' and press enter to exit\n");
+
+  //  print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
+    char *argv[] = {0};
+    int fds[2];
+    int pids[2];
+  //  sysPipe(fds);
+    creationParameters params;
+  //  params.name = "inputP";
+  //  params.argc =0;
+  //  params.argv = argv;
+  //  params.priority = 1;
+  //   params.fds[0] = STDIN;
+ //   params.fds[1] = fds[1];
+ //   params.entryPoint = (entryPoint)inputP;
+ //   params.foreground = 1;
+ // pids[0] = createProcess(&params);
+    params.name = "outputP";
+    params.argc =0;
+    params.argv = argv;
+    params.priority = 1;
+    params.fds[0] = STDIN;
+    params.fds[1] = STDOUT;
+    params.entryPoint = (entryPoint)outputAlone;
+    params.foreground = 1;
+pids[1] = createProcess(&params);
+ //   sysWait(pids[0], NULL);
+    sysWait(pids[1], NULL);
+    dummy();
+    return 0;
+
+}
+
