@@ -11,10 +11,10 @@ void playEasterEgg();
 void yield();
 void printProcessesInformation();
 void getMemoryStatus();
-int testMM();
-int testPrio();
-int testProc();
-int testNoSync();
-int testSync();
+int testMM(int foreground);
+int testPrio(int foreground);
+int testProc(int foreground);
+int testNoSync(int foreground);
+int testSync(int foreground);
 
 #endif

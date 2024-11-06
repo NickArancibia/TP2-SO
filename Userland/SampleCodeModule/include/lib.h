@@ -50,4 +50,14 @@ int createProcess(creationParameters *params);
  */
 void stringToInt(char *str, int *num);
 
+/**
+ * Receives a string and a delimiter.
+ * Tokenizes the string dividing it according to the delimiter
+ * If str is not NULL, returns the first token.
+ * If str is NULL, returns the next token.
+ *
+ * If no more tokens are found, returns NULL.
+ */
+char *strtok(char *str, const char *delim);
+
 #endif

@@ -176,7 +176,7 @@ void getMemoryStatus()
     printf("Bloques ocupados= %d\n", memoryStatus[0]);
 }
 
-int testProc(void)
+int testProc(int foreground)
 {
     sysHideCursor();
     print("You are testing processes\n");
@@ -189,12 +189,12 @@ int testProc(void)
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_processes;
-    params.foreground = 1;
+    params.foreground = foreground;
 
     return createProcess(&params);
 }
 
-int testPrio()
+int testPrio(int foreground)
 {
     sysHideCursor();
     print("You are testing processes priorities\n");
@@ -206,12 +206,12 @@ int testPrio()
     params.argv = NULL;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_prio;
-    params.foreground = 1;
+    params.foreground = foreground;
 
     return createProcess(&params);
 }
 
-int testMM(void)
+int testMM(int foreground)
 {
     sysHideCursor();
     print("You are testing memory manager\n");
@@ -224,12 +224,12 @@ int testMM(void)
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_mm;
-    params.foreground = 1;
+    params.foreground = foreground;
 
     return createProcess(&params);
 }
 
-int testSync(void)
+int testSync(int foreground)
 {
     sysHideCursor();
     print("You are testing syncronization with semaphores\n");
@@ -241,12 +241,12 @@ int testSync(void)
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_sync;
-    params.foreground = 1;
+    params.foreground = foreground;
 
     return createProcess(&params);
 }
 
-int testNoSync(void)
+int testNoSync(int foreground)
 {
     sysHideCursor();
     print("You are testing syncronization without semaphores\n");
@@ -258,7 +258,7 @@ int testNoSync(void)
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)test_sync;
-    params.foreground = 1;
+    params.foreground = foreground;
 
     return createProcess(&params);
 }

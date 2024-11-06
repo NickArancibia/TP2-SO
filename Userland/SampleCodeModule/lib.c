@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "include/lib.h"
 #include "include/syscalls.h"
+#include <stddef.h>
 
 int incTextSize()
 {
@@ -50,4 +51,51 @@ void stringToInt(char *str, int *num)
 int createProcess(creationParameters *params)
 {
     return sysCreateProcess(params);
+}
+
+char *strtok(char *str, const char *delim)
+{
+    static char *input = NULL;
+    if (str != NULL)
+    {
+        input = str; // Si se proporciona una nueva cadena, se actualiza
+    }
+    if (input == NULL || *input == '\0')
+    {
+        return NULL; // Si no queda nada, devolvemos NULL
+    }
+
+    // Encontrar el inicio del próximo token
+    char *start = input;
+    while (*start && *start == *delim)
+    {
+        start++;
+    }
+
+    // Si alcanzamos el final de la cadena, no hay más tokens
+    if (*start == '\0')
+    {
+        input = NULL;
+        return NULL;
+    }
+
+    // Encontrar el final del token
+    char *end = start;
+    while (*end && *end != *delim)
+    {
+        end++;
+    }
+
+    // Colocar un terminador nulo en el final del token
+    if (*end != '\0')
+    {
+        *end = '\0';
+        input = end + 1; // Mover el puntero al próximo token
+    }
+    else
+    {
+        input = end; // No quedan más tokens
+    }
+
+    return start;
 }

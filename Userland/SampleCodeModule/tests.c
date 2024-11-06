@@ -90,7 +90,7 @@ int64_t test_processes(uint64_t argc, char *argv[])
     params.argv = argvAux;
     params.priority = 1;
     params.entryPoint = (entryPoint)endless_loop;
-    params.foreground = 1;
+    params.foreground = 0;
 
     if (argc != 1)
         return -1;
@@ -180,7 +180,7 @@ void test_prio()
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)endless_loop_print;
-    params.foreground = 1;
+    params.foreground = 0;
 
     for (i = 0; i < TOTAL_PROCESSES; i++)
         pids[i] = createProcess(&params);
