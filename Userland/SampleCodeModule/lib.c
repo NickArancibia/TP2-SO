@@ -58,43 +58,39 @@ char *strtok(char *str, const char *delim)
     static char *input = NULL;
     if (str != NULL)
     {
-        input = str; // Si se proporciona una nueva cadena, se actualiza
+        input = str;
     }
     if (input == NULL || *input == '\0')
     {
-        return NULL; // Si no queda nada, devolvemos NULL
+        return NULL;
     }
 
-    // Encontrar el inicio del próximo token
     char *start = input;
     while (*start && *start == *delim)
     {
         start++;
     }
 
-    // Si alcanzamos el final de la cadena, no hay más tokens
     if (*start == '\0')
     {
         input = NULL;
         return NULL;
     }
 
-    // Encontrar el final del token
     char *end = start;
     while (*end && *end != *delim)
     {
         end++;
     }
 
-    // Colocar un terminador nulo en el final del token
     if (*end != '\0')
     {
         *end = '\0';
-        input = end + 1; // Mover el puntero al próximo token
+        input = end + 1;
     }
     else
     {
-        input = end; // No quedan más tokens
+        input = end;
     }
 
     return start;
