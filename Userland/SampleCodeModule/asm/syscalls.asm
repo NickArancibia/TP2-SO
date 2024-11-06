@@ -302,3 +302,8 @@ sysPipe:
     mov rax,48
     int 80h
     ret
+
+sysChangeFDs:
+    mov rax,49
+    int 80h
+    ret

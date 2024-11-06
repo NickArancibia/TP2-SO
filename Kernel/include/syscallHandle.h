@@ -68,5 +68,6 @@ void sem_wait( sem_t sem);
 void sem_post( sem_t sem);
 int sem_close( sem_t sem);
 int getFDs(int fds[2]);
+int changeFDs(int fds[2]);
 int pipes(int fds[2]);
 #endif

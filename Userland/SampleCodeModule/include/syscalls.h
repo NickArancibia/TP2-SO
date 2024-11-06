@@ -63,4 +63,5 @@ int sysSemClose( sem_t sem);
 void sysSemWait( sem_t sem);
 void sysSemPost( sem_t sem);
 int sysPipe(int fds[2]);
+int sysChangeFDs(int fds[2]);
 #endif

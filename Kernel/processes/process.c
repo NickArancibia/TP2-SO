@@ -280,3 +280,13 @@ int getFileDescriptors(int *fds)
     memcpy(fds, currentProcess->fds, 2 * sizeof(int));
     return 0;
 }
+
+int changeFileDescriptors(int *fds){
+    Process *currentProcess = getCurrentProcess();
+    if (currentProcess == NULL || fds == NULL || fds[0] < 0 || fds[1] < 0 || fds[0] >= MAX_FDS || fds[1] >= MAX_FDS) 
+    {
+        return -1;
+    }
+    memcpy(currentProcess->fds, fds, 2 * sizeof(int));
+    return 0;
+}
