@@ -13,6 +13,8 @@
 #include "include/test_util.h"
 #include "include/tests.h"
 
+#define MAX_BUFF_LEN 30
+
 char *dateTimeAux;
 int zoomAux, regAux;
 int memoryStatus[4];
@@ -176,13 +178,15 @@ void getMemoryStatus()
     printf("Bloques ocupados= %d\n", memoryStatus[0]);
 }
 
-int testProc(int foreground)
+int testProc(int processCount, int foreground)
 {
+    char count[MAX_BUFF_LEN];
+    intToString(processCount, count, 0);
     sysHideCursor();
     print("You are testing processes\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
     print("Press 'q' to finish the test\n\n");
-    char *argv[] = {"2", 0};
+    char *argv[] = {count, 0};
     creationParameters params;
     params.name = "test_processes";
     params.argc = 1;
@@ -211,13 +215,14 @@ int testPrio(int foreground)
     return createProcess(&params);
 }
 
-int testMM(int foreground)
+int testMM(int maxMem, int foreground)
 {
+    char max[MAX_BUFF_LEN];
+    intToString(maxMem, max, 0);
     sysHideCursor();
     print("You are testing memory manager\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    print("Press 'q' to finish the test\n\n");
-    char *argv[] = {"25000", 0};
+    char *argv[] = {max, 0};
     creationParameters params;
     params.name = "test_mm";
     params.argc = 1;
@@ -229,12 +234,14 @@ int testMM(int foreground)
     return createProcess(&params);
 }
 
-int testSync(int foreground)
+int testSync(int n, int foreground)
 {
+    char start[MAX_BUFF_LEN];
+    intToString(n, start, 0);
     sysHideCursor();
     print("You are testing syncronization with semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"10", "1", 0};
+    char *argv[] = {start, "1", 0};
     creationParameters params;
     params.name = "test_sync";
     params.argc = 2;
@@ -246,12 +253,14 @@ int testSync(int foreground)
     return createProcess(&params);
 }
 
-int testNoSync(int foreground)
+int testNoSync(int n, int foreground)
 {
+    char start[MAX_BUFF_LEN];
+    intToString(n, start, 0);
     sysHideCursor();
     print("You are testing syncronization without semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"10", "0", 0};
+    char *argv[] = {start, "0", 0};
     creationParameters params;
     params.name = "test_sync";
     params.argc = 2;

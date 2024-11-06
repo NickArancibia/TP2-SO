@@ -31,6 +31,8 @@ int init()
         sysShowCursor();
         scanf(commandPrompt, 32);
         token = strtok(commandPrompt, " ");
+        if (token == NULL)
+            continue;
 
         if (strcasecmp(token, modes[HELP_MODE]) == SELECTED_MODE)
             help();
@@ -127,22 +129,40 @@ int init()
         else if (strcasecmp(token, modes[TEST_MM]) == SELECTED_MODE)
         {
             getNextToken();
-            char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
-            int pid = testMM(isForeground);
-            if (isForeground)
-                sysWait(pid, NULL);
-            sysShowCursor();
-            printf("\n");
+            int maxMem = satoi(token);
+            if (maxMem == 0)
+            {
+                printf("Use: testmm [maxMem] (e.g. testmm 25000)\n");
+            }
+            else
+            {
+                getNextToken();
+                char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
+                int pid = testMM(maxMem, isForeground);
+                if (isForeground)
+                    sysWait(pid, NULL);
+                sysShowCursor();
+                printf("\n");
+            }
         }
         else if (strcasecmp(token, modes[TEST_PROCS]) == SELECTED_MODE)
         {
             getNextToken();
-            char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
-            int pid = testProc(isForeground);
-            if (isForeground)
-                sysWait(pid, NULL);
-            sysShowCursor();
-            printf("\n");
+            int processes = satoi(token);
+            if (processes == 0)
+            {
+                printf("Use: testprocs [processes] (e.g. testprocs 3)\n");
+            }
+            else
+            {
+                getNextToken();
+                char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
+                int pid = testProc(processes, isForeground);
+                if (isForeground)
+                    sysWait(pid, NULL);
+                sysShowCursor();
+                printf("\n");
+            }
         }
         else if (strcasecmp(token, modes[TEST_PRIO]) == SELECTED_MODE)
         {
@@ -157,27 +177,45 @@ int init()
         else if (strcasecmp(token, modes[TEST_SYNC]) == SELECTED_MODE)
         {
             getNextToken();
-            char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
-            int pid = testSync(isForeground);
+            int n = satoi(token);
+            if (n == 0)
+            {
+                printf("Use: testsync [n] (e.g. testsync 3)\n");
+            }
+            else
+            {
+                getNextToken();
+                char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
+                int pid = testSync(n, isForeground);
 
-            if (isForeground)
-                sysWait(pid, NULL);
-            sysShowCursor();
-            printf("\n");
+                if (isForeground)
+                    sysWait(pid, NULL);
+                sysShowCursor();
+                printf("\n");
+            }
         }
         else if (strcasecmp(token, modes[TEST_NO_SYNC]) == SELECTED_MODE)
         {
             getNextToken();
-            char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
-            int pid = testNoSync(isForeground);
+            int n = satoi(token);
+            if (n == 0)
+            {
+                printf("Use: testsync [n] (e.g. testsync 3)\n");
+            }
+            else
+            {
+                getNextToken();
+                char isForeground = (token == NULL || strcasecmp(token, "&") != 0);
+                int pid = testNoSync(n, isForeground);
 
-            if (isForeground)
-                sysWait(pid, NULL);
-            sysShowCursor();
-            printf("\n");
+                if (isForeground)
+                    sysWait(pid, NULL);
+                sysShowCursor();
+                printf("\n");
+            }
         }
         else
-            notFound(token);
+            notFound(commandPrompt);
     }
 }
 
