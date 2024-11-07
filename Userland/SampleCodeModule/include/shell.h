@@ -28,6 +28,7 @@
 #define TEST_NO_SYNC 19
 #define TEST_PIPES 20
 #define LOOP 21
+#define PHYLO 22
 
 int init();
 

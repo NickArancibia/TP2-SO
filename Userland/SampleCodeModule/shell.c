@@ -21,7 +21,7 @@ static const char *modes[] = {
     "date", "clear", "registers", "easteregg", "ps", "yield",
     "kill", "suspend", "resume", "nice", "memstatus", "testmm",
     "testproc", "testprio", "testsync", "testnosync", "testpipe",
-    "loop"};
+    "loop", "phylo"};
 
 static void getNextToken();
 
@@ -247,6 +247,30 @@ int init()
             params.fds[0] = STDIN;
             params.fds[1] = STDOUT;
             params.entryPoint = (entryPoint)loop;
+
+            getNextToken();
+            params.foreground = (token == NULL || strcasecmp(token, "&") != 0);
+            programDispatcher(&params);
+        }
+
+        else if (strcasecmp(token, modes[PHYLO]) == SELECTED_MODE)
+        {
+            getNextToken();
+            if (token == NULL)
+            {
+                printf("Usage: phylo <ammount of philosophers>\n");
+                continue;
+            }
+            strcpy(buffer, token);
+            argv[0] = buffer;
+            argv[1] = NULL;
+            params.name = "phylo";
+            params.priority = 1;
+            params.argc = 1;
+            params.argv = argv;
+            params.fds[0] = STDIN;
+            params.fds[1] = STDOUT;
+            params.entryPoint = (entryPoint)phylo;
 
             getNextToken();
             params.foreground = (token == NULL || strcasecmp(token, "&") != 0);
