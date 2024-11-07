@@ -8,13 +8,17 @@
 #include "include/string.h"
 #include "include/lib.h"
 #include "include/test_util.h"
+#include "include/programs.h"
+
+#define BUFLEN 32
 
 char *token = NULL;
 static const char *modes[] = {
     "shell", "idle", "help", "time",
     "date", "clear", "registers", "easteregg", "ps", "yield",
     "kill", "suspend", "resume", "nice", "memstatus", "testmm",
-    "testproc", "testprio", "testsync", "testnosync", "testpipe"};
+    "testproc", "testprio", "testsync", "testnosync", "testpipe",
+    "loop"};
 
 static void getNextToken();
 
@@ -25,6 +29,7 @@ int init()
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
     char commandPrompt[32] = {0};
     int returnValue;
+    creationParameters params;
     while (IDLE_MODE)
     {
         sysClearKbEntry();
@@ -45,7 +50,6 @@ int init()
             testPipe();
             printf("\n");
         }
-
         else if (strcasecmp(commandPrompt, modes[TIME_MODE]) == SELECTED_MODE)
             time();
         else if (strcasecmp(token, modes[DATE_MODE]) == SELECTED_MODE)
@@ -221,6 +225,29 @@ int init()
                 sysShowCursor();
                 printf("\n");
             }
+        }
+        else if (strcasecmp(token, modes[LOOP]) == SELECTED_MODE)
+        {
+            char buf[BUFLEN];
+            char *argv[] = {buf, 0};
+            getNextToken();
+            if (token == NULL)
+            {
+                printf("Usage: loop <seconds to sleep>\n");
+                continue;
+            }
+            strcpy(buf, token);
+            params.name = "loop";
+            params.priority = 1;
+            params.argc = 1;
+            params.argv = argv;
+            params.fds[0] = STDIN;
+            params.fds[1] = STDOUT;
+            params.entryPoint = (entryPoint)loop;
+
+            getNextToken();
+            params.foreground = (token == NULL || strcasecmp(token, "&") != 0);
+            programDispatcher(&params);
         }
         else
             notFound(commandPrompt);

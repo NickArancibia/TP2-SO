@@ -10,9 +10,9 @@
 #define STDERR 2
 typedef enum
 {
-    R = 1 << 0,  
-    W = 1 << 1,  
-    RW = R | W   
+    R = 1 << 0,
+    W = 1 << 1,
+    RW = R | W
 } Mode;
 
 typedef struct
@@ -27,18 +27,18 @@ typedef struct
     sem_t writeSem;
 } Stream;
 
-
 typedef struct
 {
-    Stream * resource;
+    Stream *resource;
     int isOpen;
     Mode mode;
 } FD;
 
 void initFileDescriptors();
-int writeToFD(int fd, char *buf, uint64_t count,uint64_t hexColor);
+int writeToFD(int fd, char *buf, uint64_t count, uint64_t hexColor);
 int readFromFD(int fd, char *buf, uint64_t count);
 int createPipe(int fds[2]);
 int setEOF(int fd);
+int closeFD(int fd);
 
 #endif

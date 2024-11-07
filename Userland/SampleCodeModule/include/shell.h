@@ -27,6 +27,7 @@
 #define TEST_SYNC 18
 #define TEST_NO_SYNC 19
 #define TEST_PIPES 20
+#define LOOP 21
 
 int init();
 
