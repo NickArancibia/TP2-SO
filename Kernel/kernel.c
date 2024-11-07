@@ -67,7 +67,7 @@ void idle()
 
 int main()
 {
-	
+
 	load_idt();
 
 	initializeMemoryMM(memoryStart, memorySize);
@@ -77,7 +77,7 @@ int main()
 
 	drawBootLogo();
 	playBootSound();
-	
+
 	vdClearScreen();
 	initializeSems();
 	initFileDescriptors();
@@ -98,7 +98,7 @@ int main()
 	params.foreground = 1;
 	params.argc = 0;
 	params.argv = NULL;
-	params.priority = DEFAULT_PRIORITY;
+	params.priority = MAX_PRIORITY;
 	params.fds[0] = STDIN;
 	params.fds[1] = STDOUT;
 	createProcess(&params);

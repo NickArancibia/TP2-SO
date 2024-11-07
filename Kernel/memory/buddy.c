@@ -1,4 +1,5 @@
-#include <memoryManager.h>
+#include "../include/math.h"
+#include "../include/memoryManager.h"
 
 #include <stddef.h>
 #define MIN_BLOCK_SIZE 8
@@ -33,7 +34,7 @@ void initializeMemoryMM(void *memoryStart, int memorySize)
     }
 
     int initialLevel = 0;
-    while ((1 << initialLevel) * MIN_BLOCK_SIZE < memorySize)
+    while (pow(2, initialLevel) * MIN_BLOCK_SIZE < memorySize)
     {
         initialLevel++;
     }
@@ -47,7 +48,7 @@ void initializeMemoryMM(void *memoryStart, int memorySize)
 void *mallocMM(int size)
 {
     int level = 0;
-    while ((1 << level) * MIN_BLOCK_SIZE < size + sizeof(Block))
+    while (pow(2, level) * MIN_BLOCK_SIZE < size + sizeof(Block))
     {
         level++;
     }
@@ -67,14 +68,14 @@ void *mallocMM(int size)
             while (i > level) // We divide the block if it is bigger than the requested size
             {
                 i--;
-                Block *buddy = (Block *)((void *)block + (1 << i) * MIN_BLOCK_SIZE); // Divide the block
+                Block *buddy = (Block *)((void *)block + pow(2, i) * MIN_BLOCK_SIZE); // Divide the block
                 buddy->next = buddyLists[i];
                 buddy->level = i;
                 buddyLists[i] = buddy;
             }
-
+            int allocatedSize = pow(2, level) * MIN_BLOCK_SIZE;
             block->level = level;
-            updateMemoryStats((1 << level) * MIN_BLOCK_SIZE, -1 * (1 << level) * MIN_BLOCK_SIZE, 1);
+            updateMemoryStats(allocatedSize, -1 * allocatedSize, 1);
             return (void *)((void *)block + sizeof(Block));
         }
     }
@@ -91,11 +92,11 @@ void freeMM(void *memorySegment)
 
     Block *block = (Block *)((void *)memorySegment - sizeof(Block));
     int level = block->level;
-    int freedSize = (1 << level) * MIN_BLOCK_SIZE;
+    int freedSize = pow(2, level) * MIN_BLOCK_SIZE;
 
     while (level < MAX_LEVELS - 1)
     {
-        Block *buddy = (Block *)((void *)memoryBase + (((void *)block - (void *)memoryBase) ^ ((1 << level) * MIN_BLOCK_SIZE)));
+        Block *buddy = (Block *)((void *)memoryBase + (((void *)block - (void *)memoryBase) ^ (pow(2, level) * MIN_BLOCK_SIZE)));
 
         Block **current = &buddyLists[level];
         while (*current != NULL && *current != buddy)
