@@ -60,6 +60,12 @@ int print(char *str)
 {
     return printColor(str, DEFAULT);
 }
+int perror(char *str){
+    int len = strlen(str) + 1;
+    sysWriteScreen(STDERR, str, len, RED);
+    return;
+}
+
 
 int printf(char *str, ...)
 {

@@ -56,4 +56,6 @@ int printf(char *str, ...);
  */
 int scanf(char *buffer, int size);
 
+
+int perror(char *str);
 #endif
