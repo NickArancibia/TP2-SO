@@ -40,5 +40,6 @@ int readFromFD(int fd, char *buf, uint64_t count);
 int createPipe(int fds[2]);
 int setEOF(int fd);
 int closeFD(int fd);
-
+int getReadPos(int fd);
+int readFromFDAt(int fd, char *buf, uint64_t count, uint64_t pos);
 #endif

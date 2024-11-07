@@ -64,4 +64,6 @@ void sysSemWait( sem_t sem);
 void sysSemPost( sem_t sem);
 int sysPipe(int fds[2]);
 int sysChangeFDs(int fds[2]);
+int sysGetReadPos();
+int sysReadScreenAt(uint64_t fd, unsigned char *buffer, uint64_t len,int pos);
 #endif

@@ -58,4 +58,7 @@ int scanf(char *buffer, int size);
 
 
 int perror(char *str);
+
+
+unsigned char getcharAt(int pos);
 #endif

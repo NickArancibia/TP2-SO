@@ -34,6 +34,16 @@ unsigned char getchar(void)
     return read;
 }
 
+unsigned char getcharAt(int pos)
+{
+    int fds[2];
+    sysGetFDs(fds);
+    unsigned char read = EOF;
+    readSizeFlag = sysReadScreenAt(fds[0], &read, 1,pos);
+    return read;
+}
+
+
 unsigned char putchar(unsigned char c)
 {
     int fds[2];
