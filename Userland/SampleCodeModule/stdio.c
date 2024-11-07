@@ -34,12 +34,12 @@ unsigned char getchar(void)
     return read;
 }
 
-unsigned char getcharAt(int pos)
+unsigned char getcharAtCurrentPosition(void)
 {
     int fds[2];
     sysGetFDs(fds);
     unsigned char read = EOF;
-    readSizeFlag = sysReadScreenAt(fds[0], &read, 1,pos);
+    readSizeFlag = sysReadScreenAtCurrentPosition(fds[0], &read, 1);
     return read;
 }
 

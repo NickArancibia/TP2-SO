@@ -53,8 +53,7 @@ GLOBAL sysSemWait
 GLOBAL sysSemPost
 GLOBAL sysGetFDs
 GLOBAL sysPipe
-GLOBAL sysGetReadPos
-GLOBAL sysReadScreenAt
+GLOBAL sysReadScreenAtCurrentPosition
 
 section .text
 
@@ -311,12 +310,7 @@ sysChangeFDs:
     int 80h
     ret
 
-sysGetReadPos:
+sysReadScreenAtCurrentPosition:
     mov rax,50
-    int 80h
-    ret
-sysReadScreenAt:
-    mov r10, rcx
-    mov rax,51
     int 80h
     ret
