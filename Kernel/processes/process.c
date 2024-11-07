@@ -106,23 +106,30 @@ PID createProcess(creationParameters *params)
         return -1;
     }
 
+    if (args == NULL && params->argc != 0)
+    {
+        freeMM(stackLimit);
+        return -1;
+    }
     // Copy args
-
     for (int i = 0; i < params->argc; i++)
     {
-        int len = strlen(params->argv[i]);
-        if ((args[i] = mallocMM(len + 1)) == NULL)
+        if (args != NULL)
         {
-            for (int j = 0; j < i; j++)
+            int len = strlen(params->argv[i]);
+            if ((args[i] = mallocMM(len + 1)) == NULL)
             {
-                freeMM(args[j]);
+                for (int j = 0; j < i; j++)
+                {
+                    freeMM(args[j]);
+                }
+                freeMM(args);
+                freeMM(stackLimit);
+                return -1;
             }
-            freeMM(args);
-            freeMM(stackLimit);
-            return -1;
-        }
 
-        memcpy(args[i], params->argv[i], len + 1);
+            memcpy(args[i], params->argv[i], len + 1);
+        }
     }
 
     Process *currentProcess;
@@ -130,11 +137,14 @@ PID createProcess(creationParameters *params)
     if (allocatedProcess == -1)
     {
         freeMM(stackLimit);
-        for (int i = 0; i < params->argc; i++)
+        if (args != NULL)
         {
-            freeMM(args[i]);
+            for (int i = 0; i < params->argc; i++)
+            {
+                freeMM(args[i]);
+            }
+            freeMM(args);
         }
-        freeMM(args);
         return -1;
     }
 
