@@ -63,7 +63,7 @@ int print(char *str)
 int perror(char *str){
     int len = strlen(str) + 1;
     sysWriteScreen(STDERR, str, len, RED);
-    return;
+    return 0;
 }
 
 
