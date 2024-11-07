@@ -209,5 +209,6 @@ int semClose(int sem_id)
         }
         release(&semaphores[sem_id].isInUse);
     }
+    release(&semaphores[sem_id].isInUse);
     return 0;
 }
