@@ -145,14 +145,14 @@ int semCreate(int initialValue)
 
 int semWait(int sem_id)
 {
-   
+
     acquire(&semaphores[sem_id].isInUse);
     if (semaphores[sem_id].name != NULL && !wasOpenBy(semaphores[sem_id], getpid()))
     {
         release(&semaphores[sem_id].isInUse);
         return -1;
     }
-    
+
     while (semaphores[sem_id].value == 0)
     {
         queue(semaphores[sem_id].waitingProcess, getpid());
@@ -168,10 +168,9 @@ int semWait(int sem_id)
 
 int semPost(int sem_id)
 {
-  
-   
+
     acquire(&semaphores[sem_id].isInUse);
-    if (semaphores[sem_id].name !=NULL && !wasOpenBy(semaphores[sem_id], getpid()))
+    if (semaphores[sem_id].name != NULL && !wasOpenBy(semaphores[sem_id], getpid()))
     {
         release(&semaphores[sem_id].isInUse);
         return -1;
@@ -188,13 +187,14 @@ int semPost(int sem_id)
 
 int semClose(int sem_id)
 {
-    if (semaphores[sem_id].isAvailable )
+    if (semaphores[sem_id].isAvailable)
     {
         return -1;
     }
     acquire(&semaphores[sem_id].isInUse);
-    if(!isEmpty(semaphores[sem_id].waitingProcess) ){
-        removeOpenBy(sem_id,getpid());
+    if (!isEmpty(semaphores[sem_id].waitingProcess))
+    {
+        removeOpenBy(sem_id, getpid());
         release(&semaphores[sem_id].isInUse);
         return 0;
     }
@@ -211,4 +211,3 @@ int semClose(int sem_id)
     }
     return 0;
 }
-

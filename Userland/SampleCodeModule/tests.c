@@ -179,7 +179,7 @@ void test_prio()
     creationParameters params;
     params.name = "endless_loop_print";
     params.argc = 0;
-     params.fds[0] = STDIN;
+    params.fds[0] = STDIN;
     params.fds[1] = STDOUT;
     params.argv = argv;
     params.priority = 1;

@@ -3,12 +3,12 @@
 #include "../include/videoDriver.h"
 #include <process.h>
 
-
 FD fileDescriptors[MAX_FDS];
 
 void initFileDescriptors()
 {
-   for (int i = STDERR+1; i < MAX_FDS; i++) {
+    for (int i = STDERR + 1; i < MAX_FDS; i++)
+    {
         fileDescriptors[i].isOpen = 0;
     }
 
@@ -21,7 +21,6 @@ void initFileDescriptors()
     fileDescriptors[0].resource->writePos = 0;
     fileDescriptors[0].resource->readSem = semCreate(0);
     fileDescriptors[0].resource->writeSem = semCreate(BUFFER_SIZE);
-  
 
     fileDescriptors[1].isOpen = 1;
     fileDescriptors[1].mode = W;
@@ -32,16 +31,16 @@ void initFileDescriptors()
     fileDescriptors[2].resource = NULL;
 }
 
-
-int writeToFD(int fd, char *buf, uint64_t count,uint64_t hexColor){
+int writeToFD(int fd, char *buf, uint64_t count, uint64_t hexColor)
+{
     int written = 0;
     if (fd < 0 || fd >= MAX_FDS || !fileDescriptors[fd].isOpen || fileDescriptors[fd].mode == R)
         return -1;
 
-    
-    if (fd == STDOUT || fd == STDERR){
-    
-        int color = (fd == STDERR)? 0x00FF0000 : hexColor;
+    if (fd == STDOUT || fd == STDERR)
+    {
+
+        int color = (fd == STDERR) ? 0x00FF0000 : hexColor;
         char toPrint[2] = {0, 0};
         for (written = 0; written < count; written++)
         {
@@ -50,13 +49,13 @@ int writeToFD(int fd, char *buf, uint64_t count,uint64_t hexColor){
         }
         return written;
     }
-        
+
     Stream *stream = fileDescriptors[fd].resource;
     if (stream->eof)
     {
         stream->eof = 0;
     }
-    
+
     for (written = 0; written < count; written++)
     {
         semWait(stream->writeSem);
@@ -67,15 +66,16 @@ int writeToFD(int fd, char *buf, uint64_t count,uint64_t hexColor){
     }
     return written;
 }
-void dummy1(){}
+void dummy1() {}
 
-int readFromFD(int fd, char *buf, uint64_t count){
+int readFromFD(int fd, char *buf, uint64_t count)
+{
     int sizeRead = 0;
     if (fd < 0 || fd >= MAX_FDS || !fileDescriptors[fd].isOpen || fileDescriptors[fd].mode == W)
         return -1;
 
     unsigned char lastRead = '\0';
-    Stream *stream = fileDescriptors[fd].resource;    
+    Stream *stream = fileDescriptors[fd].resource;
     while (!stream->eof && sizeRead != count)
     {
         semWait(stream->readSem);
@@ -90,16 +90,17 @@ int readFromFD(int fd, char *buf, uint64_t count){
         else
         {
             stream->eof = 1;
-            
         }
     }
-    if(fd == STDIN){
+    if (fd == STDIN)
+    {
         stream->eof = 0;
     }
     return sizeRead;
 }
 
-int getAvailableFD(){
+int getAvailableFD()
+{
     for (int i = 3; i < MAX_FDS; i++)
     {
         if (!fileDescriptors[i].isOpen)
@@ -111,10 +112,11 @@ int getAvailableFD(){
     return -1;
 }
 
-int createPipe(int fds[2]){
+int createPipe(int fds[2])
+{
     int fd1 = getAvailableFD(), fd2 = getAvailableFD();
     if (fd1 == -1 || fd2 == -1)
-    return -1;
+        return -1;
     Stream *stream = mallocMM(sizeof(Stream));
     stream->referenceCountByMode[0] = 0;
     stream->referenceCountByMode[1] = 0;
@@ -143,16 +145,13 @@ int closeFD(int fd)
         fileDescriptors[fd].resource->eof = 0;
         return 0;
     }
-    
-    
-   
 
     if (fileDescriptors[fd].mode & R)
         fileDescriptors[fd].resource->referenceCountByMode[0] -= 1;
 
     if (fileDescriptors[fd].mode & W)
         fileDescriptors[fd].resource->referenceCountByMode[1] -= 1;
-    
+
     if (fileDescriptors[fd].resource->referenceCountByMode[0] == 0 && fileDescriptors[fd].resource->referenceCountByMode[1] == 0)
     {
         semClose(fileDescriptors[fd].resource->readSem);
@@ -164,7 +163,8 @@ int closeFD(int fd)
     return 0;
 }
 
-int setEOF(int fd){
+int setEOF(int fd)
+{
     if (fd < 0 || fd >= MAX_FDS || fd == STDOUT || fd == STDERR || !fileDescriptors[fd].isOpen || fileDescriptors[fd].mode == R)
         return -1;
     Stream *stream = fileDescriptors[fd].resource;
@@ -172,4 +172,3 @@ int setEOF(int fd){
     semPost(stream->readSem);
     return 0;
 }
-

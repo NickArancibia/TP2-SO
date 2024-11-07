@@ -100,7 +100,8 @@ int scanf(char *buffer, int size)
         ctrlFlag = sysCtrlPressed();
         read = getchar();
         if (!readSizeFlag)
-            break;;
+            break;
+        ;
 
         if (ctrlFlag)
         {

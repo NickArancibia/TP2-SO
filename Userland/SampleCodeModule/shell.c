@@ -40,11 +40,12 @@ int init()
             help();
         else if (strcasecmp(token, modes[CLEAR_MODE]) == SELECTED_MODE)
             clear();
-        else if (strcasecmp(commandPrompt, modes[TEST_PIPES]) == SELECTED_MODE){
+        else if (strcasecmp(commandPrompt, modes[TEST_PIPES]) == SELECTED_MODE)
+        {
             testPipe();
             printf("\n");
         }
-          
+
         else if (strcasecmp(commandPrompt, modes[TIME_MODE]) == SELECTED_MODE)
             time();
         else if (strcasecmp(token, modes[DATE_MODE]) == SELECTED_MODE)
