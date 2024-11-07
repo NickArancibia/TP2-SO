@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "../include/fileDescriptors.h"
 #include "../include/memoryManager.h"
 #include "../include/videoDriver.h"
@@ -76,7 +78,7 @@ int readFromFD(int fd, char *buf, uint64_t count)
 
     unsigned char lastRead = '\0';
     Stream *stream = fileDescriptors[fd].resource;
-    while (!stream->eof && sizeRead != count)
+    while (sizeRead != count)
     {
         semWait(stream->readSem);
         if (!stream->eof || (fd != STDIN && (stream->referenceCountByMode[1] != 0 || stream->dataAvailable > 0)))

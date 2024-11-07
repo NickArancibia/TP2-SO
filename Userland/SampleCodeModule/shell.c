@@ -11,8 +11,11 @@
 #include "include/programs.h"
 
 #define BUFLEN 32
+#define MAXARGC 8
 
 char *token = NULL;
+char buffer[BUFLEN] = {0};
+char *argv[MAXARGC] = {0};
 static const char *modes[] = {
     "shell", "idle", "help", "time",
     "date", "clear", "registers", "easteregg", "ps", "yield",
@@ -228,15 +231,15 @@ int init()
         }
         else if (strcasecmp(token, modes[LOOP]) == SELECTED_MODE)
         {
-            char buf[BUFLEN];
-            char *argv[] = {buf, 0};
             getNextToken();
             if (token == NULL)
             {
                 printf("Usage: loop <seconds to sleep>\n");
                 continue;
             }
-            strcpy(buf, token);
+            strcpy(buffer, token);
+            argv[0] = buffer;
+            argv[1] = NULL;
             params.name = "loop";
             params.priority = 1;
             params.argc = 1;

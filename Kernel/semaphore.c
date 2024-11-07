@@ -40,7 +40,7 @@ int wasOpenBy(sem semaphore, PID pid)
             return 1;
         }
     }
-    return -1;
+    return 0;
 }
 
 int isOpenByEmpty(sem semaphore)

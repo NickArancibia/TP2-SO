@@ -138,11 +138,11 @@ uint64_t *switchContent(uint64_t *rsp)
     {
 
         currentProcess = unschedule();
-        quantumsLeft = currentProcess->priority - 1;
         if (currentProcess == NULL)
         {
             return rsp;
         }
+        quantumsLeft = currentProcess->priority - 1;
     } while (currentProcess->state == BLOCKED || currentProcess->state == DEAD);
 
     clearYield();
