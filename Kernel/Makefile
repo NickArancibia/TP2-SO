@@ -40,6 +40,10 @@ $(OBJDIR):
 move_objects: $(OBJDIR)
 	mv *.o $(OBJDIR)
 	mv asm/*.o $(OBJDIR)
+	mv processes/*.o $(OBJDIR)
+	mv drivers/*.o $(OBJDIR)
+	mv memory/*.o $(OBJDIR)
+
 clean:
 	rm -rf $(OBJDIR) *.bin *.elf
 
