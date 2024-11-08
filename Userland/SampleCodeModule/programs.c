@@ -5,6 +5,7 @@
 #include "./include/stdio.h"
 #include "./include/syscalls.h"
 #include "./include/test_util.h"
+#include "./include/lib.h"
 
 void programDispatcher(creationParameters *params)
 {
@@ -36,23 +37,34 @@ void loop(int argc, char **argv)
     }
 }
 
-/*void addPhylo(int ammountOfPhylo, PID *pids, int *phylos, char *semNames[]){
+char **getSemNames(int ammountOfPhylo){
+    char ** ans = sysMalloc(sizeof(char *) * ammountOfPhylo);
+    for (int i = 0; i < ammountOfPhylo; i++)
+    {
+        
+    }
+    
+}
+
+void addPhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[]){
 
     phylos[0] = NOTEATING;
-    phylos[ammountOfPhylo - 1] = NOTEATING;
+    phylos[*ammountOfPhylo - 1] = NOTEATING;
     sysSuspendProcess(pids[0]);
-    sysKill(pids[ammountOfPhylo - 1]);   //lo mato ya que debo cambiar el semaforo
+    sysKill(pids[*ammountOfPhylo - 1]);   //lo mato ya que debo cambiar el semaforo
 
-    ammountOfPhylo++;
+    (*ammountOfPhylo)++;
     //hago un realloc de pids y agrego uno
     //hago un realloc de phylos y agrego uno, le clavo NOEATING
     //hago un realloc de semNames y agrego uno, le clavo fork_"$(ammountOfPhylo)"
 
-    for (int i = ammountOfPhylo - 2; i < ammountOfPhylo; i++)
+    for (int i = (*ammountOfPhylo) - 2; i < (*ammountOfPhylo); i++)
     {
         char index[1];
+        int a = i; //fix raro porque intToString cambia el valor??????
         intToString(i,index,1);
-        char *argv[] = {semNames[i], semNames[(i+1) % ammountOfPhylo], index, 0};
+        //i = a;  //fix raro porque intToString cambia el valor??????
+        char *argv[] = {semNames[i], semNames[(i+1) % *ammountOfPhylo], index, 0};
 
         creationParameters params;
         params.name = "eachPhylo";
@@ -61,11 +73,14 @@ void loop(int argc, char **argv)
         params.priority = 1;
         params.entryPoint = (entryPoint)eachPhylo;
         params.foreground = 1;
+        params.fds[0] = STDIN;
+        params.fds[1] = STDOUT;
 
         phylos[i] = NOTEATING;
-        pids[i] = createProcess(&params);
+        pids[i] = sysCreateProcess(&params);
     }
-}*/
+    sysResumeProcess(pids[0]);
+}
 
 int terminatePhylosophers = 0; //global variable that indicates phylosophers must finish
 int *phylos;
@@ -108,10 +123,10 @@ void phylo(int argc, char **argv){
     }
 
     terminatePhylosophers = 0;
-    PID *pids = sysMalloc(sizeof(PID) * ammountOfPhylo);
-    phylos = sysMalloc(sizeof(int) * ammountOfPhylo);
+    PID *pids = sysMalloc(sizeof(PID) * 50); //TODO: no dejar fijo
+    phylos = sysMalloc(sizeof(int) * 50); //TODO: no dejar fijo
 
-    char *semNames[5] = {"fork_1","fork_2","fork_3","fork_4","fork_5"};
+    char *semNames[10] = {"fork_1","fork_2","fork_3","fork_4","fork_5","fork_6","fork_7","fork_8","fork_9","fork_10"};
 
 
     for (int i = 0; i < ammountOfPhylo; i++)
@@ -136,9 +151,15 @@ void phylo(int argc, char **argv){
 
     sysSleep(0,10); //wait until the proccesses are executed for the first time
 
-    for (int i = 0; i < 10; i++)
+    for (int i = 0; i < 50; i++)
     {
-        printf(" ");
+        //scanf(a,1);
+        char a = getchar();
+        if(a == 'a'){
+            printf("\n",a);
+            addPhylo(&ammountOfPhylo, pids, phylos, semNames);
+        }
+        //putchar(a);
         for (int j = 0; j < ammountOfPhylo ; j++)
         {
             if(phylos[j] == EATING)
