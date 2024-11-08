@@ -53,6 +53,8 @@ GLOBAL sysSemWait
 GLOBAL sysSemPost
 GLOBAL sysGetFDs
 GLOBAL sysPipe
+GLOBAL sysReadScreenAtCurrentPosition
+
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
@@ -305,5 +307,10 @@ sysPipe:
 
 sysChangeFDs:
     mov rax,49
+    int 80h
+    ret
+
+sysReadScreenAtCurrentPosition:
+    mov rax,50
     int 80h
     ret
