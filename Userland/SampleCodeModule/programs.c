@@ -58,7 +58,7 @@ void addPhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[])
     phylos[0] = NOTEATING;
     phylos[*ammountOfPhylo - 1] = NOTEATING;
     sysSuspendProcess(pids[0]);
-    sem_close[*ammountOfPhylo - 1] = 1;
+    //sem_close[*ammountOfPhylo - 1] = 1;
     //sysSleep(0,50);
     sysKill(pids[*ammountOfPhylo - 1]);   //lo mato ya que debo cambiar el semaforo
 
@@ -71,10 +71,10 @@ void addPhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[])
     {
         char index[2];
         intToString(i,index,1);
-        char *argv[] = {semNames[i], semNames[(i+1) % *ammountOfPhylo], index, "0", 0};
+        char *argv[] = {semNames[i], semNames[(i+1) % *ammountOfPhylo], index, "0", 0}; //ACA
 
-        if(i == ammountOfPhylo - 1){
-            argv[3] = 1;
+        if(i == (*ammountOfPhylo) - 1){
+            argv[3] = "1";
         }
 
         creationParameters params;
@@ -101,8 +101,8 @@ void removePhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[])
     phylos[0] = NOTEATING;
     phylos[*ammountOfPhylo - 1] = NOTEATING;
     sysSuspendProcess(pids[0]);
-    sem_close[*ammountOfPhylo - 1] = 1;
-    sem_close[*ammountOfPhylo - 2] = 1;
+    //sem_close[*ammountOfPhylo - 1] = 1;
+    //sem_close[*ammountOfPhylo - 2] = 1;
     //sysSleep(0,50);                          //para que de el tiempo a cerrar los sem
     sysKill(pids[*ammountOfPhylo - 1]);      //lo mato ya que debo cambiar el semaforo
     sysKill(pids[*ammountOfPhylo -2]);
@@ -142,7 +142,7 @@ void eachPhylo(int argc, char **argv)
     int index;
     int isLastOrFirst;
     stringToInt(argv[2],&index);
-    stringToInt(argv[2],&isLastOrFirst);
+    stringToInt(argv[3],&isLastOrFirst);
 
     int fork1_id = sysSemOpen(fork1,1);
     int fork2_id = sysSemOpen(fork2,1);
@@ -162,7 +162,6 @@ void eachPhylo(int argc, char **argv)
         sysSemWait(fork2_id);
         phylos[index] = EATING;
         phyloStateHasChanged = 1;
-        //printf("Arranca a comer el phylo %d\n",index+1);
         sysSleep(0,10);  //the phylosopher is eating
         sysSemPost(fork1_id);
         sysSemPost(fork2_id);
@@ -202,7 +201,7 @@ void phylo(int argc, char **argv){
         intToString(i,index,1);
         char *argv[] = {semNames[i], semNames[(i+1) % ammountOfPhylo], index, "0", 0};
 
-        if(i == 0 || i == ammountOfPhylo -1){
+        if(i == 0 || i == ammountOfPhylo - 1){
             argv[3] = "1";
         }
 
