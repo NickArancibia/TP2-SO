@@ -37,7 +37,8 @@ void loop(int argc, char **argv)
     }
 }
 
-char **getSemNames(int ammountOfPhylo){
+char **getSemNames(int ammountOfPhylo)
+{
     char ** ans = sysMalloc(sizeof(char *) * ammountOfPhylo);
     for (int i = 0; i < ammountOfPhylo; i++)
     {
@@ -51,13 +52,14 @@ int terminatePhylosophers = 0; //global variable that indicates phylosophers mus
 int *phylos;
 int sem_close[10];
 
-void addPhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[]){
+void addPhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[])
+{
 
     phylos[0] = NOTEATING;
     phylos[*ammountOfPhylo - 1] = NOTEATING;
     sysSuspendProcess(pids[0]);
     sem_close[*ammountOfPhylo - 1] = 1;
-    sysSleep(0,30);
+    //sysSleep(0,50);
     sysKill(pids[*ammountOfPhylo - 1]);   //lo mato ya que debo cambiar el semaforo
 
     (*ammountOfPhylo)++;
@@ -69,11 +71,15 @@ void addPhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[]){
     {
         char index[2];
         intToString(i,index,1);
-        char *argv[] = {semNames[i], semNames[(i+1) % *ammountOfPhylo], index, 0};
+        char *argv[] = {semNames[i], semNames[(i+1) % *ammountOfPhylo], index, "0", 0};
+
+        if(i == ammountOfPhylo - 1){
+            argv[3] = 1;
+        }
 
         creationParameters params;
         params.name = "eachPhylo";
-        params.argc = 3;
+        params.argc = 4;
         params.argv = argv;
         params.priority = 1;
         params.entryPoint = (entryPoint)eachPhylo;
@@ -89,14 +95,15 @@ void addPhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[]){
     sysResumeProcess(pids[0]);
 }
 
-void removePhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[]){
+void removePhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[])
+{
 
     phylos[0] = NOTEATING;
     phylos[*ammountOfPhylo - 1] = NOTEATING;
     sysSuspendProcess(pids[0]);
     sem_close[*ammountOfPhylo - 1] = 1;
     sem_close[*ammountOfPhylo - 2] = 1;
-    sysSleep(0,10);                          //para que de el tiempo a cerrar los sem
+    //sysSleep(0,50);                          //para que de el tiempo a cerrar los sem
     sysKill(pids[*ammountOfPhylo - 1]);      //lo mato ya que debo cambiar el semaforo
     sysKill(pids[*ammountOfPhylo -2]);
 
@@ -109,17 +116,18 @@ void removePhylo(int *ammountOfPhylo, PID *pids, int *phylos, char *semNames[]){
     char index[2];
     int nextIndex = (*ammountOfPhylo) - 1;
     intToString(nextIndex,index,1);
-    char *argv[] = {semNames[nextIndex], semNames[(nextIndex+1) % *ammountOfPhylo], index, 0};
+    char *argv[] = {semNames[nextIndex], semNames[(nextIndex+1) % *ammountOfPhylo], index, "1", 0};
 
     creationParameters params;
     params.name = "eachPhylo";
-    params.argc = 3;
+    params.argc = 4;
     params.argv = argv;
     params.priority = 1;
     params.entryPoint = (entryPoint)eachPhylo;
     params.foreground = 1;
     params.fds[0] = STDIN;
     params.fds[1] = STDOUT;
+    sem_close[nextIndex] = 0;
 
     phylos[nextIndex] = NOTEATING;
     pids[nextIndex] = sysCreateProcess(&params);
@@ -132,12 +140,23 @@ void eachPhylo(int argc, char **argv)
     char *fork1 = argv[0];
     char *fork2 = argv[1];
     int index;
+    int isLastOrFirst;
     stringToInt(argv[2],&index);
+    stringToInt(argv[2],&isLastOrFirst);
 
     int fork1_id = sysSemOpen(fork1,1);
     int fork2_id = sysSemOpen(fork2,1);
 
+    int mutex_id = -1;
+    if(isLastOrFirst){
+        mutex_id = sysSemOpen("mutex",1);
+    }
+
     while(!terminatePhylosophers && !sem_close[index]){
+
+        if(mutex_id != -1){
+            sysSemWait(mutex_id);
+        }
 
         sysSemWait(fork1_id);
         sysSemWait(fork2_id);
@@ -147,6 +166,10 @@ void eachPhylo(int argc, char **argv)
         sysSleep(0,10);  //the phylosopher is eating
         sysSemPost(fork1_id);
         sysSemPost(fork2_id);
+
+        if(mutex_id != -1){
+            sysSemPost(mutex_id);
+        }
         phylos[index] = NOTEATING;
         sysSleep(0,10); //the phylosopher is thinking
     }
@@ -156,6 +179,8 @@ void eachPhylo(int argc, char **argv)
 }
 
 void phylo(int argc, char **argv){
+
+    int mutexId = sysSemOpen("mutex",1);
 
     int ammountOfPhylo = satoi(argv[0]);
     if (ammountOfPhylo <= 0)
@@ -175,11 +200,15 @@ void phylo(int argc, char **argv){
     {
         char index[2];
         intToString(i,index,1);
-        char *argv[] = {semNames[i], semNames[(i+1) % ammountOfPhylo], index, 0};
+        char *argv[] = {semNames[i], semNames[(i+1) % ammountOfPhylo], index, "0", 0};
+
+        if(i == 0 || i == ammountOfPhylo -1){
+            argv[3] = "1";
+        }
 
         creationParameters params;
         params.name = "eachPhylo";
-        params.argc = 3;
+        params.argc = 4;
         params.argv = argv;
         params.priority = 1;
         params.entryPoint = (entryPoint)eachPhylo;
@@ -201,15 +230,19 @@ void phylo(int argc, char **argv){
         sysReadScreenAtCurrentPosition(STDIN,&charToRead,1);
 
         if(charToRead == 'a'){
+            sysSemWait(mutexId);
             printf("Agrego phylo %d\n",ammountOfPhylo + 1);
             addPhylo(&ammountOfPhylo, pids, phylos, semNames);
             sysWriteScreen(STDIN," ",1,0xFFF); //para que en la entrada se "resetee" el a
+            sysSemPost(mutexId);
         }
 
         else if(charToRead == 'r' && ammountOfPhylo > 2){
+            sysSemWait(mutexId);
             printf("Elimino phylo %d\n",ammountOfPhylo);
             removePhylo(&ammountOfPhylo, pids, phylos, semNames);
             sysWriteScreen(STDIN," ",1,0xFFF); //para que en la entrada se "resetee" el a
+            sysSemPost(mutexId);
         }
 
         if(phyloStateHasChanged){
