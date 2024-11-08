@@ -68,7 +68,6 @@ int writeToFD(int fd, char *buf, uint64_t count, uint64_t hexColor)
     }
     return written;
 }
-void dummy1() {}
 
 int readFromFD(int fd, char *buf, uint64_t count)
 {
@@ -78,9 +77,11 @@ int readFromFD(int fd, char *buf, uint64_t count)
 
     unsigned char lastRead = '\0';
     Stream *stream = fileDescriptors[fd].resource;
-    while (sizeRead != count)
+    while (sizeRead != count && !stream->eof)
     {
+
         semWait(stream->readSem);
+ 
         if (!stream->eof || (fd != STDIN && (stream->referenceCountByMode[1] != 0 || stream->dataAvailable > 0)))
         {
             lastRead = stream->buffer[stream->readPos];
