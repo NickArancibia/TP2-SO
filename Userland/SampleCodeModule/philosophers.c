@@ -36,7 +36,6 @@ int philoStart(int argc, char *argv[])
     finishPhilosophers = 0;
     for (int i = 0; i < MAX_PHILOSOPHERS; i++)
     {
-        intToString(i, indexName, 0);
         forks[i] = sysSemOpen(NULL, 1);
         if (forks[i] == -1)
         {
