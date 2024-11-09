@@ -16,7 +16,7 @@
 #define MAX_BUFF_LEN 30
 #define MAX_COMMANDS 2
 #define MAX_ARGS 5
-
+#define MAX_BUFFER 2048
 
 char * commands[MAX_COMMANDS] = {NULL};
 char * args[MAX_COMMANDS][MAX_ARGS] = {NULL};
@@ -48,6 +48,9 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "TESTSYNC            ->      Test syncronization with semaphores.\n",
                            "TESTNOSYNC          ->      Test syncronization without semaphores.\n",
                            "TESTPIPE            ->      Test pipes.\n",
+                           "CAT                 ->      Read from the input and print the content to the output\n",
+                            "WC                  ->      Count the words from the input\n",
+                            "FILTER              ->      Read from the input and print the content to the output without vowels\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -89,6 +92,10 @@ Command commandList[] = {
     {"loop", (CommandFunc)loopCreate, 0, 0},
     {"inputalone",(CommandFunc)inputP,0,1},
     {"outputalone",(CommandFunc)outputP,0,1},
+    {"cat", (CommandFunc)catProgram, 0, 0},
+    {"wc", (CommandFunc)wcProgram, 0,0},
+    {"filter", (CommandFunc)filterProgram, 0, 0},
+    {"loop", (CommandFunc)loopProgram, 1, 0},
     {NULL, (CommandFunc)notFound, 0, 1} // Sentinel value to mark the end of the array
 };
 
@@ -296,6 +303,136 @@ void nice(char *argv[]){
     sysNice(pid, prio);
 }
 
+void wc(void){
+    int count = 0;
+    char c;
+    while((c = getchar()) != EOF){
+        if (c == '\n')
+        {
+            count++;
+        }        
+    }
+    printf("Total words: %d\n", count);
+}
+
+void cat(void){
+    char c = '\0';
+    int idx = 0;
+    char buffer[MAX_BUFFER+1] = {'\0'};
+     while((c = getchar()) != EOF){
+        putchar(c);
+        if(idx < MAX_BUFFER){
+            buffer[idx++] = c;
+        }
+    }
+        print(buffer);
+        print("\n");
+}
+
+void filter(void){
+    char buffer[MAX_BUFFER+1] = {'\0'};
+    char letter[2] = {'\0'};
+    int idx = 0;
+    while((letter[0] = getchar()) != EOF ){
+        putchar(letter[0]);
+        if (strcmp(letter,"a") != 0 && strcmp(letter,"e") != 0 && strcmp(letter,"i") != 0 && strcmp(letter,"o") != 0 && strcmp(letter,"u") != 0)
+        {
+            if (idx < MAX_BUFFER)
+            {
+                buffer[idx++] = letter[0];
+            }
+        }
+    }
+    print(buffer);
+    print("\n");
+
+}
+
+int wcProgram(int *fds, int isForeground,char* args[]){
+    sysHideCursor();
+    char *argv[] = {0};
+    creationParameters params;
+
+     params.fds[0] = fds[0];
+    params.fds[1] = fds[1];
+    params.name = "wc";
+    params.argc = 0;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)wc;
+    params.foreground = isForeground;
+    return createProcess(&params);
+}
+
+void loop(int argc, char **argv)
+{
+    if (argc != 1 || argv[0] == NULL)
+    {
+        printf("Usage: loop <seconds to sleep>\n");
+        return;
+    }
+    int n = satoi(argv[0]);
+    if (n <= 0)
+    {
+        printf("Invalid argument\n");
+        return;
+    }
+    int mypid = sysGetPID();
+    while (1)
+    {
+        printf("%d ", mypid);
+        sysSleep(n, 0);
+    }
+}
+
+int loopProgram(int *fds, int isForeground,char* args[]){
+    sysHideCursor();
+    char buffer[MAX_BUFF_LEN];
+    strcpy(buffer, args[0]);
+    char *argv[] = {buffer,0};
+    creationParameters params;
+    params.fds[0] = fds[0];
+    params.fds[1] = fds[1];
+    params.name = "lopp";
+    params.argc = 1;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)loop;
+    params.foreground = isForeground;
+    return createProcess(&params);
+}
+
+int catProgram(int *fds, int isForeground,char* args[]){
+    sysHideCursor();
+    char *argv[] = {0};
+    creationParameters params;
+    params.fds[0] = fds[0];
+    params.fds[1] = fds[1];
+    params.name = "cat";
+    params.argc = 1;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)cat;
+    params.foreground = isForeground;
+
+    return createProcess(&params);
+}
+
+int filterProgram(int *fds, int isForeground,char* args[]){
+    sysHideCursor();
+    char *argv[] = {0};
+    creationParameters params;
+    params.fds[0] = fds[0];
+    params.fds[1] = fds[1];
+    params.name = "filter";
+    params.argc = 1;
+    params.argv = argv;
+    params.priority = 1;
+    params.entryPoint = (entryPoint)filter;
+    params.foreground = isForeground;
+
+    return createProcess(&params);
+}
 
 int testProc(int *fds, int isForeground,char *args[])
 {
@@ -550,6 +687,7 @@ void executeCommands(int isForeground[MAX_COMMANDS]){
             sysWait(pids[i], NULL);
         }
     }   
+    sysShowCursor();
 }
 
 void parseConsolePrompt(char *consolePrompt) {

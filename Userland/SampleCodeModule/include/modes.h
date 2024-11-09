@@ -22,4 +22,12 @@ void suspend(char *argv[]);
 void resume(char *argv[]);
 void nice(char *argv[]);
 void killProcess(char *argv[]);
+int wcProgram(int *fds, int isForeground,char* args[]);
+int catProgram(int *fds, int isForeground,char* args[]);
+int filterProgram(int *fds, int isForeground,char* args[]);
+void filter(void);
+void cat(void);
+void wc(void);
+void loop(int argc, char **argv);
+int loopProgram(int *fds, int isForeground,char* args[]);
 #endif

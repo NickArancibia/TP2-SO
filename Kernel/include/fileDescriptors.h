@@ -4,7 +4,7 @@
 
 #include "semaphore.h"
 
-#define BUFFER_SIZE 1024
+#define BUFFER_SIZE 2048
 #define STDIN 0
 #define STDOUT 1
 #define STDERR 2
