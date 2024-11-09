@@ -69,7 +69,6 @@ typedef struct {
 int64_t outputP(uint64_t argc, char *argv[]);
 int64_t inputP(uint64_t argc, char *argv[]);
 
-void loopCreate(int* r, int e,char **argv){}
 Command commandList[] = {
     {"help", (CommandFunc)help, 0, 1},
     {"clear",(CommandFunc) clear, 0, 1},
@@ -89,7 +88,6 @@ Command commandList[] = {
     {"testsync", testSync, 1, 0},
     {"testnosync", testNoSync, 1, 0},
     {"testpipe", testPipe, 1, 0},
-    {"loop", (CommandFunc)loopCreate, 0, 0},
     {"inputalone",(CommandFunc)inputP,0,1},
     {"outputalone",(CommandFunc)outputP,0,1},
     {"cat", (CommandFunc)catProgram, 0, 0},
@@ -99,6 +97,18 @@ Command commandList[] = {
     {NULL, (CommandFunc)notFound, 0, 1} // Sentinel value to mark the end of the array
 };
 
+int createProgram( char *name, int argc, char **argv, int priority, entryPoint entry, int *fds, int isForeground) {
+    creationParameters params;
+    params.name = name;
+    params.argc = argc;
+    params.argv = argv;
+    params.priority = priority;
+    params.entryPoint = entry;
+    params.foreground = isForeground;
+    params.fds[0] = fds[0];
+    params.fds[1] = fds[1];
+   return createProcess(&params);
+}
 
 void help(void)
 {
@@ -349,89 +359,20 @@ void filter(void){
 }
 
 int wcProgram(int *fds, int isForeground,char* args[]){
-    sysHideCursor();
-    char *argv[] = {0};
-    creationParameters params;
-
-     params.fds[0] = fds[0];
-    params.fds[1] = fds[1];
-    params.name = "wc";
-    params.argc = 0;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)wc;
-    params.foreground = isForeground;
-    return createProcess(&params);
+    return createProgram("wc", 0, NULL, 1, (entryPoint)wc, fds, isForeground);
 }
 
-void loop(int argc, char **argv)
-{
-    if (argc != 1 || argv[0] == NULL)
-    {
-        printf("Usage: loop <seconds to sleep>\n");
-        return;
-    }
-    int n = satoi(argv[0]);
-    if (n <= 0)
-    {
-        printf("Invalid argument\n");
-        return;
-    }
-    int mypid = sysGetPID();
-    while (1)
-    {
-        printf("%d ", mypid);
-        sysSleep(n, 0);
-    }
-}
 
 int loopProgram(int *fds, int isForeground,char* args[]){
-    sysHideCursor();
-    char buffer[MAX_BUFF_LEN];
-    strcpy(buffer, args[0]);
-    char *argv[] = {buffer,0};
-    creationParameters params;
-    params.fds[0] = fds[0];
-    params.fds[1] = fds[1];
-    params.name = "lopp";
-    params.argc = 1;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)loop;
-    params.foreground = isForeground;
-    return createProcess(&params);
+    return createProgram("loop", 1, args, 1, (entryPoint)loop, fds, isForeground);  
 }
 
 int catProgram(int *fds, int isForeground,char* args[]){
-    sysHideCursor();
-    char *argv[] = {0};
-    creationParameters params;
-    params.fds[0] = fds[0];
-    params.fds[1] = fds[1];
-    params.name = "cat";
-    params.argc = 1;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)cat;
-    params.foreground = isForeground;
-
-    return createProcess(&params);
+    return createProgram("cat", 0, NULL, 1, (entryPoint)cat, fds, isForeground);
 }
 
 int filterProgram(int *fds, int isForeground,char* args[]){
-    sysHideCursor();
-    char *argv[] = {0};
-    creationParameters params;
-    params.fds[0] = fds[0];
-    params.fds[1] = fds[1];
-    params.name = "filter";
-    params.argc = 1;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)filter;
-    params.foreground = isForeground;
-
-    return createProcess(&params);
+   return createProgram("filter", 0, NULL, 1, (entryPoint)filter, fds, isForeground);
 }
 
 int testProc(int *fds, int isForeground,char *args[])
@@ -443,18 +384,7 @@ int testProc(int *fds, int isForeground,char *args[])
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
     print("Press 'q' to finish the test\n\n");
     char *argv[] = {count, 0};
-    creationParameters params;
-
-     params.fds[0] = fds[0];
-    params.fds[1] = fds[1];
-    params.name = "test_processes";
-    params.argc = 1;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_processes;
-    params.foreground = isForeground;
-
-    return createProcess(&params);
+    return createProgram("test_processes", 1, argv, 1, (entryPoint)test_processes, fds, isForeground);
 }
 
 int testPrio(int *fds, int isForeground,char *args[])
@@ -463,17 +393,7 @@ int testPrio(int *fds, int isForeground,char *args[])
     print("You are testing processes priorities\n");
     print("Below you will see information on running processes\n");
     print("Each process will print its PID an amount of times based on its priority\n\n");
-    creationParameters params;
-    params.name = "test_prio";
-    params.argc = 0;
-     params.fds[0] = fds[0];
-    params.fds[1] = fds[1]; 
-    params.argv = NULL;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_prio;
-    params.foreground = isForeground;
-
-    return createProcess(&params);
+    return createProgram("test_prio", 0, NULL, 1, (entryPoint)test_prio, fds, isForeground);
 }
 
 int testMM(int *fds, int isForeground,char *args[])
@@ -484,16 +404,7 @@ int testMM(int *fds, int isForeground,char *args[])
     print("You are testing memory manager\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
     char *argv[] = {max, 0};
-    creationParameters params;
-    params.name = "test_mm";
-    params.argc = 1;
-    params.argv = argv;
-     params.fds[0] = fds[0];
-    params.fds[1] = fds[1]; 
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_mm;
-    params.foreground = isForeground;   
-    return createProcess(&params);
+    return createProgram("test_mm", 2, argv, 1, (entryPoint)test_mm, fds, isForeground);
 }
 
 int testSync(int *fds, int isForeground,char *args[])
@@ -504,16 +415,7 @@ int testSync(int *fds, int isForeground,char *args[])
     print("You are testing syncronization with semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
     char *argv[] = {start, "1", 0};
-    creationParameters params;
-    params.name = "test_sync";
-    params.argc = 2;
-    params.argv = argv;
-    params.priority = 1;
-    params.fds[0] = fds[0];    
-    params.fds[1] = fds[1]; 
-    params.entryPoint = (entryPoint)test_sync;
-    params.foreground = isForeground;
-    return createProcess(&params);
+    return createProgram("test_sync", 2, argv, 1, (entryPoint)test_sync, fds, isForeground);
 }
 
 int testNoSync(int *fds, int isForeground,char *args[]) 
@@ -524,16 +426,7 @@ int testNoSync(int *fds, int isForeground,char *args[])
     print("You are testing syncronization without semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
     char *argv[] = {start, "0", 0};
-    creationParameters params;
-    params.name = "test_sync";
-    params.argc = 2;
-    params.argv = argv;
-    params.priority = 1;
-    params.fds[0] = fds[0];
-    params.fds[1] = fds[1];
-    params.entryPoint = (entryPoint)test_sync;
-    params.foreground = isForeground;
-    return createProcess(&params);
+    return createProgram("test_nosync", 2, argv, 1, (entryPoint)test_sync, fds, isForeground);
 }
 
 int64_t inputP(uint64_t argc, char *argv[]){
@@ -607,6 +500,7 @@ int closeFDsmadeByParser(){
 }
 
 void executeCommands(int isForeground[MAX_COMMANDS]){
+
     int execute[MAX_COMMANDS];
     int pids[MAX_COMMANDS] = {-1};
     int testPipeFlag = 0;
@@ -656,7 +550,7 @@ void executeCommands(int isForeground[MAX_COMMANDS]){
         perror("Error: Cannot pipe testpipe command\n");
         return;
     }
-
+    sysHideCursor();
     for (int i = 0; i < commandsToExecute; i++) {
         if (!commandList[execute[i]].isBuiltIn) {
             pids[i] = commandList[execute[i]].func(fds[i],isForeground[i],args[i]);
@@ -669,16 +563,8 @@ void executeCommands(int isForeground[MAX_COMMANDS]){
         }
         
         else{
-            creationParameters params;
-            params.name = commandList[execute[i]].name;
-            params.argc = commandList[execute[i]].expectedArgs;
-            params.argv = args[i];
-            params.priority = 1;
-            params.entryPoint = (entryPoint)commandList[execute[i]].func;
-            params.foreground = isForeground[i];
-            params.fds[0] = fds[i][0];
-            params.fds[1] = fds[i][1];
-            pids[i] = createProcess(&params);
+          pids[i] = createProgram(commandList[execute[i]].name, commandList[execute[i]].expectedArgs, args[i], 1, (entryPoint)commandList[execute[i]].func, fds[i], isForeground[i]);
+
         }   
     }
     
