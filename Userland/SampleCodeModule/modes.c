@@ -414,7 +414,6 @@ int64_t inputP(uint64_t argc, char *argv[]){
 int64_t outputP(uint64_t argc, char *argv[]){
     char buffer[100] = {'\0'};
     while(scanf(buffer, 100) != EOF){
-        scanf(buffer, 100);
         if (strcmp(buffer, "exit") == 0)
         {
             return 0;
