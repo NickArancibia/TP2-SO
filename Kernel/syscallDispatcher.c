@@ -23,7 +23,7 @@ static int (*syscallHandlers[])() = {
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)(void))malloc, (int (*)(void))free,
     (int (*)(void))processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)(void))getPS, (int (*)(void))freePS, yield,
     suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus,
-    sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post, getFDs, pipes, changeFDs,readAtCurrentPosition};
+    sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post, getFDs, pipes, changeFDs, readAtCurrentPosition};
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax)
 {
@@ -259,6 +259,7 @@ int killProcess(PID pid)
 
 void exit()
 {
+    killAllChildren(getpid());
     kill(getpid(), 0);
 }
 

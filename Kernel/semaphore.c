@@ -33,6 +33,7 @@ int initializeSems()
 
 int wasOpenBy(sem semaphore, PID pid)
 {
+    return 1;
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
         if (pid == 1 || semaphore.openBy[i] == pid)

@@ -26,6 +26,7 @@ static const char *modes[] = {
 static void getNextToken();
 
 static void getNextToken();
+int philoStart(int argc, char *argv[]);
 
 int init()
 {
@@ -270,7 +271,7 @@ int init()
             params.argv = argv;
             params.fds[0] = STDIN;
             params.fds[1] = STDOUT;
-            params.entryPoint = (entryPoint)phylo;
+            params.entryPoint = (entryPoint)philoStart;
 
             getNextToken();
             params.foreground = (token == NULL || strcasecmp(token, "&") != 0);
