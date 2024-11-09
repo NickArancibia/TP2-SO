@@ -206,7 +206,7 @@ int readFromFDAt(int fd, char *buf, uint64_t count, uint64_t pos)
     if (pos == stream->readPos && stream->dataAvailable > 0)
     {
         stream->readPos = (stream->readPos + 1) % BUFFER_SIZE;
-        stream->dataAvailable--;
+        (stream->dataAvailable)--;
     }
     return sizeRead;
 }

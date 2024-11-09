@@ -87,8 +87,9 @@ void printPhiloStates()
 
 void getKey()
 {
-    unsigned char charToRead;
+    unsigned char charToRead = '\0';
     sysReadScreenAtCurrentPosition(STDIN, &charToRead, 1);
+
     if (charToRead == 'q')
     {
         quitPhilosophers();
@@ -96,12 +97,10 @@ void getKey()
     else if (charToRead == 'a')
     {
         addPhilosopher();
-        sysWriteScreen(STDIN, " ", 1, 0xFFF);
     }
     else if (charToRead == 'r')
     {
         removePhilosopher();
-        sysWriteScreen(STDIN, " ", 1, 0xFFF);
     }
 }
 
