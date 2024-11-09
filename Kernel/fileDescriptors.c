@@ -77,11 +77,13 @@ int readFromFD(int fd, char *buf, uint64_t count)
 
     unsigned char lastRead = '\0';
     Stream *stream = fileDescriptors[fd].resource;
-    while (sizeRead != count && !stream->eof)
+    while (sizeRead != count)
     {
 
-        semWait(stream->readSem);
+        if (stream->eof )
+            semPost(stream->readSem);
 
+        semWait(stream->readSem);
         if (!stream->eof || (fd != STDIN && (stream->referenceCountByMode[1] != 0 || stream->dataAvailable > 0)))
         {
             lastRead = stream->buffer[stream->readPos];
@@ -93,6 +95,7 @@ int readFromFD(int fd, char *buf, uint64_t count)
         else
         {
             stream->eof = 1;
+            break;
         }
     }
     if (fd == STDIN)
@@ -155,8 +158,20 @@ int closeFD(int fd)
     if (fileDescriptors[fd].mode & W)
         fileDescriptors[fd].resource->referenceCountByMode[1] -= 1;
 
+    if (fileDescriptors[fd].resource->referenceCountByMode[0] > 0 && fileDescriptors[fd].resource->referenceCountByMode[1] <= 0)
+    {
+        fileDescriptors[fd].resource->eof = 1;
+        for (int i = 0; i < fileDescriptors[fd].resource->referenceCountByMode[0]; i++)
+        {
+            semPost(fileDescriptors[fd].resource->readSem);
+        }
+        
+    }
+    
+
     if (fileDescriptors[fd].resource->referenceCountByMode[0] == 0 && fileDescriptors[fd].resource->referenceCountByMode[1] == 0)
     {
+        fileDescriptors[fd].resource->eof = 0;
         semClose(fileDescriptors[fd].resource->readSem);
         semClose(fileDescriptors[fd].resource->writeSem);
         freeMM(fileDescriptors[fd].resource);

@@ -11,10 +11,23 @@ void playEasterEgg();
 void yield();
 void printProcessesInformation();
 void getMemoryStatus();
-int testMM(int maxMem, int foreground);
-int testPrio(int foreground);
-int testProc(int processCount, int foreground);
-int testNoSync(int n, int foreground);
-int testSync(int n, int foreground);
-int testPipe(void);
+int testMM(int *fds, int isForeground,char* args[]); // args = {maxMem}
+int testPrio(int *fds, int isForeground,char* args[]);  // args = null
+int testProc(int *fds, int isForeground,char* args[]); // args = {processCount}
+int testNoSync(int *fds, int isForeground,char* args[]); // args = {n}
+int testSync(int *fds, int isForeground,char* args[]); // args = {n}
+int testPipe(int *fds, int isForeground,char* args[]); // args = {n}
+void parseConsolePrompt(char *consolePrompt); 
+void suspend(char *argv[]);
+void resume(char *argv[]);
+void nice(char *argv[]);
+void killProcess(char *argv[]);
+int wcProgram(int *fds, int isForeground,char* args[]);
+int catProgram(int *fds, int isForeground,char* args[]);
+int filterProgram(int *fds, int isForeground,char* args[]);
+void filter(void);
+void cat(void);
+void wc(void);
+void loop(int argc, char **argv);
+int loopProgram(int *fds, int isForeground,char* args[]);
 #endif

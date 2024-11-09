@@ -54,7 +54,7 @@ GLOBAL sysSemPost
 GLOBAL sysGetFDs
 GLOBAL sysPipe
 GLOBAL sysReadScreenAtCurrentPosition
-
+GLOBAL sysCloseFD
 section .text
 
 sysReadScreen:         ; RDI: fileDescriptor, RSI: buffer, RDX: sizeToRead
