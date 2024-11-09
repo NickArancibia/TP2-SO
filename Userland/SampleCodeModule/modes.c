@@ -13,6 +13,7 @@
 #include "include/test_util.h"
 #include "include/tests.h"
 #include "include/string.h"
+
 #define MAX_BUFF_LEN 30
 #define MAX_COMMANDS 2
 #define MAX_ARGS 5
@@ -94,6 +95,7 @@ Command commandList[] = {
     {"wc", (CommandFunc)wcProgram, 0,0},
     {"filter", (CommandFunc)filterProgram, 0, 0},
     {"loop", (CommandFunc)loopProgram, 1, 0},
+    {"phylo", (CommandFunc)phylo, 1, 0},
     {NULL, (CommandFunc)notFound, 0, 1} // Sentinel value to mark the end of the array
 };
 
@@ -358,6 +360,17 @@ void filter(void){
 
 }
 
+int phylo(int *fds, int isForeground, char *argv[])
+{
+    if (satoi(argv[0]) < 2)
+    {
+        perror("You need at least 2 philosophers\n");
+        return -1;
+    }
+    return createProgram("phylo", 1, argv, 1, (entryPoint)philoStart, fds, isForeground);
+}
+
+
 int wcProgram(int *fds, int isForeground,char* args[]){
     return createProgram("wc", 0, NULL, 1, (entryPoint)wc, fds, isForeground);
 }
@@ -454,34 +467,21 @@ int64_t outputP(uint64_t argc, char *argv[]){
 
 int testPipe(int *fileDescriptors, int isForeground,char *args[])
 {
-    sysHideCursor();
     print("Testing pipes\n");
     print("Two processes were created, one reads from STDIN, the other writes to STDOUT \n");
     print("this test works like 'input | output'\n");
     print("Type 'exit' and press enter to exit\n");
     char *argv[] = {0};
-    int fds[2];
+    int pipe[2];
     int pids[2];
     sysPipe(fds);
-    creationParameters params;
-    params.name = "inputP";
-    params.argc =0;
-    params.argv = argv;
-    params.priority = 1;
-    params.fds[0] = STDIN;
-    params.fds[1] = fds[1];
-    params.entryPoint = (entryPoint)inputP;
-    params.foreground = isForeground;
-    pids[0] = createProcess(&params);
-    params.name = "outputP";
-    params.argc =0;
-    params.argv = argv;
-    params.priority = 1;
-    params.fds[0] = fds[0];
-    params.fds[1] = STDOUT;
-    params.entryPoint = (entryPoint)outputP;
-    params.foreground = isForeground;
-    pids[1] = createProcess(&params);
+    int fds [2][2];
+    int fds[0][0] = STDIN;
+    int fds[0][1] = pipe[1];
+    int fds[1][0] = pipe[0];
+    int fds[1][1] = STDOUT;
+    pids[0] = createProgram("inputP", 0, NULL, 1, (entryPoint)inputP, fds[0], isForeground);
+    pids[1] = createProgram("outputP", 0, NULL, 1, (entryPoint)outputP, fds[1], isForeground);
     if (isForeground)
     {
         sysWait(pids[0], NULL);

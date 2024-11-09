@@ -30,4 +30,6 @@ void cat(void);
 void wc(void);
 void loop(int argc, char **argv);
 int loopProgram(int *fds, int isForeground,char* args[]);
+int phylo(int *fds, int isForeground,char* args[]);
+int philoStart(int argc, char *argv[]);
 #endif
