@@ -10,24 +10,9 @@
 #include "include/test_util.h"
 #include "include/programs.h"
 
-#define BUFLEN 64
-#define MAXARGC 8
-
-char *token = NULL;
-char buffer[BUFLEN] = {0};
-char *argv[MAXARGC] = {0};
-
-
-static void getNextToken();
-
-static void getNextToken();
-
 int init()
 {
     printColor("Welcome to Shell! Type HELP for command information.\n\n", YELLOW);
-   
-    int returnValue;
-    creationParameters params;
     while (IDLE_MODE)
     {
         char commandPrompt[64] = {0};
