@@ -17,4 +17,6 @@ int testProc(int processCount, int foreground);
 int testNoSync(int n, int foreground);
 int testSync(int n, int foreground);
 int testPipe(void);
+void parseConsolePrompt(char *consolePrompt);
+
 #endif
