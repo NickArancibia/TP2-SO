@@ -172,6 +172,8 @@ int blockProcess(PID pid)
 
 int unblockProcess(PID pid)
 {
+    if (getProcess(pid)->state != BLOCKED)
+        return -1;
     Process *pcb = getProcess(pid);
     pcb->state = READY;
     schedule(pcb);

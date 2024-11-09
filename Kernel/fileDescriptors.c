@@ -81,7 +81,7 @@ int readFromFD(int fd, char *buf, uint64_t count)
     {
 
         semWait(stream->readSem);
- 
+
         if (!stream->eof || (fd != STDIN && (stream->referenceCountByMode[1] != 0 || stream->dataAvailable > 0)))
         {
             lastRead = stream->buffer[stream->readPos];
@@ -191,17 +191,20 @@ int readFromFDAt(int fd, char *buf, uint64_t count, uint64_t pos)
 
     unsigned char lastRead = '\0';
     Stream *stream = fileDescriptors[fd].resource;
-    if(pos >= BUFFER_SIZE || pos < 0)
+    if (pos >= BUFFER_SIZE || pos < 0)
         return -1;
 
-    if(stream->dataAvailable > 0){
-        if(stream->buffer[pos] != '\0'){
+    if (stream->dataAvailable > 0)
+    {
+        if (stream->buffer[pos] != '\0')
+        {
             semWait(stream->readSem);
             lastRead = stream->buffer[pos];
             buf[sizeRead++] = lastRead;
         }
     }
-    if(pos == stream->readPos && stream->dataAvailable > 0){
+    if (pos == stream->readPos && stream->dataAvailable > 0)
+    {
         stream->readPos = (stream->readPos + 1) % BUFFER_SIZE;
         stream->dataAvailable--;
     }

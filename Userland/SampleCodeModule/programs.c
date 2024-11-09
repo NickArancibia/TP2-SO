@@ -5,14 +5,17 @@
 #include "./include/stdio.h"
 #include "./include/syscalls.h"
 #include "./include/test_util.h"
+#include "./include/lib.h"
 
 void programDispatcher(creationParameters *params)
 {
+    sysHideCursor();
     int pid = sysCreateProcess(params);
     if (params->foreground)
     {
         sysWait(pid, NULL);
     }
+    sysShowCursor();
 }
 
 void loop(int argc, char **argv)

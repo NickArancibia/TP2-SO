@@ -7,4 +7,6 @@ void programDispatcher(creationParameters *params);
 
 void loop(int argc, char **argv);
 
+int philoStart(int argc, char *argv[]);
+
 #endif

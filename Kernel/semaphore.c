@@ -33,6 +33,7 @@ int initializeSems()
 
 int wasOpenBy(sem semaphore, PID pid)
 {
+    return 1;
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
         if (pid == 1 || semaphore.openBy[i] == pid)
@@ -178,8 +179,12 @@ int semPost(int sem_id)
     semaphores[sem_id].value++;
     if (!isEmpty(semaphores[sem_id].waitingProcess))
     {
-        PID pid = dequeue(semaphores[sem_id].waitingProcess);
-        unblockProcess(pid);
+        int returnValue;
+        do
+        {
+            PID pid = dequeue(semaphores[sem_id].waitingProcess);
+            returnValue = unblockProcess(pid);
+        } while (returnValue == -1 && !isEmpty(semaphores[sem_id].waitingProcess));
     }
     release(&semaphores[sem_id].isInUse);
     return 0;
@@ -198,6 +203,7 @@ int semClose(int sem_id)
         release(&semaphores[sem_id].isInUse);
         return 0;
     }
+
     if (semaphores[sem_id].name == NULL || isOpenByEmpty(semaphores[sem_id]))
     {
         memset(semaphores[sem_id].openBy, -1, sizeof(semaphores[sem_id].openBy));

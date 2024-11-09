@@ -28,7 +28,7 @@ int intLength(int num, int minLen)
 void intToString(int64_t num, char *buf, int minLen)
 {
     int length = intLength(num, minLen);
-
+    
     // Convert each digit to a char
     for (int i = length - 1; i >= 0; i--)
     {
