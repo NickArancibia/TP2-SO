@@ -471,15 +471,14 @@ int testPipe(int *fileDescriptors, int isForeground,char *args[])
     print("Two processes were created, one reads from STDIN, the other writes to STDOUT \n");
     print("this test works like 'input | output'\n");
     print("Type 'exit' and press enter to exit\n");
-    char *argv[] = {0};
     int pipe[2];
     int pids[2];
-    sysPipe(fds);
+    sysPipe(pipe);
     int fds [2][2];
-    int fds[0][0] = STDIN;
-    int fds[0][1] = pipe[1];
-    int fds[1][0] = pipe[0];
-    int fds[1][1] = STDOUT;
+     fds[0][0] = STDIN;
+     fds[0][1] = pipe[1];
+     fds[1][0] = pipe[0];
+     fds[1][1] = STDOUT;
     pids[0] = createProgram("inputP", 0, NULL, 1, (entryPoint)inputP, fds[0], isForeground);
     pids[1] = createProgram("outputP", 0, NULL, 1, (entryPoint)outputP, fds[1], isForeground);
     if (isForeground)
