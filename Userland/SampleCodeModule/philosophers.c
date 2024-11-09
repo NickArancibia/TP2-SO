@@ -15,7 +15,6 @@
 int philoStates[MAX_PHILOSOPHERS];
 int philoPIDS[MAX_PHILOSOPHERS];
 int forks[MAX_PHILOSOPHERS];
-int mutex;
 int philoCount;
 int hasChanged = 0, finishPhilosophers = 0;
 
@@ -60,8 +59,6 @@ int philoStart(int argc, char *argv[])
         philoStates[i] = NOTEATING;
         philoPIDS[i] = -1;
     }
-
-    mutex = sysSemOpen("mutex", 1);
 
     creationParameters params;
     char *argvAux[] = {indexName, NULL};
@@ -164,9 +161,7 @@ void addPhilosopher()
         printf("Max philosophers reached\n");
         return;
     }
-    sysSemWait(mutex);
     philoCount++;
-    sysSemPost(mutex);
     printf("A new philosopher has just arrived! \n");
     char indexName[MAXNAMELEN] = {0};
     char *argvAux[] = {indexName, NULL};
@@ -191,9 +186,7 @@ void removePhilosopher()
         printf("Min philosophers reached\n");
         return;
     }
-    sysSemWait(mutex);
     philoCount--;
-    sysSemPost(mutex);
 
     printf("A philosopher leaves the table... \n");
 }
@@ -209,7 +202,6 @@ void quitPhilosophers()
     {
         sysSemClose(forks[i]);
     }
-    sysSemClose(mutex);
     sysExit();
 }
 
@@ -221,10 +213,9 @@ void philoThink(int index)
 
 void philoEat(int index)
 {
-    sysSemWait(mutex);
+    int currentCount = philoCount;
     int leftFork = forks[index];
-    int rightFork = forks[(index + 1) % philoCount];
-    sysSemPost(mutex);
+    int rightFork = forks[(index + 1) % currentCount];
 
     if (index % 2 == 0)
     {
