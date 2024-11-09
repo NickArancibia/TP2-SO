@@ -203,6 +203,7 @@ int semClose(int sem_id)
         release(&semaphores[sem_id].isInUse);
         return 0;
     }
+
     if (semaphores[sem_id].name == NULL || isOpenByEmpty(semaphores[sem_id]))
     {
         memset(semaphores[sem_id].openBy, -1, sizeof(semaphores[sem_id].openBy));

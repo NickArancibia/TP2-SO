@@ -2,6 +2,7 @@
 #include "./include/test_util.h"
 #include "./include/syscalls.h"
 #include "./include/lib.h"
+#include "./include/philosophers.h"
 
 #define MAXNAMELEN 16
 #define MAXITERATION 20000
@@ -9,26 +10,11 @@
 #define MAX_PHILOSOPHERS 16
 #define MIN_PHILOSOPHERS 2
 
-#define EATING 1
-#define NOTEATING 0
-
 int philoStates[MAX_PHILOSOPHERS];
 int philoPIDS[MAX_PHILOSOPHERS];
 int forks[MAX_PHILOSOPHERS];
 int philoCount;
 int hasChanged = 0, finishPhilosophers = 0;
-
-void getKey();
-void printPhiloStates();
-char *getPhiloState(int index);
-void philosopher(int argc, char *argv[]); // Use forks[index] and forks[(index + 1) % phyloCount]
-
-void quitPhilosophers();
-void addPhilosopher();
-void removePhilosopher();
-
-void philoThink(int index);
-void philoEat(int index);
 
 int philoStart(int argc, char *argv[])
 {
@@ -47,10 +33,11 @@ int philoStart(int argc, char *argv[])
     printf("Welcome to philosophers!\nPress 'q' to end, 'a' to add a philosopher and 'r' to remove one\n");
     sysSleep(1, 0);
     char indexName[MAXNAMELEN] = {0};
+    finishPhilosophers = 0;
     for (int i = 0; i < MAX_PHILOSOPHERS; i++)
     {
         intToString(i, indexName, 0);
-        forks[i] = sysSemOpen(indexName, 1);
+        forks[i] = sysSemOpen(NULL, 1);
         if (forks[i] == -1)
         {
             printf("Error opening semaphore %d\n", i);

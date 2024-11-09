@@ -21,12 +21,11 @@ static const char *modes[] = {
     "date", "clear", "registers", "easteregg", "ps", "yield",
     "kill", "suspend", "resume", "nice", "memstatus", "testmm",
     "testproc", "testprio", "testsync", "testnosync", "testpipe",
-    "loop", "phylo"};
+    "loop", "philo"};
 
 static void getNextToken();
 
 static void getNextToken();
-int philoStart(int argc, char *argv[]);
 
 int init()
 {
@@ -254,7 +253,7 @@ int init()
             programDispatcher(&params);
         }
 
-        else if (strcasecmp(token, modes[PHYLO]) == SELECTED_MODE)
+        else if (strcasecmp(token, modes[PHILO]) == SELECTED_MODE)
         {
             getNextToken();
             if (token == NULL)

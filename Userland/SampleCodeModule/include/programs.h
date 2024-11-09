@@ -7,9 +7,6 @@ void programDispatcher(creationParameters *params);
 
 void loop(int argc, char **argv);
 
-#define NOTEATING 0
-#define EATING 1
-void phylo(int argc, char **argv);
-void eachPhylo(int argc, char **argv);
+int philoStart(int argc, char *argv[]);
 
 #endif
