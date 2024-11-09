@@ -196,12 +196,13 @@ int readFromFDAt(int fd, char *buf, uint64_t count, uint64_t pos)
 
     if(stream->dataAvailable > 0){
         if(stream->buffer[pos] != '\0'){
+            semWait(stream->readSem);
             lastRead = stream->buffer[pos];
             buf[sizeRead++] = lastRead;
         }
     }
     if(pos == stream->readPos && stream->dataAvailable > 0){
-        stream->readPos++;
+        stream->readPos = (stream->readPos + 1) % BUFFER_SIZE;
         stream->dataAvailable--;
     }
     return sizeRead;
