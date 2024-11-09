@@ -203,7 +203,7 @@ int semClose(int sem_id)
         release(&semaphores[sem_id].isInUse);
         return 0;
     }
-
+    removeOpenBy(sem_id, getpid());
     if (semaphores[sem_id].name == NULL || isOpenByEmpty(semaphores[sem_id]))
     {
         memset(semaphores[sem_id].openBy, -1, sizeof(semaphores[sem_id].openBy));
@@ -213,7 +213,7 @@ int semClose(int sem_id)
             memset(semaphores[sem_id].name, 0, strlen(semaphores[sem_id].name) + 1);
             freeMM(semaphores[sem_id].name);
         }
-        release(&semaphores[sem_id].isInUse);
+       
     }
     release(&semaphores[sem_id].isInUse);
     return 0;
