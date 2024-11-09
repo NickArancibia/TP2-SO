@@ -17,7 +17,7 @@ int philoPIDS[MAX_PHILOSOPHERS];
 int forks[MAX_PHILOSOPHERS];
 int mutex;
 int philoCount;
-int hasChanged = 0;
+int hasChanged = 0, finishPhilosophers = 0;
 
 void getKey();
 void printPhiloStates();
@@ -28,7 +28,7 @@ void quitPhilosophers();
 void addPhilosopher();
 void removePhilosopher();
 
-void philoThink();
+void philoThink(int index);
 void philoEat(int index);
 
 int philoStart(int argc, char *argv[])
@@ -48,7 +48,7 @@ int philoStart(int argc, char *argv[])
     printf("Welcome to philosophers!\nPress 'q' to end, 'a' to add a philosopher and 'r' to remove one\n");
     sysSleep(1, 0);
     char indexName[MAXNAMELEN] = {0};
-    for (int i = 0; i < philoCount; i++)
+    for (int i = 0; i < MAX_PHILOSOPHERS; i++)
     {
         intToString(i, indexName, 0);
         forks[i] = sysSemOpen(indexName, 1);
@@ -148,11 +148,11 @@ void philosopher(int argc, char *argv[])
 
     while (1)
     {
-        philoThink();
-        if (index >= philoCount)
+        philoThink(index);
+        if (index >= philoCount || finishPhilosophers)
             break;
         philoEat(index);
-        if (index >= philoCount)
+        if (index >= philoCount || finishPhilosophers)
             break;
     }
 }
@@ -165,11 +165,12 @@ void addPhilosopher()
         return;
     }
     sysSemWait(mutex);
+    philoCount++;
+    sysSemPost(mutex);
     printf("A new philosopher has just arrived! \n");
     char indexName[MAXNAMELEN] = {0};
     char *argvAux[] = {indexName, NULL};
-    intToString(philoCount, indexName, 0);
-    philoCount++;
+    intToString(philoCount - 1, indexName, 0);
 
     creationParameters params;
     params.argc = 1;
@@ -181,7 +182,6 @@ void addPhilosopher()
     params.fds[0] = STDIN;
     params.fds[1] = STDOUT;
     sysCreateProcess(&params);
-    sysSemPost(mutex);
 }
 
 void removePhilosopher()
@@ -192,60 +192,57 @@ void removePhilosopher()
         return;
     }
     sysSemWait(mutex);
-    printf("A philosopher leaves the table... \n");
-    sysKill(philoPIDS[philoCount - 1]);
     philoCount--;
     sysSemPost(mutex);
+
+    printf("A philosopher leaves the table... \n");
 }
 
 void quitPhilosophers()
 {
+    finishPhilosophers = 1;
     for (int i = 0; i < philoCount; i++)
     {
-        sysKill(philoPIDS[i]);
+        sysWait(philoPIDS[i], NULL);
     }
-    for (int i = 0; i < philoCount; i++)
+    for (int i = 0; i < MAX_PHILOSOPHERS; i++)
     {
         sysSemClose(forks[i]);
     }
     sysSemClose(mutex);
-    sysWriteScreen(STDIN, " ", 1, 0xFFF);
     sysExit();
 }
 
-void philoThink()
+void philoThink(int index)
 {
-    sysSleep(0, 5);
+    int thinkTime = GetUniform(index) % 20;
+    sysSleep(0, thinkTime);
 }
 
 void philoEat(int index)
 {
-    if (index == philoCount - 1 || index == philoCount - 2)
-    {
-        sysSemWait(mutex);
-    }
+    sysSemWait(mutex);
+    int leftFork = forks[index];
+    int rightFork = forks[(index + 1) % philoCount];
+    sysSemPost(mutex);
 
     if (index % 2 == 0)
     {
-        sysSemWait(forks[index]);
-        sysSemWait(forks[(index + 1) % philoCount]);
+        sysSemWait(leftFork);
+        sysSemWait(rightFork);
     }
     else
     {
-        sysSemWait(forks[(index + 1) % philoCount]);
-        sysSemWait(forks[index]);
+        sysSemWait(rightFork);
+        sysSemWait(leftFork);
     }
     philoStates[index] = EATING;
     hasChanged = 1;
     sysSleep(0, 10); // Eating
 
-    sysSemPost(forks[(index + 1) % philoCount]);
-    sysSemPost(forks[index]);
+    sysSemPost(rightFork);
+    sysSemPost(leftFork);
 
     philoStates[index] = NOTEATING;
     hasChanged = 1;
-    if (index == philoCount - 1 || index == philoCount - 2)
-    {
-        sysSemPost(mutex);
-    }
 }
