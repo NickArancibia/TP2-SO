@@ -1,3 +1,5 @@
+// This is a personal academic project. Dear PVS-Studio, please check it.
+// PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "../include/math.h"
 #include "../include/memoryManager.h"
 
@@ -104,7 +106,7 @@ void freeMM(void *memorySegment)
             current = &(*current)->next;
         }
 
-        if (*current == buddy)
+        if (buddy != NULL && *current == buddy)
         {
             *current = buddy->next;
             block = (Block *)((void *)block < (void *)buddy ? (void *)block : (void *)buddy);

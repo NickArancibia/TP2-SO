@@ -123,12 +123,14 @@ void updateBuffer()
             }
             return;
         }
-         if (ctrlPressed && (c == 'd' || c == 'D'))
+        if (ctrlPressed && (c == 'd' || c == 'D'))
         {
             Process *pcb = getCurrentProcess();
             ctrlPressed = 0;
-            if(pcb->fds[0] == STDIN)
+            if (pcb->fds[0] == STDIN)
+            {
                 setEOF(pcb->fds[0]);
+            }
             setEOF(pcb->fds[1]);
             return;
         }

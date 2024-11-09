@@ -33,7 +33,6 @@ int initializeSems()
 
 int wasOpenBy(sem semaphore, PID pid)
 {
-    return 1;
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
         if (pid == 1 || semaphore.openBy[i] == pid)
@@ -213,8 +212,7 @@ int semClose(int sem_id)
             memset(semaphores[sem_id].name, 0, strlen(semaphores[sem_id].name) + 1);
             freeMM(semaphores[sem_id].name);
         }
-       
-    }
+        }
     release(&semaphores[sem_id].isInUse);
     return 0;
 }
