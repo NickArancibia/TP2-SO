@@ -71,5 +71,5 @@ int getFDs(int fds[2]);
 int changeFDs(int fds[2]);
 int pipes(int fds[2]);
 int readAtCurrentPosition(uint64_t fd, char *buf, uint64_t count);
-
+int closeFileDescriptor(uint64_t fd);
 #endif

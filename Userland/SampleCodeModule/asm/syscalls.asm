@@ -314,3 +314,8 @@ sysReadScreenAtCurrentPosition:
     mov rax,50
     int 80h
     ret
+
+sysCloseFD:
+    mov rax,51
+    int 80h
+    ret

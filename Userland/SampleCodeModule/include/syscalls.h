@@ -66,4 +66,5 @@ int sysPipe(int fds[2]);
 int sysChangeFDs(int fds[2]);
 int sysGetReadPos();
 int sysReadScreenAtCurrentPosition(uint64_t fd, unsigned char *buffer, uint64_t len);
+int sysCloseFD(int fd);
 #endif
