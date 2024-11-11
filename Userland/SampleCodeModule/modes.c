@@ -480,7 +480,7 @@ void executeCommands(int isForeground[MAX_COMMANDS])
             return;
         }
 
-        if (isBuiltIn && !isForeground[i])
+        if (isBuiltIn && !isForeground[i] && !pipeFlag)
         {
             closeFDsmadeByParser();
             perror("Error: Cannot run built-in commands in background\n");
