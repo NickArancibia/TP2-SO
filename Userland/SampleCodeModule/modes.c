@@ -226,7 +226,7 @@ void getMemoryStatus()
 {
     sysGetMemStatus(memoryStatus);
     printf("Memoria total= %d B |  ", memoryStatus[3]);
-    printf("Memoria ocupada= %d B (%d)|  ", memoryStatus[1], memoryStatus[1] * 100 / memoryStatus[3]);
+    printf("Memoria ocupada= %d B (%d %)|  ", memoryStatus[1], memoryStatus[1] * 100 / memoryStatus[3]);
     printf("Memoria libre= %d B | ", memoryStatus[2]);
     printf("Bloques ocupados= %d\n", memoryStatus[0]);
 }
