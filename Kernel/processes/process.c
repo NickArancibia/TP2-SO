@@ -11,7 +11,15 @@
 #include <videoDriver.h>
 #include "../include/fileDescriptors.h"
 Process processes[MAX_PROCESSES];
-PID current;
+
+PID getCurrentPPID(Process *currentProcess, PID currentPID)
+{
+    if (currentProcess == NULL)
+    {
+        return currentPID == SHELLPID ? INITPID : INITPID - 1;
+    }
+    return currentProcess->pid;
+}
 
 int isValidPID(PID pid)
 {
@@ -56,7 +64,6 @@ int processLoader(int argc, char *argv[], entryPoint entry)
 
 PID initProcesses(void)
 {
-    current = 1;
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
         processes[i].pid = i + 1;
@@ -93,7 +100,7 @@ int getFreeProcess()
 PID createProcess(creationParameters *params)
 {
 
-    if (params == NULL || !checkPriority(params->priority) || params->argc < 0 || params->entryPoint == NULL || !checkName(params->name) || current > MAX_PID)
+    if (params == NULL || !checkPriority(params->priority) || params->argc < 0 || params->entryPoint == NULL || !checkName(params->name))
     {
         return -1;
     }
@@ -132,7 +139,6 @@ PID createProcess(creationParameters *params)
         }
     }
 
-    Process *currentProcess;
     int allocatedProcess = getFreeProcess();
     if (allocatedProcess == -1)
     {
@@ -150,7 +156,7 @@ PID createProcess(creationParameters *params)
 
     // Set current process Information
     memcpy(processes[allocatedProcess].name, params->name, strlen(params->name) + 1);
-    processes[allocatedProcess].parentpid = (currentProcess = getCurrentProcess()) == NULL ? 0 : currentProcess->pid;
+    processes[allocatedProcess].parentpid = getCurrentPPID(getCurrentProcess(), allocatedProcess + 1);
     processes[allocatedProcess].waitingPID = NONPID;
     processes[allocatedProcess].argc = params->argc;
     processes[allocatedProcess].argv = args;
@@ -164,7 +170,6 @@ PID createProcess(creationParameters *params)
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
-    // TODO: Handle entryPoint return value
 }
 
 int getProcessesCount()

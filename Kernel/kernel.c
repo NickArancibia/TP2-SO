@@ -92,7 +92,6 @@ int main()
 	params.fds[0] = STDIN;
 	params.fds[1] = STDOUT;
 	createProcess(&params);
-	initScheduler();
 	params.name = "shell";
 	params.entryPoint = (entryPoint)sampleCodeModuleAddress;
 	params.foreground = 1;
@@ -102,6 +101,7 @@ int main()
 	params.fds[0] = STDIN;
 	params.fds[1] = STDOUT;
 	createProcess(&params);
+	initScheduler();
 	forceSwitchContent();
 
 	return 0;
