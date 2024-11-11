@@ -4,6 +4,11 @@
 #define EATING 1
 #define NOTEATING 0
 
+#define MAXNAMELEN 16
+
+#define MAX_PHILOSOPHERS 16
+#define MIN_PHILOSOPHERS 2
+
 void getKey();
 void printPhiloStates();
 char *getPhiloState(int index);

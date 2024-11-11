@@ -43,7 +43,6 @@ unsigned char getcharAtCurrentPosition(void)
     return read;
 }
 
-
 unsigned char putchar(unsigned char c)
 {
     int fds[2];
@@ -68,12 +67,12 @@ int print(char *str)
 {
     return printColor(str, DEFAULT);
 }
-int perror(char *str){
+int perror(char *str)
+{
     int len = strlen(str) + 1;
-    sysWriteScreen(STDERR,(unsigned char *) str, len, RED);
+    sysWriteScreen(STDERR, (unsigned char *)str, len, RED);
     return 0;
 }
-
 
 int printf(char *str, ...)
 {

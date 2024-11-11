@@ -58,10 +58,10 @@ void sysWait(PID pid, int *wstatus);
 int sysNice(PID pid, Priority priority);
 void sysGetMemStatus(int *memStatus);
 
-int sysSemOpen( char *sem_id, int initialValue );
-int sysSemClose( sem_t sem);
-void sysSemWait( sem_t sem);
-void sysSemPost( sem_t sem);
+int sysSemOpen(char *sem_id, int initialValue);
+int sysSemClose(sem_t sem);
+void sysSemWait(sem_t sem);
+void sysSemPost(sem_t sem);
 int sysPipe(int fds[2]);
 int sysChangeFDs(int fds[2]);
 int sysGetReadPos();

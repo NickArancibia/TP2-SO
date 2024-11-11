@@ -6,12 +6,6 @@
 #include "./include/lib.h"
 #include "./include/philosophers.h"
 
-#define MAXNAMELEN 16
-#define MAXITERATION 20000
-
-#define MAX_PHILOSOPHERS 16
-#define MIN_PHILOSOPHERS 2
-
 int philoStates[MAX_PHILOSOPHERS];
 int philoPIDS[MAX_PHILOSOPHERS];
 int forks[MAX_PHILOSOPHERS];

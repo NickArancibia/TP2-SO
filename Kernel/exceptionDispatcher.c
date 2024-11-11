@@ -10,7 +10,6 @@
 #include <defs.h>
 #include "../include/fileDescriptors.h"
 
-
 #define ERRORCOL 0x00FF0000
 #define COMMENTCOL 0x00FFFFFF
 

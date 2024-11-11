@@ -212,7 +212,7 @@ int semClose(int sem_id)
             memset(semaphores[sem_id].name, 0, strlen(semaphores[sem_id].name) + 1);
             freeMM(semaphores[sem_id].name);
         }
-        }
+    }
     release(&semaphores[sem_id].isInUse);
     return 0;
 }
