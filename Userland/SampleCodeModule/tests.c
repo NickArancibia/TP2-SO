@@ -20,6 +20,8 @@ int checkMemExit();
 
 uint64_t test_mm(uint64_t argc, char *argv[])
 {
+    int memoryStatus[4];
+
     uint8_t rq;
     mm_rq mm_rqs[MAX_BLOCKS];
 
@@ -27,6 +29,12 @@ uint64_t test_mm(uint64_t argc, char *argv[])
     uint64_t max_memory;
     if ((max_memory = satoi(argv[0])) <= 0)
         return -1;
+    sysGetMemStatus(memoryStatus);
+
+    if(memoryStatus[2] < max_memory){
+        perror("Not enough memory\n");
+        return -1;
+    }
 
     while (1)
     {
