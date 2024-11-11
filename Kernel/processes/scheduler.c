@@ -138,11 +138,11 @@ uint64_t *switchContent(uint64_t *rsp)
     {
 
         currentProcess = unschedule();
-        quantumsLeft = currentProcess->priority - 1;
         if (currentProcess == NULL)
         {
             return rsp;
         }
+        quantumsLeft = currentProcess->priority - 1;
     } while (currentProcess->state == BLOCKED || currentProcess->state == DEAD);
 
     clearYield();
@@ -172,6 +172,8 @@ int blockProcess(PID pid)
 
 int unblockProcess(PID pid)
 {
+    if (getProcess(pid)->state != BLOCKED)
+        return -1;
     Process *pcb = getProcess(pid);
     pcb->state = READY;
     schedule(pcb);

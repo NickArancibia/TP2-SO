@@ -25,7 +25,7 @@ int seconds_elapsed()
 void sleep(int msToSleep)
 {
     long start = ticks;
-    while ((ticks - start) != msToSleep)
+    while ((ticks - start) <= msToSleep)
     {
         _hlt();
     }

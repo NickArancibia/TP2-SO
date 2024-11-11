@@ -7,8 +7,7 @@
 #define STDOUT 1
 #define STDERR 2
 #define NULL 0
-
-typedef unsigned int size_t;
+#define EOF 0
 
 /**
  * Reads STDIN and returns the next char in it.
@@ -47,7 +46,7 @@ int print(char *str);
  *
  * Returns length print
  */
-int printf(char *str,...);
+int printf(char *str, ...);
 
 /**
  * Receives a buffer and size as parameters
@@ -57,4 +56,7 @@ int printf(char *str,...);
  */
 int scanf(char *buffer, int size);
 
+int perror(char *str);
+
+unsigned char getcharAtCurrentPosition(void);
 #endif

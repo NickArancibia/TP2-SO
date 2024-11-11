@@ -3,8 +3,11 @@
 #include <keyboard.h>
 #include <lib.h>
 #include <videoDriver.h>
+#include "../include/scheduler.h"
+#include "../include/process.h"
+#include "../include/fileDescriptors.h"
 
-#define MAXSIZE 128
+#define MAXSIZE 1024
 
 #define UP_ARROW_VAL 0xE0
 #define LEFT_ARROW_VAL 0xE1
@@ -107,10 +110,33 @@ void updateBuffer()
         ctrlPressed = 0;
     }
     else if (arrowValue || (!shiftHandler(scancode) && scancode < MAX_SCANCODE))
-    { // We add the characters, with their corresponding modification for a shift
+    {
         dataStatus = 1;
         char c = (arrowValue != 0) ? arrowValue : scancodesChars[shift][scancode];
-        buffer[bufferPos++] = c;
+        if (ctrlPressed && (c == 'c' || c == 'C'))
+        {
+            Process *pcb = getCurrentProcess();
+            if (pcb->foreground && pcb->pid != INITPID && pcb->pid != SHELLPID)
+            {
+                writeToFD(STDOUT, "^C\n", 3, 0xF0F0F0);
+                killAllChildren(pcb->pid);
+                kill(pcb->pid, -1);
+            }
+            return;
+        }
+        if (ctrlPressed && (c == 'd' || c == 'D'))
+        {
+            Process *pcb = getCurrentProcess();
+            ctrlPressed = 0;
+            if (pcb->fds[0] == STDIN)
+            {
+                setEOF(pcb->fds[0]);
+            }
+            setEOF(pcb->fds[1]);
+            return;
+        }
+        bufferPos++;
+        writeToFD(STDIN, &c, 1, 0);
         if (bufferPos >= MAXSIZE)
         {
             bufferPos = 0;

@@ -2,6 +2,7 @@
 // PVS-Studio Static Code Analyzer for C, C++ and C#: http://www.viva64.com
 #include "include/lib.h"
 #include "include/syscalls.h"
+#include <stddef.h>
 
 int incTextSize()
 {
@@ -13,7 +14,7 @@ int decTextSize()
     return sysZoomOut();
 }
 
-int intLength(int num, int minLen)
+int intLength(int64_t num, int minLen)
 {
     int length = 0;
     while (num != 0)
@@ -24,7 +25,7 @@ int intLength(int num, int minLen)
     return length < minLen ? minLen : length;
 }
 
-void intToString(int num, char *buf, int minLen)
+void intToString(int64_t num, char *buf, int minLen)
 {
     int length = intLength(num, minLen);
 
@@ -50,4 +51,47 @@ void stringToInt(char *str, int *num)
 int createProcess(creationParameters *params)
 {
     return sysCreateProcess(params);
+}
+
+char *strtok(char *str, const char *delim)
+{
+    static char *input = NULL;
+    if (str != NULL)
+    {
+        input = str;
+    }
+    if (input == NULL || *input == '\0')
+    {
+        return NULL;
+    }
+
+    char *start = input;
+    while (*start && *start == *delim)
+    {
+        start++;
+    }
+
+    if (*start == '\0')
+    {
+        input = NULL;
+        return NULL;
+    }
+
+    char *end = start;
+    while (*end && *end != *delim)
+    {
+        end++;
+    }
+
+    if (*end != '\0')
+    {
+        *end = '\0';
+        input = end + 1;
+    }
+    else
+    {
+        input = end;
+    }
+
+    return start;
 }

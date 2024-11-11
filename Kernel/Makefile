@@ -1,7 +1,13 @@
 include Makefile.inc
 
+ifdef MMTYPE
+    MM := memory/buddy.c
+else
+    MM := memory/memoryManager.c
+endif
+
 KERNEL=kernel.bin
-SOURCES=$(wildcard *.c processes/*.c memory/*.c drivers/*.c)
+SOURCES=$(wildcard *.c processes/*.c drivers/*.c) $(MM)
 SOURCES_ASM=$(wildcard asm/*.asm)
 OBJECTS=$(SOURCES:.c=.o)
 OBJECTS_ASM=$(SOURCES_ASM:.asm=.o)
@@ -34,6 +40,10 @@ $(OBJDIR):
 move_objects: $(OBJDIR)
 	mv *.o $(OBJDIR)
 	mv asm/*.o $(OBJDIR)
+	mv processes/*.o $(OBJDIR)
+	mv drivers/*.o $(OBJDIR)
+	mv memory/*.o $(OBJDIR)
+
 clean:
 	rm -rf $(OBJDIR) *.bin *.elf
 

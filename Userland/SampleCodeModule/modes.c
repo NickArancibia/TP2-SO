@@ -12,10 +12,21 @@
 #include "include/processStructure.h"
 #include "include/test_util.h"
 #include "include/tests.h"
+#include "include/string.h"
+#include "include/programs.h"
 
+#define MAX_BUFF_LEN 30
+#define MAX_COMMANDS 2
+#define MAX_ARGS 5
+
+char *commands[MAX_COMMANDS] = {NULL};
+char *args[MAX_COMMANDS][MAX_ARGS] = {NULL};
+int fds[MAX_COMMANDS][2];
 char *dateTimeAux;
 int zoomAux, regAux;
-int memoryStatus[3];
+int memoryStatus[4];
+int commandsToExecute = 0;
+int pipeFlag = 0;
 
 static char *helpText[] = {"Command information is displayed below:\n\n",
                            "HELP                ->      Shows a description on each available command.\n",
@@ -32,14 +43,70 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "NICE [pid] [prio]   ->      Change the priority of the process with the given pid to prio.\n",
                            "MEMSTATUS           ->      Prints how many blocks and bytes were allocated \n",
                            "                            and how many bytes are still free.\n",
+                           "CAT                 ->      Read from the input and print the content to the output\n",
+                           "WC                  ->      Count the number of newlines from the input\n",
+                           "FILTER              ->      Read from the input and print the content to the output without vowels\n",
                            "TESTMM              ->      Test memory manager.\n",
                            "TESTPROC            ->      Test processes creation.\n",
                            "TESTPRIO            ->      Test processes priority.\n",
                            "TESTSYNC            ->      Test syncronization with semaphores.\n",
                            "TESTNOSYNC          ->      Test syncronization without semaphores.\n",
+                           "TESTPIPE            ->      Connects two process dummy that each one reads from STDIN and writes to STDOUT.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
+
+typedef int (*CommandFunc)(int *, int, char **);
+typedef struct
+{
+    char *name;
+    CommandFunc func;
+    int expectedArgs;
+    int isBuiltIn;
+} Command;
+
+int64_t dummy(uint64_t argc, char *argv[]);
+
+Command commandList[] = {
+    {"help", (CommandFunc)help, 0, 1},
+    {"clear", (CommandFunc)clear, 0, 1},
+    {"time", (CommandFunc)time, 0, 1},
+    {"date", (CommandFunc)date, 0, 1},
+    {"registers", (CommandFunc)registers, 0, 1},
+    {"yield", (CommandFunc)yield, 0, 1},
+    {"ps", (CommandFunc)ps, 0, 1},
+    {"kill", (CommandFunc)killProcess, 1, 1},
+    {"suspend", (CommandFunc)suspend, 1, 1},
+    {"resume", (CommandFunc)resume, 1, 1},
+    {"nice", (CommandFunc)nice, 2, 1},
+    {"memstatus", (CommandFunc)getMemoryStatus, 0, 1},
+    {"testmm", testMM, 1, 0},
+    {"testproc", testProc, 1, 0},
+    {"testprio", testPrio, 0, 0},
+    {"testsync", testSync, 1, 0},
+    {"testnosync", testNoSync, 1, 0},
+    {"testpipe", testPipe, 0, 0},
+    {"cat", (CommandFunc)catProgram, 0, 0},
+    {"wc", (CommandFunc)wcProgram, 0, 0},
+    {"filter", (CommandFunc)filterProgram, 0, 0},
+    {"loop", (CommandFunc)loopProgram, 1, 0},
+    {"philo", (CommandFunc)philo, 1, 0},
+    {NULL, (CommandFunc)notFound, 0, 1} // Sentinel value to mark the end of the array
+};
+
+int createProgram(char *name, int argc, char **argv, int priority, entryPoint entry, int *fds, int isForeground)
+{
+    creationParameters params;
+    params.name = name;
+    params.argc = argc;
+    params.argv = argv;
+    params.priority = priority;
+    params.entryPoint = entry;
+    params.foreground = isForeground;
+    params.fds[0] = fds[0];
+    params.fds[1] = fds[1];
+    return createProcess(&params);
+}
 
 void help(void)
 {
@@ -136,12 +203,12 @@ void ps()
     for (int i = 0; processes[i].pid != -1; i++)
     {
         printf("PID=%d | Name=",
-               processes[i].pid);
+               (int32_t)processes[i].pid);
         print(processes[i].name);
         printf(" | ParentPID=%d | Priority=%d | Foreground=%d | State=",
-               processes[i].parentpid,
-               processes[i].priority,
-               processes[i].foreground);
+               (int32_t)processes[i].parentpid,
+               (int32_t)processes[i].priority,
+               (int32_t)processes[i].foreground);
         print(states[processes[i].state]);
         printf(" | StackBase=0x");
         print(hexToString((uint64_t)processes[i].stackBase));
@@ -152,129 +219,402 @@ void ps()
     sysFreePS(processes);
 }
 
-void printProcessesInformation()
-{
-    PID pid;
-    creationParameters params;
-    params.name = "ps";
-    params.argc = 0;
-    params.argv = NULL;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)ps;
-    params.foreground = 1;
-    pid = createProcess(&params);
-    sysWait(pid, NULL);
-    return;
-}
-
 void getMemoryStatus()
 {
     sysGetMemStatus(memoryStatus);
     printf("Memoria total= %d B |  ", memoryStatus[3]);
-    printf("Memoria ocupada ocupados= %d B |  ", memoryStatus[1]);
+    printf("Memoria ocupada= %d B (%d %)|  ", memoryStatus[1], memoryStatus[1] * 100 / memoryStatus[3]);
     printf("Memoria libre= %d B | ", memoryStatus[2]);
     printf("Bloques ocupados= %d\n", memoryStatus[0]);
 }
 
-void testProc(void)
+void killProcess(char *argv[])
 {
+    int pid = satoi(argv[0]);
+    if (pid == -1)
+    {
+        perror("Invalid PID\n");
+        return;
+    }
+    if (pid == sysGetPID())
+    {
+        perror("You can't kill the shell\n");
+        return;
+    }
+    if (pid == 1)
+    {
+        perror("You can't kill idle\n");
+        return;
+    }
+    sysKill(pid);
+}
+
+void suspend(char *argv[])
+{
+    int pid = satoi(argv[0]);
+    if (pid == -1)
+    {
+        perror("Invalid PID\n");
+        return;
+    }
+    if (pid == sysGetPID())
+    {
+        perror("You can't suspend the shell\n");
+        return;
+    }
+    if (pid == 1)
+    {
+        perror("You can't suspend idle\n");
+        return;
+    }
+    sysSuspendProcess(pid);
+}
+
+void resume(char *argv[])
+{
+    int pid = satoi(argv[0]);
+    if (pid == -1)
+    {
+        perror("Invalid PID\n");
+        return;
+    }
+    sysResumeProcess(pid);
+}
+
+void nice(char *argv[])
+{
+    int pid = satoi(argv[0]);
+    int prio = satoi(argv[1]);
+    if (pid == -1)
+    {
+        perror("Invalid PID\n");
+        return;
+    }
+    if (prio < 0 || prio > 5)
+    {
+        perror("Invalid priority\n");
+        return;
+    }
+    sysNice(pid, prio);
+}
+
+int philo(int *fds, int isForeground, char *argv[])
+{
+    if (satoi(argv[0]) < 2)
+    {
+        perror("You need at least 2 philosophers\n");
+        return -1;
+    }
+    return createProgram("philo", 1, argv, 1, (entryPoint)philoStart, fds, isForeground);
+}
+
+int wcProgram(int *fds, int isForeground, char *args[])
+{
+    return createProgram("wc", 0, NULL, 1, (entryPoint)wc, fds, isForeground);
+}
+
+int loopProgram(int *fds, int isForeground, char *args[])
+{
+    return createProgram("loop", 1, args, 1, (entryPoint)loop, fds, isForeground);
+}
+
+int catProgram(int *fds, int isForeground, char *args[])
+{
+    return createProgram("cat", 0, NULL, 1, (entryPoint)cat, fds, isForeground);
+}
+
+int filterProgram(int *fds, int isForeground, char *args[])
+{
+    return createProgram("filter", 0, NULL, 1, (entryPoint)filter, fds, isForeground);
+}
+
+int testProc(int *fds, int isForeground, char *args[])
+{
+    char count[MAX_BUFF_LEN];
+    intToString(satoi(args[0]), count, 0);
     sysHideCursor();
     print("You are testing processes\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    print("Press 'q' to finish the test\n\n");
-    char *argv[] = {"6", 0};
-    creationParameters params;
-    params.name = "test_processes";
-    params.argc = 1;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_processes;
-    params.foreground = 1;
-
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    char *argv[] = {count, 0};
+    return createProgram("test_processes", 1, argv, 1, (entryPoint)test_processes, fds, isForeground);
 }
 
-void testPrio()
+int testPrio(int *fds, int isForeground, char *args[])
 {
     sysHideCursor();
     print("You are testing processes priorities\n");
     print("Below you will see information on running processes\n");
     print("Each process will print its PID an amount of times based on its priority\n\n");
-    PID pid;
-    creationParameters params;
-    params.name = "test_prio";
-    params.argc = 0;
-    params.argv = NULL;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_prio;
-    params.foreground = 1;
-    sysSleep(1, 0);
-    pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    return createProgram("test_prio", 0, NULL, 1, (entryPoint)test_prio, fds, isForeground);
 }
 
-void testMM(void)
+int testMM(int *fds, int isForeground, char *args[])
 {
+    char max[MAX_BUFF_LEN];
+    intToString(satoi(args[0]), max, 0);
     sysHideCursor();
     print("You are testing memory manager\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    print("Press 'q' to finish the test\n\n");
-    char *argv[] = {"25000", 0};
-    creationParameters params;
-    params.name = "test_mm";
-    params.argc = 1;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_mm;
-    params.foreground = 1;
-
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    char *argv[] = {max, 0};
+    return createProgram("test_mm", 2, argv, 1, (entryPoint)test_mm, fds, isForeground);
 }
 
-void testSync(void)
+int testSync(int *fds, int isForeground, char *args[])
 {
+    char start[MAX_BUFF_LEN];
+    intToString(satoi(args[0]), start, 0);
     sysHideCursor();
     print("You are testing syncronization with semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"1", "1", 0};
-    creationParameters params;
-    params.name = "test_sync";
-    params.argc = 2;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_sync;
-    params.foreground = 1;
-
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
-    sysShowCursor();
-    printf("\n");
+    char *argv[] = {start, "1", 0};
+    return createProgram("test_sync", 2, argv, 1, (entryPoint)test_sync, fds, isForeground);
 }
 
-void testNoSync(void)
+int testNoSync(int *fds, int isForeground, char *args[])
 {
+    char start[MAX_BUFF_LEN];
+    intToString(satoi(args[0]), start, 0);
     sysHideCursor();
     print("You are testing syncronization without semaphores\n");
     print("If an error takes place, the proper message will appear\nOtherwise, nothing will happen\n");
-    char *argv[] = {"20", "0", 0};
-    creationParameters params;
-    params.name = "test_sync";
-    params.argc = 2;
-    params.argv = argv;
-    params.priority = 1;
-    params.entryPoint = (entryPoint)test_sync;
-    params.foreground = 1;
+    char *argv[] = {start, "0", 0};
+    return createProgram("test_nosync", 2, argv, 1, (entryPoint)test_sync, fds, isForeground);
+}
 
-    int pid = createProcess(&params);
-    sysWait(pid, NULL);
+int64_t dummy(uint64_t argc, char *argv[])
+{
+    char buffer[100] = {'\0'};
+    while (scanf(buffer, 100) != EOF)
+    {
+        if (strcmp(buffer, "exit") == 0)
+        {
+            return 0;
+        }
+    }
+    return 0;
+}
+
+int testPipe(int *fileDescriptors, int isForeground, char *args[])
+{
+    print("Testing pipes\n");
+    print("Two processes were created, one reads from STDIN, the other writes to STDOUT \n");
+    print("this test works like 'dummy | dummy'\n");
+    print("Type 'exit' and press enter to exit\n");
+    int pipe[2];
+    int pids[2];
+    sysPipe(pipe);
+    int fds[2][2];
+    fds[0][0] = STDIN;
+    fds[0][1] = pipe[1];
+    fds[1][0] = pipe[0];
+    fds[1][1] = STDOUT;
+    pids[0] = createProgram("input", 0, NULL, 1, (entryPoint)dummy, fds[0], isForeground);
+    pids[1] = createProgram("output", 0, NULL, 1, (entryPoint)dummy, fds[1], isForeground);
+    if (isForeground)
+    {
+        sysWait(pids[0], NULL);
+        sysWait(pids[1], NULL);
+    }
+    return 0;
+}
+
+int closeFDsmadeByParser()
+{
+    for (int i = 0; i < MAX_COMMANDS; i++)
+    {
+        sysCloseFD(fds[i][0]);
+        sysCloseFD(fds[i][1]);
+    }
+    return 0;
+}
+
+void executeCommands(int isForeground[MAX_COMMANDS])
+{
+    char buffer[3] = {'0', 0, 0};
+    int execute[MAX_COMMANDS];
+    int pids[MAX_COMMANDS] = {0};
+    int testPipeFlag = 0;
+    for (int i = 0; i < commandsToExecute; i++)
+    {
+        int expectedArgs = 0;
+        int isBuiltIn = 0;
+
+        CommandFunc func = NULL;
+        int j;
+        for (j = 0; commandList[j].name != NULL; j++)
+        {
+            if (strcmp(commands[i], commandList[j].name) == 0)
+            {
+                if (strcmp(commandList[j].name, "testpipe") == 0)
+                {
+                    testPipeFlag = 1;
+                }
+                func = commandList[j].func;
+                expectedArgs = commandList[j].expectedArgs;
+                isBuiltIn = commandList[j].isBuiltIn;
+                break;
+            }
+        }
+
+        if (func == NULL)
+        {
+            closeFDsmadeByParser();
+            notFound(commands[i]);
+            return;
+        }
+
+        if (isBuiltIn && !isForeground[i] && !pipeFlag)
+        {
+            closeFDsmadeByParser();
+            perror("Error: Cannot run built-in commands in background\n");
+            return;
+        }
+
+        for (int k = 0; k < expectedArgs; k++)
+        {
+            if (args[i][k] == NULL)
+            {
+                intToString(expectedArgs, buffer, 0);
+                closeFDsmadeByParser();
+                perror("Error: Too few arguments for command '");
+                perror(commands[i]);
+                perror("'\n");
+                perror("Expected: ");
+                perror(buffer);
+                perror(" args\n");
+                return;
+            }
+        }
+
+        if (args[i][expectedArgs] != NULL)
+        {
+            if (expectedArgs != 0)
+            {
+                intToString(expectedArgs, buffer, 0);
+            }
+            closeFDsmadeByParser();
+            perror("Error: Invalid number of arguments for command '");
+            perror(commands[i]);
+            perror("'\n");
+            perror("Expected: ");
+            perror(buffer);
+            perror(" args\n");
+            return;
+        }
+        execute[i] = j;
+    }
+    if (pipeFlag && testPipeFlag)
+    {
+        closeFDsmadeByParser();
+        perror("Error: Cannot pipe testpipe command\n");
+        return;
+    }
+    sysHideCursor();
+    for (int i = 0; i < commandsToExecute; i++)
+    {
+        if (!commandList[execute[i]].isBuiltIn)
+        {
+            pids[i] = commandList[execute[i]].func(fds[i], isForeground[i], args[i]);
+        }
+        else if (commandList[execute[i]].isBuiltIn && !pipeFlag)
+        {
+            void (*func)(char **) = (void (*)(char **))commandList[execute[i]].func;
+            func(args[i]);
+            return;
+        }
+
+        else
+        {
+            pids[i] = createProgram(commandList[execute[i]].name, commandList[execute[i]].expectedArgs, args[i], 1, (entryPoint)commandList[execute[i]].func, fds[i], isForeground[i]);
+        }
+    }
+
+    for (int i = 0; i < commandsToExecute; i++)
+    {
+        if (isForeground[commandsToExecute - 1])
+        {
+            sysWait(pids[i], NULL);
+        }
+    }
     sysShowCursor();
-    printf("\n");
+}
+
+void parseConsolePrompt(char *consolePrompt)
+{
+    char *token;
+    int pipe[2];
+    token = strtok(consolePrompt, " ");
+    int argsc = 0, commandsCount = 0;
+    pipeFlag = 0;
+    memset(commands, 0, sizeof(commands));
+    memset(args, 0, sizeof(args));
+    for (int i = 0; i < MAX_COMMANDS; i++)
+    {
+        fds[i][0] = STDIN;
+        fds[i][1] = STDOUT;
+    }
+    commandsToExecute = 0;
+    int isForeground[MAX_COMMANDS] = {1, 1};
+    while (token != NULL)
+    {
+        commands[commandsCount] = token;
+        token = strtok(NULL, " ");
+        argsc = 0;
+
+        while (token != NULL && strcmp(token, "|") != 0 && strcmp(token, "&") != 0)
+        {
+            if (argsc >= MAX_ARGS)
+            {
+                closeFDsmadeByParser();
+                perror("Error: You exceeded the maximum number of arguments\n");
+                return;
+            }
+            args[commandsCount][argsc++] = token;
+            token = strtok(NULL, " ");
+        }
+
+        args[commandsCount][argsc] = NULL;
+
+        if (token != NULL && strcmp(token, "&") == 0)
+        {
+            isForeground[commandsCount] = 0;
+            token = strtok(NULL, " ");
+            if (token != NULL && strcmp(token, "|") != 0)
+            {
+                closeFDsmadeByParser();
+                perror("Error: Invalid command, NULL or '|' expected after '&'\n");
+                return;
+            }
+        }
+
+        if (token != NULL && strcmp(token, "|") == 0)
+        {
+            if (!isForeground[commandsCount])
+            {
+                closeFDsmadeByParser();
+                perror("Error: Cannot pipe background commands\n");
+                return;
+            }
+            if (pipeFlag)
+            {
+                closeFDsmadeByParser();
+                perror("Error: Only one pipe is allowed\n");
+                return;
+            }
+            pipeFlag = 1;
+            token = strtok(NULL, " ");
+            if (token == NULL || strcmp(token, "|") == 0 || strcmp(token, "&") == 0)
+            {
+                perror("Error: another command was expected\n");
+                return;
+            }
+            sysPipe(pipe);
+            fds[commandsCount][1] = pipe[1];
+            fds[commandsCount + 1][0] = pipe[0];
+        }
+
+        commandsCount++;
+    }
+    commandsToExecute = commandsCount;
+    executeCommands(isForeground);
 }

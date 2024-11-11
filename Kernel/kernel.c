@@ -7,6 +7,7 @@
 #include <fonts.h>
 #include "include/time.h"
 #include <defs.h>
+#include "../include/fileDescriptors.h"
 #include "interrupts.h"
 #include "time.h"
 #include "./include/memoryManager.h"
@@ -66,7 +67,7 @@ void idle()
 
 int main()
 {
-	
+
 	load_idt();
 
 	initializeMemoryMM(memoryStart, memorySize);
@@ -76,9 +77,10 @@ int main()
 
 	drawBootLogo();
 	playBootSound();
-	
+
 	vdClearScreen();
 	initializeSems();
+	initFileDescriptors();
 	initProcesses();
 	creationParameters params;
 	params.name = "init";
@@ -87,15 +89,19 @@ int main()
 	params.priority = DEFAULT_PRIORITY;
 	params.entryPoint = (entryPoint)&idle;
 	params.foreground = 1;
+	params.fds[0] = STDIN;
+	params.fds[1] = STDOUT;
 	createProcess(&params);
-	initScheduler();
 	params.name = "shell";
 	params.entryPoint = (entryPoint)sampleCodeModuleAddress;
 	params.foreground = 1;
 	params.argc = 0;
 	params.argv = NULL;
-	params.priority = DEFAULT_PRIORITY;
+	params.priority = MAX_PRIORITY;
+	params.fds[0] = STDIN;
+	params.fds[1] = STDOUT;
 	createProcess(&params);
+	initScheduler();
 	forceSwitchContent();
 
 	return 0;

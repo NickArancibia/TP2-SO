@@ -13,8 +13,8 @@
 #include "fonts.h"
 #include <scheduler.h>
 #include "semaphore.h"
-
-#define HANDLER_SIZE 47
+#include "../include/fileDescriptors.h"
+#define HANDLER_SIZE 52
 
 static int (*syscallHandlers[])() = {
     read, write, printRegs, incSize, decSize, getZoomLevel, setZoomLevel, upArrowValue, leftArrowValue, downArrowValue,
@@ -22,8 +22,8 @@ static int (*syscallHandlers[])() = {
     showCursor, printCursor, getCurrentSeconds, getCurrentMinutes, getCurrentHours, getCurrentDay,
     getCurrentMonth, getCurrentYear, isctrlPressed, cleanKbBuffer, (int (*)(void))malloc, (int (*)(void))free,
     (int (*)(void))processCreate, (int (*)(void))getProcesspid, (int (*)(void))getProcessParentpid, (int (*)(void))getPS, (int (*)(void))freePS, yield,
-    suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus, 
-    sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post};
+    suspendProcess, resumeProcess, (int (*)(void))killProcess, (int (*)(void))exit, (int (*)(void))wait, (int (*)(void))nice, (int (*)(void))getMemStatus,
+    sem_open, sem_close, (int (*)(void))sem_wait, (int (*)(void))sem_post, getFDs, pipes, changeFDs, readAtCurrentPosition, closeFileDescriptor};
 
 uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r10, uint64_t r8, uint64_t rax)
 {
@@ -37,32 +37,12 @@ uint64_t syscallDispatcher(uint64_t rdi, uint64_t rsi, uint64_t rdx, uint64_t r1
 
 int read(uint64_t fd, char *buf, uint64_t count)
 {
-    if (fd != STDIN)
-    { // Only can read from standard input
-        return 0;
-    }
-    uint64_t sizeRead = 0;
-    unsigned char lastRead = '\0';
-    while (sizeRead != count && !kbisBufferEmpty())
-    {
-        lastRead = kbreadBuf();
-        buf[sizeRead++] = lastRead;
-    }
-    return sizeRead; // If we return sizeRead-1 it means we stopped at '\n'
+    return readFromFD(fd, buf, count);
 }
 
 int write(uint64_t fd, char *buf, uint64_t count, uint64_t hexColor)
 {
-    if (fd != STDOUT) // Only can write in STDOUT
-        return 0;
-    int i;
-    char toPrint[2] = {0, 0};
-    for (i = 0; i < count; i++)
-    {
-        toPrint[0] = buf[i];
-        vdPrint(toPrint, hexColor);
-    }
-    return i;
+    return writeToFD(fd, buf, count, hexColor);
 }
 
 int incSize()
@@ -274,12 +254,13 @@ int resumeProcess(PID pid)
 
 int killProcess(PID pid)
 {
-    return kill(pid);
+    return kill(pid, -1);
 }
 
 void exit()
 {
-    kill(getpid());
+    killAllChildren(getpid());
+    kill(getpid(), 0);
 }
 
 void wait(PID pidToWait, int *wstatus)
@@ -297,18 +278,49 @@ void getMemStatus(int *memStatus)
     getMemoryStatus(memStatus);
 }
 
-int sem_open( char *sem_id, int initialValue ){
-    return semOpen(sem_id,initialValue);
+int sem_open(char *sem_id, int initialValue)
+{
+    return semOpen(sem_id, initialValue);
 }
 
-void sem_wait( char *sem_id ){
-    semWait(sem_id);
+void sem_wait(sem_t sem)
+{
+    semWait(sem);
 }
 
-void sem_post( char *sem_id ){
-    semPost(sem_id);
+void sem_post(sem_t sem)
+{
+    semPost(sem);
 }
 
-int sem_close( char *sem_id ){
-   return semClose(sem_id);
+int sem_close(sem_t sem)
+{
+    return semClose(sem);
+}
+
+int getFDs(int fds[2])
+{
+    return getFileDescriptors(fds);
+}
+
+int pipes(int fds[2])
+{
+    if (createPipe(fds) == -1)
+        return -1;
+    return 0;
+}
+
+int changeFDs(int fds[2])
+{
+    return changeFileDescriptors(fds);
+}
+
+int readAtCurrentPosition(uint64_t fd, char *buf, uint64_t count)
+{
+    return readFromFDAt(fd, buf, count, getReadPos(fd));
+}
+
+int closeFileDescriptor(uint64_t fd)
+{
+    return closeFD(fd);
 }

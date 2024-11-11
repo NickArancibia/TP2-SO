@@ -29,7 +29,7 @@ int decTextSize(void);
  * If the calculated length is lower than minLen, returns minLen.
  *
  */
-int intLength(int num, int minLen);
+int intLength(int64_t num, int minLen);
 
 /**
  * Receives a num, buffer and minLen. Copies the number in the buffer.
@@ -37,7 +37,7 @@ int intLength(int num, int minLen);
  * 0's up to minLen
  * */
 
-void intToString(int num, char *buf, int minLen);
+void intToString(int64_t num, char *buf, int minLen);
 
 /**
  * Used to create a new process
@@ -49,5 +49,15 @@ int createProcess(creationParameters *params);
  * Converts the string to an int and leaves it in num.
  */
 void stringToInt(char *str, int *num);
+
+/**
+ * Receives a string and a delimiter.
+ * Tokenizes the string dividing it according to the delimiter
+ * If str is not NULL, returns the first token.
+ * If str is NULL, returns the next token.
+ *
+ * If no more tokens are found, returns NULL.
+ */
+char *strtok(char *str, const char *delim);
 
 #endif

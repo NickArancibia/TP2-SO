@@ -9,9 +9,17 @@
 #include <interrupts.h>
 #include <scheduler.h>
 #include <videoDriver.h>
-
+#include "../include/fileDescriptors.h"
 Process processes[MAX_PROCESSES];
-PID current;
+
+PID getCurrentPPID(Process *currentProcess, PID currentPID)
+{
+    if (currentProcess == NULL)
+    {
+        return currentPID == SHELLPID ? INITPID : INITPID - 1;
+    }
+    return currentProcess->pid;
+}
 
 int isValidPID(PID pid)
 {
@@ -50,14 +58,12 @@ int processLoader(int argc, char *argv[], entryPoint entry)
 {
     int returnValue = entry(argc, argv);
     PID processPid = getpid();
-    unblockWaitingProcesses(processPid, returnValue);
-    kill(processPid);
+    kill(processPid, returnValue);
     return returnValue;
 }
 
 PID initProcesses(void)
 {
-    current = 1;
     for (int i = 0; i < MAX_PROCESSES; i++)
     {
         processes[i].pid = i + 1;
@@ -94,7 +100,7 @@ int getFreeProcess()
 PID createProcess(creationParameters *params)
 {
 
-    if (params == NULL || !checkPriority(params->priority) || params->argc < 0 || params->entryPoint == NULL || !checkName(params->name) || current > MAX_PID)
+    if (params == NULL || !checkPriority(params->priority) || params->argc < 0 || params->entryPoint == NULL || !checkName(params->name))
     {
         return -1;
     }
@@ -107,41 +113,50 @@ PID createProcess(creationParameters *params)
         return -1;
     }
 
+    if (args == NULL && params->argc != 0)
+    {
+        freeMM(stackLimit);
+        return -1;
+    }
     // Copy args
-
     for (int i = 0; i < params->argc; i++)
     {
-        int len = strlen(params->argv[i]);
-        if ((args[i] = mallocMM(len + 1)) == NULL)
+        if (args != NULL)
         {
-            for (int j = 0; j < i; j++)
+            int len = strlen(params->argv[i]);
+            if ((args[i] = mallocMM(len + 1)) == NULL)
             {
-                freeMM(args[j]);
+                for (int j = 0; j < i; j++)
+                {
+                    freeMM(args[j]);
+                }
+                freeMM(args);
+                freeMM(stackLimit);
+                return -1;
             }
-            freeMM(args);
-            freeMM(stackLimit);
-            return -1;
-        }
 
-        memcpy(args[i], params->argv[i], len + 1);
+            memcpy(args[i], params->argv[i], len + 1);
+        }
     }
 
-    Process *currentProcess;
     int allocatedProcess = getFreeProcess();
     if (allocatedProcess == -1)
     {
         freeMM(stackLimit);
-        for (int i = 0; i < params->argc; i++)
+        if (args != NULL)
         {
-            freeMM(args[i]);
+            for (int i = 0; i < params->argc; i++)
+            {
+                freeMM(args[i]);
+            }
+            freeMM(args);
         }
-        freeMM(args);
         return -1;
     }
 
     // Set current process Information
     memcpy(processes[allocatedProcess].name, params->name, strlen(params->name) + 1);
-    processes[allocatedProcess].parentpid = (currentProcess = getCurrentProcess()) == NULL ? 0 : currentProcess->pid;
+    processes[allocatedProcess].parentpid = getCurrentPPID(getCurrentProcess(), allocatedProcess + 1);
     processes[allocatedProcess].waitingPID = NONPID;
     processes[allocatedProcess].argc = params->argc;
     processes[allocatedProcess].argv = args;
@@ -151,10 +166,10 @@ PID createProcess(creationParameters *params)
     processes[allocatedProcess].state = READY;
     processes[allocatedProcess].stackBase = stackLimit + STACK_SIZE;
     processes[allocatedProcess].stackEnd = setupStack(params->argc, args, params->entryPoint, processes[allocatedProcess].stackBase, (entryPoint)processLoader);
+    memcpy(processes[allocatedProcess].fds, params->fds, 2 * sizeof(int));
 
     schedule(&(processes[allocatedProcess]));
     return processes[allocatedProcess].pid;
-    // TODO: Handle entryPoint return value
 }
 
 int getProcessesCount()
@@ -210,7 +225,7 @@ void freeProcessesInformation(Process *processesInfo)
     freeMM(processesInfo);
 }
 
-int kill(PID pid)
+int kill(PID pid, int returnValue)
 {
     if (pid <= INITPID || pid > MAX_PID)
         return -1;
@@ -232,11 +247,30 @@ int kill(PID pid)
     pcb->state = DEAD;
     pcb->argv = NULL;
     pcb->argc = 0;
+    closeFD(pcb->fds[0]);
+    closeFD(pcb->fds[1]);
     garbageCollect();
+    unblockWaitingProcesses(pid, returnValue);
 
     if (getCurrentProcess()->pid == pid)
     {
         forceSwitchContent();
+    }
+    return 0;
+}
+
+int killAllChildren(PID pid)
+{
+    if (!isValidPID(pid))
+    {
+        return -1;
+    }
+    for (int i = 0; i < MAX_PROCESSES; i++)
+    {
+        if (processes[i].parentpid == pid)
+        {
+            kill(processes[i].pid, -1);
+        }
     }
     return 0;
 }
@@ -248,5 +282,27 @@ int changeProccessPriority(PID pid, Priority priority)
         return -1;
     }
     processes[pid - 1].priority = priority;
+    return 0;
+}
+
+int getFileDescriptors(int *fds)
+{
+    Process *currentProcess = getCurrentProcess();
+    if (currentProcess == NULL)
+    {
+        return -1;
+    }
+    memcpy(fds, currentProcess->fds, 2 * sizeof(int));
+    return 0;
+}
+
+int changeFileDescriptors(int *fds)
+{
+    Process *currentProcess = getCurrentProcess();
+    if (currentProcess == NULL || fds == NULL || fds[0] < 0 || fds[1] < 0 || fds[0] >= MAX_FDS || fds[1] >= MAX_FDS)
+    {
+        return -1;
+    }
+    memcpy(currentProcess->fds, fds, 2 * sizeof(int));
     return 0;
 }

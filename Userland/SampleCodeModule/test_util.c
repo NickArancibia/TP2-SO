@@ -76,7 +76,7 @@ void endless_loop_print(uint64_t wait)
 
   while (1)
   {
-    printf("%d ", pid);
+    printf("%d ", (int32_t)pid);
     bussy_wait(MINOR_WAIT);
   }
 }
