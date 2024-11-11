@@ -487,12 +487,34 @@ void executeCommands(int isForeground[MAX_COMMANDS])
             return;
         }
 
+        for (int k = 0; k < expectedArgs; k++)
+        {
+            if(args[i][k] == NULL)
+            {
+                char buffer[3]  = {'\0'};
+                intToString(expectedArgs, buffer, 0);
+                closeFDsmadeByParser();
+                perror("Error: Too few arguments for command '");
+                perror(commands[i]);
+                perror("'\n");
+                perror("Expected: ");
+                perror(buffer);
+                print(" arg/s\n");
+                return;
+            }
+        }
+        
         if (args[i][expectedArgs] != NULL)
         {
+            char buffer[3]  = {'\0'};
+            intToString(expectedArgs, buffer, 0);
             closeFDsmadeByParser();
             perror("Error: Invalid number of arguments for command '");
             perror(commands[i]);
             perror("'\n");
+            perror("Expected: ");
+            perror(buffer);
+            print(" arg/s\n");
             return;
         }
         execute[i] = j;
