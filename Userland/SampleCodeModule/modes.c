@@ -51,7 +51,7 @@ static char *helpText[] = {"Command information is displayed below:\n\n",
                            "TESTPRIO            ->      Test processes priority.\n",
                            "TESTSYNC            ->      Test syncronization with semaphores.\n",
                            "TESTNOSYNC          ->      Test syncronization without semaphores.\n",
-                           "TESTPIPE            ->      Test pipes.\n",
+                           "TESTPIPE            ->      Connects two process dummy that each one reads from STDIN and writes to STDOUT.\n",
                            "end"};
 
 char *states[5] = {"Ready", "Running", "Blocked", "Dead", "Foreground"};
@@ -65,8 +65,7 @@ typedef struct
     int isBuiltIn;
 } Command;
 
-int64_t outputP(uint64_t argc, char *argv[]);
-int64_t inputP(uint64_t argc, char *argv[]);
+int64_t dummy(uint64_t argc, char *argv[]);
 
 Command commandList[] = {
     {"help", (CommandFunc)help, 0, 1},
@@ -86,9 +85,7 @@ Command commandList[] = {
     {"testprio", testPrio, 0, 0},
     {"testsync", testSync, 1, 0},
     {"testnosync", testNoSync, 1, 0},
-    {"testpipe", testPipe, 1, 0},
-    {"inputalone", (CommandFunc)inputP, 0, 1},
-    {"outputalone", (CommandFunc)outputP, 0, 1},
+    {"testpipe", testPipe, 0, 0},
     {"cat", (CommandFunc)catProgram, 0, 0},
     {"wc", (CommandFunc)wcProgram, 0, 0},
     {"filter", (CommandFunc)filterProgram, 0, 0},
@@ -384,21 +381,7 @@ int testNoSync(int *fds, int isForeground, char *args[])
     return createProgram("test_nosync", 2, argv, 1, (entryPoint)test_sync, fds, isForeground);
 }
 
-int64_t inputP(uint64_t argc, char *argv[])
-{
-    char buffer[100] = {'\0'};
-
-    while (scanf(buffer, 100) != EOF)
-    {
-        if (strcmp(buffer, "exit") == 0)
-        {
-            return 0;
-        }
-    }
-    return 0;
-}
-
-int64_t outputP(uint64_t argc, char *argv[])
+int64_t dummy(uint64_t argc, char *argv[])
 {
     char buffer[100] = {'\0'};
     while (scanf(buffer, 100) != EOF)
@@ -415,7 +398,7 @@ int testPipe(int *fileDescriptors, int isForeground, char *args[])
 {
     print("Testing pipes\n");
     print("Two processes were created, one reads from STDIN, the other writes to STDOUT \n");
-    print("this test works like 'input | output'\n");
+    print("this test works like 'dummy | dummy'\n");
     print("Type 'exit' and press enter to exit\n");
     int pipe[2];
     int pids[2];
@@ -425,8 +408,8 @@ int testPipe(int *fileDescriptors, int isForeground, char *args[])
     fds[0][1] = pipe[1];
     fds[1][0] = pipe[0];
     fds[1][1] = STDOUT;
-    pids[0] = createProgram("inputP", 0, NULL, 1, (entryPoint)inputP, fds[0], isForeground);
-    pids[1] = createProgram("outputP", 0, NULL, 1, (entryPoint)outputP, fds[1], isForeground);
+    pids[0] = createProgram("input", 0, NULL, 1, (entryPoint)dummy, fds[0], isForeground);
+    pids[1] = createProgram("output", 0, NULL, 1, (entryPoint)dummy, fds[1], isForeground);
     if (isForeground)
     {
         sysWait(pids[0], NULL);
