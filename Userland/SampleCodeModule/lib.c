@@ -14,7 +14,7 @@ int decTextSize()
     return sysZoomOut();
 }
 
-int intLength(int num, int minLen)
+int intLength(int64_t num, int minLen)
 {
     int length = 0;
     while (num != 0)

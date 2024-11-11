@@ -29,7 +29,7 @@ int decTextSize(void);
  * If the calculated length is lower than minLen, returns minLen.
  *
  */
-int intLength(int num, int minLen);
+int intLength(int64_t num, int minLen);
 
 /**
  * Receives a num, buffer and minLen. Copies the number in the buffer.
