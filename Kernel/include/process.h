@@ -9,6 +9,7 @@
 #define MAX_PID MAX_PROCESSES
 #define NONPID -1
 #define INITPID 1
+#define SHELLPID 2
 
 #include "defs.h"
 #include <stdint.h>

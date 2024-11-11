@@ -116,8 +116,9 @@ void updateBuffer()
         if (ctrlPressed && (c == 'c' || c == 'C'))
         {
             Process *pcb = getCurrentProcess();
-            if (pcb->foreground && pcb->pid != 1 && pcb->pid != 2)
+            if (pcb->foreground && pcb->pid != INITPID && pcb->pid != SHELLPID)
             {
+                writeToFD(STDOUT, "^C\n", 3, 0xF0F0F0);
                 killAllChildren(pcb->pid);
                 kill(pcb->pid, -1);
             }
