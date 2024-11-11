@@ -232,10 +232,11 @@ void drawLetter(int x, int y, char letter, uint32_t color)
         vdPrintRect(x + 7, y + 10, 6, 6, color);
         break;
     case 'E':
-        vdPrintRect(x, y, 20, 5, color);
-        vdPrintRect(x, y + 5, 5, 25, color);
-        vdPrintRect(x, y + 15, 15, 5, color);
-        vdPrintRect(x, y + 30, 20, 5, color);
+        int initialHeight = 5;
+        vdPrintRect(x, y, 20, initialHeight, color);
+        vdPrintRect(x, y + 5, 5, initialHeight + 20, color);
+        vdPrintRect(x, y + 15, 15, initialHeight, color);
+        vdPrintRect(x, y + 30, 20, initialHeight, color);
         break;
     case 'R':
         vdPrintRect(x, y, 5, 35, color);
