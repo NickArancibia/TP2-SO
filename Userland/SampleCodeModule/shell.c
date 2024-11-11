@@ -22,5 +22,6 @@ int init()
         sysShowCursor();
         scanf(commandPrompt, 64);
         parseConsolePrompt(commandPrompt);
+        sysShowCursor();
     }
 }

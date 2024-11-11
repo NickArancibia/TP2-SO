@@ -430,7 +430,7 @@ int closeFDsmadeByParser()
 
 void executeCommands(int isForeground[MAX_COMMANDS])
 {
-
+    char buffer[3] = {'0', 0, 0};
     int execute[MAX_COMMANDS];
     int pids[MAX_COMMANDS] = {0};
     int testPipeFlag = 0;
@@ -472,9 +472,8 @@ void executeCommands(int isForeground[MAX_COMMANDS])
 
         for (int k = 0; k < expectedArgs; k++)
         {
-            if(args[i][k] == NULL)
+            if (args[i][k] == NULL)
             {
-                char buffer[3]  = {'\0'};
                 intToString(expectedArgs, buffer, 0);
                 closeFDsmadeByParser();
                 perror("Error: Too few arguments for command '");
@@ -482,22 +481,24 @@ void executeCommands(int isForeground[MAX_COMMANDS])
                 perror("'\n");
                 perror("Expected: ");
                 perror(buffer);
-                print(" arg/s\n");
+                perror(" args\n");
                 return;
             }
         }
-        
+
         if (args[i][expectedArgs] != NULL)
         {
-            char buffer[3]  = {'\0'};
-            intToString(expectedArgs, buffer, 0);
+            if (expectedArgs != 0)
+            {
+                intToString(expectedArgs, buffer, 0);
+            }
             closeFDsmadeByParser();
             perror("Error: Invalid number of arguments for command '");
             perror(commands[i]);
             perror("'\n");
             perror("Expected: ");
             perror(buffer);
-            print(" arg/s\n");
+            perror(" args\n");
             return;
         }
         execute[i] = j;
